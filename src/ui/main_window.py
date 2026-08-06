@@ -1,6 +1,6 @@
 """
-Ventana principal - Interfaz personalizada Sarah Lee Olivera
-Con panel de recursos y filtrados de casos
+Ventana principal mejorada - Interfaz profesional
+Sarah Lee Olivera - Asistente ONG
 """
 
 import customtkinter as ctk
@@ -11,6 +11,7 @@ from PIL import Image
 from .case_input import CaseInputFrame
 from .results_panel import ResultsFrame
 from .resources_panel import ResourcesPanel
+from .dashboard import DashboardPanel
 from .branding import BRAND_COLORS, AUTHOR_BIO
 from .styles import FONTS
 
@@ -108,20 +109,20 @@ class AboutPanel(ctk.CTkFrame):
 
 
 class MainWindow:
-    """Ventana principal con interfaz personalizada."""
+    """Ventana principal profesional."""
     
     def __init__(self):
         """Inicializa la ventana."""
         self.root = ctk.CTk()
-        self.root.title("🆘 Asistente ONG - Sarah Lee Olivera")
-        self.root.geometry("1800x850")
+        self.root.title("🆘 Asistente ONG - Triaje y Canalización")
+        self.root.geometry("1900x900")
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
         
         self.current_theme = "dark"
         self.results = None
         
-        logger.info("🚀 Ventana principal inicializada")
+        logger.info("✅ Ventana principal inicializada")
         self._setup_ui()
     
     def _setup_ui(self):
@@ -140,11 +141,11 @@ class MainWindow:
         left_sidebar.grid(row=0, column=0, sticky="nsew", padx=0, pady=0)
         left_sidebar.grid_rowconfigure(1, weight=1)
         
-        # LOGO G + Branding
+        # LOGO + Branding
         header_frame = ctk.CTkFrame(left_sidebar, fg_color="transparent")
         header_frame.pack(pady=15, padx=15, fill="x")
         
-        # Logo G
+        # Logo
         try:
             logo_path = Path(__file__).parent.parent.parent / "assets" / "logo_g.png"
             if logo_path.exists():
@@ -166,7 +167,7 @@ class MainWindow:
         )
         header_text.pack(side="left", anchor="w")
         
-        # Panel de entrada - ASEGURAR QUE TIENE REFERENCIA
+        # Panel de entrada
         self.case_input = CaseInputFrame(
             left_sidebar,
             on_submit=self._on_case_submit,
@@ -190,11 +191,10 @@ class MainWindow:
         center_panel.grid_rowconfigure(0, weight=1)
         center_panel.grid_columnconfigure(0, weight=1)
         
-        # GUARDAR REFERENCIA AL RESULTS
         self.results = ResultsFrame(center_panel, fg_color="#161b22")
         self.results.grid(row=0, column=0, sticky="nsew")
         
-        # --- SIDEBAR DERECHO (Tabs: Recursos / Sobre Sarah) ---
+        # --- SIDEBAR DERECHO (Tabs) ---
         right_sidebar = ctk.CTkFrame(main_frame, width=450, fg_color="#0d0d0d")
         right_sidebar.grid(row=0, column=2, sticky="nsew", padx=0, pady=0)
         right_sidebar.grid_rowconfigure(1, weight=1)
@@ -214,17 +214,22 @@ class MainWindow:
         self.tab_view = ctk.CTkTabview(right_sidebar, fg_color="#0d0d0d")
         self.tab_view.pack(fill="both", expand=True, padx=10, pady=10)
         
-        # Tab 1: Recursos
+        # Tab 1: Inicio
+        inicio_tab = self.tab_view.add("📖 Inicio")
+        self.dashboard = DashboardPanel(inicio_tab, fg_color="#0d0d0d")
+        self.dashboard.pack(fill="both", expand=True)
+        
+        # Tab 2: Recursos
         resources_tab = self.tab_view.add("🔍 Recursos")
         self.resources_panel = ResourcesPanel(resources_tab, fg_color="#0d0d0d")
         self.resources_panel.pack(fill="both", expand=True)
         
-        # Tab 2: Sobre Sarah
+        # Tab 3: Sobre Sarah
         about_tab = self.tab_view.add("👩‍💻 Sobre Sarah")
         self.about_panel = AboutPanel(about_tab, fg_color="#0d0d0d")
         self.about_panel.pack(fill="both", expand=True)
         
-        logger.info("✅ UI completamente configurada")
+        logger.info("✅ UI COMPLETA")
     
     def _on_case_submit(self, case_number: str, case_text: str):
         """Maneja envío de caso."""
@@ -235,24 +240,14 @@ class MainWindow:
                 logger.error("❌ Results panel no inicializado")
                 return
             
-            # Simulación de análisis
-            analysis = {
-                "case_number": case_number,
-                "urgency": "Alta",
-                "case_type": "violencia_doméstica",
-                "summary": f"Caso {case_number} analizado exitosamente. Requiere atención prioritaria.",
-                "risk_factors": ["violencia documentada", "riesgo potencial"],
-                "confidence": 0.87
-            }
-            
-            logger.info(f"✅ Mostrando análisis")
-            self.results.show_analysis(analysis)
+            logger.info(f"✅ Analizando: {case_number}")
+            self.results.show_analysis(case_number, case_text)
             
         except Exception as e:
             logger.error(f"❌ Error en _on_case_submit: {e}", exc_info=True)
     
     def _toggle_theme(self):
-        """Cambia entre temas claro/oscuro."""
+        """Cambia entre temas."""
         try:
             if self.current_theme == "dark":
                 ctk.set_appearance_mode("light")
@@ -260,13 +255,13 @@ class MainWindow:
             else:
                 ctk.set_appearance_mode("dark")
                 self.current_theme = "dark"
-            logger.info(f"🌓 Tema cambiado a: {self.current_theme}")
+            logger.info(f"🌓 Tema: {self.current_theme}")
         except Exception as e:
             logger.error(f"Error en tema: {e}")
     
     def run(self):
         """Inicia la aplicación."""
-        logger.info("🚀 Iniciando UI...")
+        logger.info("🚀 Iniciando aplicación...")
         self.root.mainloop()
     
     def close(self):
