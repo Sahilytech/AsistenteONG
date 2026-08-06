@@ -114,11 +114,12 @@ class MainWindow:
         """Inicializa la ventana."""
         self.root = ctk.CTk()
         self.root.title("🆘 Asistente ONG - Sarah Lee Olivera")
-        self.root.geometry("1600x850")
+        self.root.geometry("1800x850")
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
         
         self.current_theme = "dark"
+        self.results = None
         
         logger.info("🚀 Ventana principal inicializada")
         self._setup_ui()
@@ -135,7 +136,7 @@ class MainWindow:
         main_frame.grid_columnconfigure(2, weight=0)
         
         # --- SIDEBAR IZQUIERDO (Input) ---
-        left_sidebar = ctk.CTkFrame(main_frame, width=420, fg_color="#0d0d0d")
+        left_sidebar = ctk.CTkFrame(main_frame, width=400, fg_color="#0d0d0d")
         left_sidebar.grid(row=0, column=0, sticky="nsew", padx=0, pady=0)
         left_sidebar.grid_rowconfigure(1, weight=1)
         
@@ -147,8 +148,8 @@ class MainWindow:
         try:
             logo_path = Path(__file__).parent.parent.parent / "assets" / "logo_g.png"
             if logo_path.exists():
-                logo_img = Image.open(logo_path).resize((60, 60), Image.Resampling.LANCZOS)
-                ctk_logo = ctk.CTkImage(light_image=logo_img, size=(60, 60))
+                logo_img = Image.open(logo_path).resize((50, 50), Image.Resampling.LANCZOS)
+                ctk_logo = ctk.CTkImage(light_image=logo_img, size=(50, 50))
                 logo_label = ctk.CTkLabel(header_frame, image=ctk_logo, text="")
                 logo_label.image = ctk_logo
                 logo_label.pack(side="left", padx=(0, 10))
@@ -158,14 +159,14 @@ class MainWindow:
         # Texto header
         header_text = ctk.CTkLabel(
             header_frame,
-            text="🆘 Asistente ONG\nSarah Lee Olivera",
+            text="🆘 Asistente ONG",
             font=("Helvetica", 16, "bold"),
             text_color=BRAND_COLORS["primary"],
             justify="left"
         )
         header_text.pack(side="left", anchor="w")
         
-        # Panel de entrada
+        # Panel de entrada - ASEGURAR QUE TIENE REFERENCIA
         self.case_input = CaseInputFrame(
             left_sidebar,
             on_submit=self._on_case_submit,
@@ -176,7 +177,7 @@ class MainWindow:
         # Footer sidebar
         footer = ctk.CTkLabel(
             left_sidebar,
-            text="v0.7.0 - Beta ©2025\nTecnología para el bien social",
+            text="v0.7.0 - Beta\nSarah Lee Olivera ©2025",
             font=("Helvetica", 9),
             text_color="#666666",
             justify="center"
@@ -189,6 +190,7 @@ class MainWindow:
         center_panel.grid_rowconfigure(0, weight=1)
         center_panel.grid_columnconfigure(0, weight=1)
         
+        # GUARDAR REFERENCIA AL RESULTS
         self.results = ResultsFrame(center_panel, fg_color="#161b22")
         self.results.grid(row=0, column=0, sticky="nsew")
         
@@ -226,29 +228,41 @@ class MainWindow:
     
     def _on_case_submit(self, case_number: str, case_text: str):
         """Maneja envío de caso."""
-        logger.info(f"📋 Caso recibido: {case_number}")
-        
-        # Simulación de análisis
-        analysis = {
-            "case_number": case_number,
-            "urgency": "Alta",
-            "case_type": "violencia_doméstica",
-            "summary": f"Caso {case_number} analizado. Requiere atención prioritaria.",
-            "risk_factors": ["violencia documentada", "riesgo potencial"],
-            "confidence": 0.87
-        }
-        
-        self.results.show_analysis(analysis)
+        try:
+            logger.info(f"📋 Caso recibido: {case_number}")
+            
+            if not self.results:
+                logger.error("❌ Results panel no inicializado")
+                return
+            
+            # Simulación de análisis
+            analysis = {
+                "case_number": case_number,
+                "urgency": "Alta",
+                "case_type": "violencia_doméstica",
+                "summary": f"Caso {case_number} analizado exitosamente. Requiere atención prioritaria.",
+                "risk_factors": ["violencia documentada", "riesgo potencial"],
+                "confidence": 0.87
+            }
+            
+            logger.info(f"✅ Mostrando análisis")
+            self.results.show_analysis(analysis)
+            
+        except Exception as e:
+            logger.error(f"❌ Error en _on_case_submit: {e}", exc_info=True)
     
     def _toggle_theme(self):
         """Cambia entre temas claro/oscuro."""
-        if self.current_theme == "dark":
-            ctk.set_appearance_mode("light")
-            self.current_theme = "light"
-        else:
-            ctk.set_appearance_mode("dark")
-            self.current_theme = "dark"
-        logger.info(f"🌓 Tema cambiado a: {self.current_theme}")
+        try:
+            if self.current_theme == "dark":
+                ctk.set_appearance_mode("light")
+                self.current_theme = "light"
+            else:
+                ctk.set_appearance_mode("dark")
+                self.current_theme = "dark"
+            logger.info(f"🌓 Tema cambiado a: {self.current_theme}")
+        except Exception as e:
+            logger.error(f"Error en tema: {e}")
     
     def run(self):
         """Inicia la aplicación."""

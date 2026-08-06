@@ -18,6 +18,7 @@ class CaseInputFrame(ctk.CTkFrame):
         super().__init__(parent, **kwargs)
         
         self.on_submit = on_submit
+        logger.info(f"✅ CaseInputFrame inicializado con callback: {on_submit}")
         self._setup_ui()
     
     def _setup_ui(self):
@@ -87,31 +88,43 @@ class CaseInputFrame(ctk.CTkFrame):
     
     def _on_submit(self):
         """Maneja el envío del formulario."""
-        case_number = self.case_number.get().strip()
-        case_text = self.text_input.get("1.0", "end").strip()
-        
-        if not case_number:
-            logger.warning("Número de caso vacío")
-            self._show_error("Ingresa un número de caso")
-            return
-        
-        if not case_text:
-            logger.warning("Texto de caso vacío")
-            self._show_error("Ingresa la descripción del caso")
-            return
-        
-        logger.info(f"Enviando caso: {case_number}")
-        self.on_submit(case_number, case_text)
+        try:
+            case_number = self.case_number.get().strip()
+            case_text = self.text_input.get("1.0", "end").strip()
+            
+            logger.info(f"📋 Botón enviado: {case_number}")
+            
+            if not case_number:
+                logger.warning("Número de caso vacío")
+                self._show_error("Ingresa un número de caso")
+                return
+            
+            if not case_text:
+                logger.warning("Texto de caso vacío")
+                self._show_error("Ingresa la descripción del caso")
+                return
+            
+            logger.info(f"✅ Llamando callback con: {case_number}, {len(case_text)} chars")
+            
+            # LLAMAR AL CALLBACK
+            if self.on_submit:
+                self.on_submit(case_number, case_text)
+            else:
+                logger.error("❌ on_submit es None!")
+                
+        except Exception as e:
+            logger.error(f"❌ Error en _on_submit: {e}", exc_info=True)
+            self._show_error(f"Error: {str(e)}")
     
     def _on_clear(self):
         """Limpia el formulario."""
         self.case_number.delete(0, "end")
         self.text_input.delete("1.0", "end")
-        logger.info("Formulario limpiado")
+        logger.info("🗑️ Formulario limpiado")
     
     def _show_error(self, message: str):
         """Muestra un error."""
-        logger.error(message)
+        logger.error(f"⚠️ {message}")
         # TODO: Mostrar popup de error
     
     def get_input(self) -> dict:
