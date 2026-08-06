@@ -1,6 +1,6 @@
 """
 Ventana principal - Interfaz personalizada Sarah Lee Olivera
-Logo G + Foto profesional
+Con panel de recursos y filtrados de casos
 """
 
 import customtkinter as ctk
@@ -10,8 +10,9 @@ from PIL import Image
 
 from .case_input import CaseInputFrame
 from .results_panel import ResultsFrame
-from .branding import BRAND_COLORS, AUTHOR_BIO, LIGHT_THEME, DARK_THEME
-from .styles import FONTS, SPACING
+from .resources_panel import ResourcesPanel
+from .branding import BRAND_COLORS, AUTHOR_BIO
+from .styles import FONTS
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,6 @@ class AboutPanel(ctk.CTkFrame):
     
     def _setup_ui(self):
         """Configura panel de información."""
-        # Scroll para biografía larga
         scroll = ctk.CTkScrollableFrame(self, fg_color="transparent")
         scroll.pack(fill="both", expand=True, padx=15, pady=15)
         
@@ -41,7 +41,7 @@ class AboutPanel(ctk.CTkFrame):
                 ctk_img = ctk.CTkImage(light_image=pil_img, size=(200, 250))
                 
                 photo_label = ctk.CTkLabel(scroll, image=ctk_img, text="")
-                photo_label.image = ctk_img  # Keep reference
+                photo_label.image = ctk_img
                 photo_label.pack(pady=10)
         except Exception as e:
             logger.warning(f"No se pudo cargar foto: {e}")
@@ -72,7 +72,7 @@ class AboutPanel(ctk.CTkFrame):
         )
         role.pack(anchor="w")
         
-        # Email clickeable
+        # Email
         email = ctk.CTkLabel(
             scroll,
             text=f"📧 {AUTHOR_BIO['email']}",
@@ -114,13 +114,13 @@ class MainWindow:
         """Inicializa la ventana."""
         self.root = ctk.CTk()
         self.root.title("🆘 Asistente ONG - Sarah Lee Olivera")
-        self.root.geometry("1500x850")
+        self.root.geometry("1600x850")
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
         
         self.current_theme = "dark"
         
-        logger.info("Ventana principal inicializada")
+        logger.info("🚀 Ventana principal inicializada")
         self._setup_ui()
     
     def _setup_ui(self):
@@ -192,10 +192,10 @@ class MainWindow:
         self.results = ResultsFrame(center_panel, fg_color="#161b22")
         self.results.grid(row=0, column=0, sticky="nsew")
         
-        # --- SIDEBAR DERECHO (About) ---
-        right_sidebar = ctk.CTkFrame(main_frame, width=420, fg_color="#0d0d0d")
+        # --- SIDEBAR DERECHO (Tabs: Recursos / Sobre Sarah) ---
+        right_sidebar = ctk.CTkFrame(main_frame, width=450, fg_color="#0d0d0d")
         right_sidebar.grid(row=0, column=2, sticky="nsew", padx=0, pady=0)
-        right_sidebar.grid_rowconfigure(0, weight=1)
+        right_sidebar.grid_rowconfigure(1, weight=1)
         
         # Botón theme toggle
         theme_btn = ctk.CTkButton(
@@ -208,8 +208,18 @@ class MainWindow:
         )
         theme_btn.pack(pady=10, padx=15, fill="x")
         
-        # Panel About
-        self.about_panel = AboutPanel(right_sidebar, fg_color="#0d0d0d")
+        # Tabs
+        self.tab_view = ctk.CTkTabview(right_sidebar, fg_color="#0d0d0d")
+        self.tab_view.pack(fill="both", expand=True, padx=10, pady=10)
+        
+        # Tab 1: Recursos
+        resources_tab = self.tab_view.add("🔍 Recursos")
+        self.resources_panel = ResourcesPanel(resources_tab, fg_color="#0d0d0d")
+        self.resources_panel.pack(fill="both", expand=True)
+        
+        # Tab 2: Sobre Sarah
+        about_tab = self.tab_view.add("👩‍💻 Sobre Sarah")
+        self.about_panel = AboutPanel(about_tab, fg_color="#0d0d0d")
         self.about_panel.pack(fill="both", expand=True)
         
         logger.info("✅ UI completamente configurada")
