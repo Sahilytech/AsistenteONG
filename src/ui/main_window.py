@@ -1,11 +1,12 @@
 """
-Ventana principal - Interfaz personalizada
-Sarah Lee Olivera, 2025
+Ventana principal - Interfaz personalizada Sarah Lee Olivera
+Logo G + Foto profesional
 """
 
 import customtkinter as ctk
 import logging
-from typing import Optional
+from pathlib import Path
+from PIL import Image
 
 from .case_input import CaseInputFrame
 from .results_panel import ResultsFrame
@@ -32,14 +33,27 @@ class AboutPanel(ctk.CTkFrame):
         scroll = ctk.CTkScrollableFrame(self, fg_color="transparent")
         scroll.pack(fill="both", expand=True, padx=15, pady=15)
         
+        # FOTO DE SARAH
+        try:
+            img_path = Path(__file__).parent.parent.parent / "assets" / "sarah.jpg"
+            if img_path.exists():
+                pil_img = Image.open(img_path).resize((200, 250), Image.Resampling.LANCZOS)
+                ctk_img = ctk.CTkImage(light_image=pil_img, size=(200, 250))
+                
+                photo_label = ctk.CTkLabel(scroll, image=ctk_img, text="")
+                photo_label.image = ctk_img  # Keep reference
+                photo_label.pack(pady=10)
+        except Exception as e:
+            logger.warning(f"No se pudo cargar foto: {e}")
+        
         # Título
         title = ctk.CTkLabel(
             scroll,
-            text="👩‍💻 Sobre la Creadora",
+            text="👩‍💻 Sobre Sarah",
             font=("Helvetica", 18, "bold"),
             text_color=BRAND_COLORS["primary"]
         )
-        title.pack(anchor="w", pady=(0, 10))
+        title.pack(anchor="w", pady=(10, 10))
         
         # Nombre
         name = ctk.CTkLabel(
@@ -58,7 +72,7 @@ class AboutPanel(ctk.CTkFrame):
         )
         role.pack(anchor="w")
         
-        # Email
+        # Email clickeable
         email = ctk.CTkLabel(
             scroll,
             text=f"📧 {AUTHOR_BIO['email']}",
@@ -73,7 +87,7 @@ class AboutPanel(ctk.CTkFrame):
             text=AUTHOR_BIO["bio"],
             font=("Helvetica", 11),
             justify="left",
-            wraplength=350
+            wraplength=320
         )
         bio.pack(anchor="w", pady=10)
         
@@ -84,23 +98,23 @@ class AboutPanel(ctk.CTkFrame):
         # Disclaimer
         disclaimer = ctk.CTkLabel(
             scroll,
-            text="⚖️ Este software es código abierto orientado al bien común. Apoya el trabajo de profesionales y voluntarios, nunca reemplaza su criterio.",
+            text="⚖️ Código abierto orientado al bien común.\nNunca reemplaza el criterio humano.",
             font=("Helvetica", 10),
             text_color="#999999",
             justify="left",
-            wraplength=350
+            wraplength=320
         )
         disclaimer.pack(anchor="w")
 
 
 class MainWindow:
-    """Ventana principal con interfaz profesional."""
+    """Ventana principal con interfaz personalizada."""
     
     def __init__(self):
         """Inicializa la ventana."""
         self.root = ctk.CTk()
-        self.root.title("🆘 Asistente ONG - Triaje y Canalización")
-        self.root.geometry("1400x800")
+        self.root.title("🆘 Asistente ONG - Sarah Lee Olivera")
+        self.root.geometry("1500x850")
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
         
@@ -121,18 +135,35 @@ class MainWindow:
         main_frame.grid_columnconfigure(2, weight=0)
         
         # --- SIDEBAR IZQUIERDO (Input) ---
-        left_sidebar = ctk.CTkFrame(main_frame, width=400, fg_color="#0d0d0d")
+        left_sidebar = ctk.CTkFrame(main_frame, width=420, fg_color="#0d0d0d")
         left_sidebar.grid(row=0, column=0, sticky="nsew", padx=0, pady=0)
         left_sidebar.grid_rowconfigure(1, weight=1)
         
-        # Logo/Branding
-        header = ctk.CTkLabel(
-            left_sidebar,
-            text="🆘 Asistente ONG",
-            font=("Helvetica", 20, "bold"),
-            text_color=BRAND_COLORS["primary"]
+        # LOGO G + Branding
+        header_frame = ctk.CTkFrame(left_sidebar, fg_color="transparent")
+        header_frame.pack(pady=15, padx=15, fill="x")
+        
+        # Logo G
+        try:
+            logo_path = Path(__file__).parent.parent.parent / "assets" / "logo_g.png"
+            if logo_path.exists():
+                logo_img = Image.open(logo_path).resize((60, 60), Image.Resampling.LANCZOS)
+                ctk_logo = ctk.CTkImage(light_image=logo_img, size=(60, 60))
+                logo_label = ctk.CTkLabel(header_frame, image=ctk_logo, text="")
+                logo_label.image = ctk_logo
+                logo_label.pack(side="left", padx=(0, 10))
+        except Exception as e:
+            logger.warning(f"Logo no cargado: {e}")
+        
+        # Texto header
+        header_text = ctk.CTkLabel(
+            header_frame,
+            text="🆘 Asistente ONG\nSarah Lee Olivera",
+            font=("Helvetica", 16, "bold"),
+            text_color=BRAND_COLORS["primary"],
+            justify="left"
         )
-        header.pack(pady=15, padx=15)
+        header_text.pack(side="left", anchor="w")
         
         # Panel de entrada
         self.case_input = CaseInputFrame(
@@ -145,9 +176,10 @@ class MainWindow:
         # Footer sidebar
         footer = ctk.CTkLabel(
             left_sidebar,
-            text="v0.7.0 - Beta\nSarah Lee Olivera ©2025",
+            text="v0.7.0 - Beta ©2025\nTecnología para el bien social",
             font=("Helvetica", 9),
-            text_color="#666666"
+            text_color="#666666",
+            justify="center"
         )
         footer.pack(pady=10, padx=10)
         
@@ -161,7 +193,7 @@ class MainWindow:
         self.results.grid(row=0, column=0, sticky="nsew")
         
         # --- SIDEBAR DERECHO (About) ---
-        right_sidebar = ctk.CTkFrame(main_frame, width=400, fg_color="#0d0d0d")
+        right_sidebar = ctk.CTkFrame(main_frame, width=420, fg_color="#0d0d0d")
         right_sidebar.grid(row=0, column=2, sticky="nsew", padx=0, pady=0)
         right_sidebar.grid_rowconfigure(0, weight=1)
         
@@ -171,7 +203,8 @@ class MainWindow:
             text="🌓 Cambiar tema",
             command=self._toggle_theme,
             fg_color=BRAND_COLORS["primary"],
-            text_color="white"
+            text_color="white",
+            font=("Helvetica", 12, "bold")
         )
         theme_btn.pack(pady=10, padx=15, fill="x")
         
@@ -179,19 +212,19 @@ class MainWindow:
         self.about_panel = AboutPanel(right_sidebar, fg_color="#0d0d0d")
         self.about_panel.pack(fill="both", expand=True)
         
-        logger.info("UI completamente configurada")
+        logger.info("✅ UI completamente configurada")
     
     def _on_case_submit(self, case_number: str, case_text: str):
         """Maneja envío de caso."""
-        logger.info(f"Caso recibido: {case_number}")
+        logger.info(f"📋 Caso recibido: {case_number}")
         
         # Simulación de análisis
         analysis = {
             "case_number": case_number,
             "urgency": "Alta",
             "case_type": "violencia_doméstica",
-            "summary": f"Caso {case_number} ingresado. Sistema analizando...",
-            "risk_factors": ["violencia física", "riesgo potencial"],
+            "summary": f"Caso {case_number} analizado. Requiere atención prioritaria.",
+            "risk_factors": ["violencia documentada", "riesgo potencial"],
             "confidence": 0.87
         }
         
@@ -205,11 +238,11 @@ class MainWindow:
         else:
             ctk.set_appearance_mode("dark")
             self.current_theme = "dark"
-        logger.info(f"Tema cambiado a: {self.current_theme}")
+        logger.info(f"🌓 Tema cambiado a: {self.current_theme}")
     
     def run(self):
         """Inicia la aplicación."""
-        logger.info("Iniciando UI...")
+        logger.info("🚀 Iniciando UI...")
         self.root.mainloop()
     
     def close(self):
