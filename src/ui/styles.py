@@ -1,43 +1,30 @@
 """
-Temas y estilos para la aplicación
+Estilos y temas para la aplicación
+Colores personalizados: Azul #0e98d6, Blanco, Negro
 """
 
 # Colores
 COLORS = {
-    "primary": "#1f6feb",      # Azul principal
+    "primary": "#0e98d6",      # Azul personalizado
     "success": "#2da44e",      # Verde
-    "warning": "#d29922",      # Naranja/Amarillo
+    "warning": "#d29922",      # Naranja
     "danger": "#da3633",       # Rojo
     "muted": "#6e7681",        # Gris
     
-    "background": "#0d1117",   # Fondo oscuro
-    "surface": "#161b22",      # Superficie
+    "background": "#0d0d0d",   # Negro
+    "surface": "#161b22",      # Superficie gris oscuro
     "border": "#30363d",       # Borde
     
-    "text": "#c9d1d9",         # Texto principal
-    "text_muted": "#8b949e",   # Texto secundario
+    "text": "#ffffff",         # Blanco
+    "text_muted": "#8b949e",   # Gris claro
 }
 
 # Urgencia - colores
 URGENCY_COLORS = {
     "Muy Alta": COLORS["danger"],
     "Alta": COLORS["warning"],
-    "Media": "#6366f1",        # Índigo
+    "Media": COLORS["primary"],
     "Baja": COLORS["muted"],
-}
-
-# Temas
-THEMES = {
-    "dark": {
-        "fg_color": COLORS["background"],
-        "bg_color": COLORS["background"],
-        "text_color": COLORS["text"],
-    },
-    "light": {
-        "fg_color": "#ffffff",
-        "bg_color": "#f6f8fa",
-        "text_color": "#0d1117",
-    }
 }
 
 # Fuentes
@@ -49,7 +36,7 @@ FONTS = {
     "mono": ("Courier New", 10),
 }
 
-# Padding y espacios
+# Espaciado
 SPACING = {
     "xs": 4,
     "sm": 8,
@@ -58,6 +45,7 @@ SPACING = {
     "xl": 32,
 }
 
+
 def get_urgency_color(urgency: str) -> str:
-    """Obtiene el color para un nivel de urgencia."""
+    """Obtiene color para urgencia."""
     return URGENCY_COLORS.get(urgency, COLORS["muted"])
