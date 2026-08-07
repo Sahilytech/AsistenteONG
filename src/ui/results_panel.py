@@ -1,34 +1,27 @@
 """
-Panel de resultados mejorado con análisis de urgencia
+Panel de resultados mejorado - Con respuestas automáticas y análisis completo
 """
 
 import customtkinter as ctk
 from typing import Optional, Dict, List
 import logging
-import sys
-from pathlib import Path
 
-# Agregar parent dir al path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from ai.urgency_detector import detect_urgency, generate_response
+from ..config_manager import ConfigManager
 from .styles import COLORS, FONTS, SPACING, get_urgency_color
 
 logger = logging.getLogger(__name__)
 
 URGENCY_LEVELS = ["Todas", "Muy Alta", "Alta", "Media", "Baja"]
-CASE_TYPES = ["Todos", "violencia_doméstica", "violencia_sexual", "asesoría_legal", "otro"]
-CASE_STATES = ["Todos", "nuevo", "en_progreso", "resuelto", "cerrado"]
 
 
 class ResultsFrame(ctk.CTkFrame):
-    """Panel para mostrar resultados de análisis con filtros."""
+    """Panel para mostrar resultados de análisis con respuestas automáticas."""
     
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
         
         self.current_case = None
-        self.all_cases = []
+        self.config_manager = ConfigManager()
         self._setup_ui()
     
     def _setup_ui(self):
@@ -37,7 +30,7 @@ class ResultsFrame(ctk.CTkFrame):
         # Título
         title = ctk.CTkLabel(
             self,
-            text="📊 Análisis de Caso",
+            text="📊 Análisis & Respuesta Automática",
             font=FONTS["heading"],
             text_color=COLORS["text"]
         )
@@ -47,69 +40,37 @@ class ResultsFrame(ctk.CTkFrame):
         filter_frame = ctk.CTkFrame(self, fg_color=COLORS["surface"])
         filter_frame.pack(fill="x", padx=SPACING["md"], pady=(0, SPACING["sm"]))
         
-        # Urgencia
         ctk.CTkLabel(filter_frame, text="🚨 Urgencia:", text_color=COLORS["text"]).pack(side="left", padx=5, pady=8)
         self.urgency_var = ctk.StringVar(value="Todas")
         urgency_combo = ctk.CTkComboBox(
             filter_frame,
             values=URGENCY_LEVELS,
             variable=self.urgency_var,
-            command=self._apply_filters,
             fg_color=COLORS["border"],
             text_color=COLORS["text"],
             width=100
         )
         urgency_combo.pack(side="left", padx=5, pady=8)
         
-        # Tipo
-        ctk.CTkLabel(filter_frame, text="📂 Tipo:", text_color=COLORS["text"]).pack(side="left", padx=5, pady=8)
-        self.type_var = ctk.StringVar(value="Todos")
-        type_combo = ctk.CTkComboBox(
-            filter_frame,
-            values=CASE_TYPES,
-            variable=self.type_var,
-            command=self._apply_filters,
-            fg_color=COLORS["border"],
-            text_color=COLORS["text"],
-            width=120
-        )
-        type_combo.pack(side="left", padx=5, pady=8)
-        
-        # Estado
-        ctk.CTkLabel(filter_frame, text="✓ Estado:", text_color=COLORS["text"]).pack(side="left", padx=5, pady=8)
-        self.state_var = ctk.StringVar(value="Todos")
-        state_combo = ctk.CTkComboBox(
-            filter_frame,
-            values=CASE_STATES,
-            variable=self.state_var,
-            command=self._apply_filters,
-            fg_color=COLORS["border"],
-            text_color=COLORS["text"],
-            width=100
-        )
-        state_combo.pack(side="left", padx=5, pady=8)
-        
-        # Limpiar filtros
         clear_btn = ctk.CTkButton(
             filter_frame,
             text="🔄 Limpiar",
-            command=self._clear_filters,
+            command=self._clear,
             fg_color=COLORS["muted"],
             text_color="white",
             width=80
         )
         clear_btn.pack(side="right", padx=5, pady=8)
         
-        # === ÁREA DE SCROLL PARA CONTENIDO ===
-        scroll_frame = ctk.CTkScrollableFrame(
+        # === ÁREA DE SCROLL PRINCIPAL ===
+        self.scroll_frame = ctk.CTkScrollableFrame(
             self,
-            fg_color=COLORS["surface"]
+            fg_color=COLORS["surface"],
+            label_text="Resultado del Análisis"
         )
-        scroll_frame.pack(fill="both", expand=True, padx=SPACING["md"], pady=SPACING["sm"])
+        self.scroll_frame.pack(fill="both", expand=True, padx=SPACING["md"], pady=SPACING["sm"])
         
-        self.scroll_frame = scroll_frame
-        
-        # Placeholder inicial
+        # Placeholder
         self._show_placeholder()
     
     def _show_placeholder(self):
@@ -124,177 +85,207 @@ class ResultsFrame(ctk.CTkFrame):
         self.placeholder = placeholder
     
     def show_analysis(self, case_number: str, case_text: str):
-        """Muestra análisis completo de un caso."""
+        """Realiza análisis completo del caso."""
         try:
-            # Limpiar
+            # Limpiar scroll
             for widget in self.scroll_frame.winfo_children():
                 widget.destroy()
             
-            logger.info(f"📊 Analizando caso: {case_number}")
+            # Usar ConfigManager para análisis
+            analysis = self.config_manager.analyze(case_text)
             
-            # Detectar urgencia
-            urgency_data = detect_urgency(case_text)
-            logger.info(f"🚨 Urgencia detectada: {urgency_data['urgency_level']} (score: {urgency_data['score']})")
-            
-            # Generar respuesta
-            response = generate_response(urgency_data)
-            
-            # Crear analysis dict
-            analysis = {
+            # Guardar caso
+            self.current_case = {
                 "case_number": case_number,
-                "case_text": case_text,
-                "urgency": urgency_data["urgency_level"],
-                "score": urgency_data["score"],
-                "keywords_found": urgency_data["keywords_found"],
-                "detected_risks": urgency_data["detected_risks"],
-                "needs_immediate_action": urgency_data["needs_immediate_action"],
-                "response": response,
-                "case_type": "violencia_doméstica"  # TODO: Detectar tipo
+                "text": case_text,
+                **analysis
             }
             
-            self.current_case = analysis
-            self._display_case(analysis)
+            logger.info(f"✅ Análisis completado: {analysis['urgency']}")
+            
+            # Mostrar análisis
+            self._display_analysis()
             
         except Exception as e:
-            logger.error(f"❌ Error en show_analysis: {e}", exc_info=True)
+            logger.error(f"❌ Error en análisis: {e}", exc_info=True)
             error_label = ctk.CTkLabel(
                 self.scroll_frame,
-                text=f"❌ Error al analizar: {str(e)}",
-                text_color=COLORS["danger"],
-                font=FONTS["small"]
+                text=f"Error: {str(e)}",
+                text_color=COLORS["danger"]
             )
             error_label.pack(pady=SPACING["lg"])
     
-    def _display_case(self, case: Dict):
-        """Muestra detalles de un caso."""
+    def _display_analysis(self):
+        """Muestra el análisis completo."""
+        if not self.current_case:
+            self._show_placeholder()
+            return
         
-        # NÚMERO DE CASO
-        num_label = ctk.CTkLabel(
-            self.scroll_frame,
+        case = self.current_case
+        
+        # === SECCIÓN 1: INFORMACIÓN DEL CASO ===
+        info_frame = ctk.CTkFrame(self.scroll_frame, fg_color="transparent")
+        info_frame.pack(fill="x", pady=SPACING["md"])
+        
+        # Número de caso
+        ctk.CTkLabel(
+            info_frame,
             text=f"📋 Caso: {case['case_number']}",
             font=FONTS["normal"],
-            text_color=COLORS["text_muted"]
-        )
-        num_label.pack(anchor="w", pady=(0, SPACING["md"]))
+            text_color=COLORS["text"]
+        ).pack(anchor="w")
         
-        # === URGENCIA (DESTACADA) ===
+        # Urgencia con color
         urgency = case.get("urgency", "Desconocida")
         urgency_color = get_urgency_color(urgency)
-        score = case.get("score", 0)
         
-        urgency_frame = ctk.CTkFrame(self.scroll_frame, fg_color=COLORS["border"], corner_radius=10)
-        urgency_frame.pack(fill="x", pady=SPACING["sm"])
+        urgency_frame = ctk.CTkFrame(info_frame, fg_color="transparent")
+        urgency_frame.pack(anchor="w", pady=SPACING["sm"])
         
-        urgency_label = ctk.CTkLabel(
+        ctk.CTkLabel(
             urgency_frame,
-            text=f"🚨 URGENCIA: {urgency}",
-            font=("Helvetica", 14, "bold"),
-            text_color=urgency_color
-        )
-        urgency_label.pack(side="left", padx=SPACING["md"], pady=SPACING["sm"])
+            text="🚨 Urgencia:",
+            font=FONTS["normal"],
+            text_color=COLORS["text"]
+        ).pack(side="left")
         
-        score_label = ctk.CTkLabel(
+        ctk.CTkLabel(
             urgency_frame,
-            text=f"Score: {score}/10",
-            font=FONTS["small"],
+            text=urgency,
+            font=FONTS["normal"],
             text_color=urgency_color
-        )
-        score_label.pack(side="right", padx=SPACING["md"], pady=SPACING["sm"])
+        ).pack(side="left", padx=SPACING["sm"])
         
-        # RIESGOS DETECTADOS
-        if "detected_risks" in case and case["detected_risks"]:
-            risks_title = ctk.CTkLabel(
-                self.scroll_frame,
-                text="⚠️ Riesgos Detectados:",
-                font=FONTS["normal"],
-                text_color=COLORS["danger"]
-            )
-            risks_title.pack(anchor="w", pady=(SPACING["md"], SPACING["sm"]))
+        # Palabras clave detectadas
+        if case.get("keywords"):
+            keywords_frame = ctk.CTkFrame(self.scroll_frame, fg_color=COLORS["border"], corner_radius=6)
+            keywords_frame.pack(fill="x", pady=SPACING["md"])
             
-            for risk in case["detected_risks"]:
-                risk_text = ctk.CTkLabel(
-                    self.scroll_frame,
-                    text=f"  {risk}",
-                    font=FONTS["small"],
-                    text_color=COLORS["danger"]
-                )
-                risk_text.pack(anchor="w", padx=SPACING["md"])
-        
-        # PALABRAS CLAVE ENCONTRADAS
-        if "keywords_found" in case and case["keywords_found"]:
-            keywords_title = ctk.CTkLabel(
-                self.scroll_frame,
-                text="🔍 Palabras Clave Detectadas:",
-                font=FONTS["normal"],
-                text_color=COLORS["text"]
-            )
-            keywords_title.pack(anchor="w", pady=(SPACING["md"], SPACING["sm"]))
+            ctk.CTkLabel(
+                keywords_frame,
+                text="🔑 Palabras Clave Detectadas:",
+                font=FONTS["small"],
+                text_color=COLORS["primary"]
+            ).pack(anchor="w", padx=SPACING["sm"], pady=(SPACING["sm"], 0))
             
-            keywords_text = ", ".join(case["keywords_found"][:5])  # Primeras 5
-            keywords_label = ctk.CTkLabel(
-                self.scroll_frame,
+            keywords_text = " • ".join(case["keywords"])
+            ctk.CTkLabel(
+                keywords_frame,
                 text=keywords_text,
                 font=FONTS["small"],
                 text_color=COLORS["text_muted"],
-                wraplength=400
-            )
-            keywords_label.pack(anchor="w", padx=SPACING["md"])
+                wraplength=400,
+                justify="left"
+            ).pack(anchor="w", padx=SPACING["md"], pady=(0, SPACING["sm"]))
         
-        # RESPUESTA BORRADOR
-        if "response" in case:
-            response_title = ctk.CTkLabel(
-                self.scroll_frame,
-                text="📝 Respuesta Automática (Borrador):",
+        # === SECCIÓN 2: RESPUESTA AUTOMÁTICA BORRADOR ===
+        if case.get("template"):
+            response_frame = ctk.CTkFrame(self.scroll_frame, fg_color=COLORS["border"], corner_radius=6)
+            response_frame.pack(fill="both", expand=True, pady=SPACING["md"])
+            
+            ctk.CTkLabel(
+                response_frame,
+                text="📨 Borrador de Respuesta Automática",
                 font=FONTS["normal"],
                 text_color=COLORS["primary"]
-            )
-            response_title.pack(anchor="w", pady=(SPACING["md"], SPACING["sm"]))
+            ).pack(anchor="w", padx=SPACING["sm"], pady=(SPACING["sm"], 0))
             
-            response_box = ctk.CTkTextbox(
-                self.scroll_frame,
-                height=200,
-                fg_color=COLORS["border"],
+            # Área de texto con respuesta
+            response_text = ctk.CTkTextbox(
+                response_frame,
+                height=150,
+                fg_color=COLORS["surface"],
                 text_color=COLORS["text"],
-                border_color=COLORS["primary"]
+                border_color=COLORS["border"]
             )
-            response_box.pack(fill="both", padx=SPACING["md"], pady=SPACING["sm"])
-            response_box.insert("1.0", case["response"])
-            response_box.configure(state="disabled")  # Read-only
+            response_text.pack(fill="both", expand=True, padx=SPACING["sm"], pady=SPACING["sm"])
+            response_text.insert("1.0", case["template"])
+            response_text.configure(state="disabled")
             
-            # Botón copiar
+            # Botones de acción
+            action_frame = ctk.CTkFrame(response_frame, fg_color="transparent")
+            action_frame.pack(fill="x", padx=SPACING["sm"], pady=(0, SPACING["sm"]))
+            
             copy_btn = ctk.CTkButton(
-                self.scroll_frame,
-                text="📋 Copiar Respuesta",
+                action_frame,
+                text="📋 Copiar",
+                command=lambda: self._copy_response(case["template"]),
                 fg_color=COLORS["primary"],
                 text_color="white",
-                command=lambda: self._copy_to_clipboard(case["response"])
+                width=100
             )
-            copy_btn.pack(anchor="w", padx=SPACING["md"], pady=SPACING["sm"])
+            copy_btn.pack(side="left", padx=(0, SPACING["sm"]))
+            
+            edit_btn = ctk.CTkButton(
+                action_frame,
+                text="✏️ Editar",
+                command=lambda: self._edit_response(response_text),
+                fg_color=COLORS["muted"],
+                text_color="white",
+                width=100
+            )
+            edit_btn.pack(side="left")
+        
+        # === SECCIÓN 3: RECURSOS SUGERIDOS ===
+        if case.get("resources"):
+            resources_frame = ctk.CTkFrame(self.scroll_frame, fg_color=COLORS["border"], corner_radius=6)
+            resources_frame.pack(fill="x", pady=SPACING["md"])
+            
+            ctk.CTkLabel(
+                resources_frame,
+                text="📞 Recursos Sugeridos",
+                font=FONTS["normal"],
+                text_color=COLORS["primary"]
+            ).pack(anchor="w", padx=SPACING["sm"], pady=(SPACING["sm"], 0))
+            
+            for resource in case["resources"]:
+                resource_label = ctk.CTkLabel(
+                    resources_frame,
+                    text=f"• {resource}",
+                    font=FONTS["small"],
+                    text_color=COLORS["text_muted"]
+                )
+                resource_label.pack(anchor="w", padx=SPACING["md"])
+            
+            # Botón: Ver detalles de recursos
+            details_btn = ctk.CTkButton(
+                resources_frame,
+                text="🔍 Ver detalles en panel de Recursos",
+                command=self._open_resources,
+                fg_color=COLORS["primary"],
+                text_color="white",
+                width=200
+            )
+            details_btn.pack(pady=SPACING["sm"])
     
-    def _copy_to_clipboard(self, text: str):
-        """Copia texto al portapapeles."""
+    def _copy_response(self, text: str):
+        """Copia respuesta al portapapeles."""
         try:
             import subprocess
             process = subprocess.Popen(['clip'], stdin=subprocess.PIPE)
             process.communicate(text.encode('utf-8'))
-            logger.info("✅ Respuesta copiada al portapapeles")
+            logger.info("✅ Respuesta copiada")
         except:
-            logger.warning("No se pudo copiar al portapapeles")
+            logger.warning("No se pudo copiar")
     
-    def _apply_filters(self, choice=None):
-        """Aplica filtros."""
-        logger.info("Filtros aplicados")
+    def _edit_response(self, text_widget):
+        """Habilita edición de respuesta."""
+        if text_widget.cget("state") == "disabled":
+            text_widget.configure(state="normal")
+            logger.info("✏️ Modo edición activado")
+        else:
+            text_widget.configure(state="disabled")
+            logger.info("✅ Cambios guardados")
     
-    def _clear_filters(self):
-        """Limpia los filtros."""
-        self.urgency_var.set("Todas")
-        self.type_var.set("Todos")
-        self.state_var.set("Todos")
-        self._apply_filters()
+    def _open_resources(self):
+        """Abre panel de recursos."""
+        logger.info("Abriendo panel de recursos...")
+        # TODO: Implementar navegación a recursos
     
-    def clear(self):
-        """Limpia los resultados."""
+    def _clear(self):
+        """Limpia el análisis."""
         for widget in self.scroll_frame.winfo_children():
             widget.destroy()
         self._show_placeholder()
         self.current_case = None
+        logger.info("🗑️ Análisis limpiado")

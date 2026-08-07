@@ -1,164 +1,185 @@
 """
-Dashboard principal - Información del proyecto y estado
+Dashboard con estadísticas, historial y reportes
 """
 
 import customtkinter as ctk
+from typing import List, Dict
+from datetime import datetime
+import logging
+
 from .styles import COLORS, FONTS, SPACING
 
-PROJECT_INFO = {
-    "title": "🆘 Asistente ONG",
-    "subtitle": "Caja de Herramientas para Líneas de Ayuda",
-    "version": "v0.7.0 - Beta",
-    
-    "problem": """
-    💔 EL PROBLEMA REAL:
-    Las pequeñas organizaciones sociales que atienden violencia de género, 
-    derechos humanos y asesoría legal reciben DECENAS de mensajes desesperados.
-    
-    Sin recursos suficientes, se colapsan. La información sensible viaja por 
-    internet. El tiempo es crítico.
-    """,
-    
-    "solution": """
-    ⚡ LA SOLUCIÓN:
-    Una herramienta en un PENDRIVE que:
-    
-    ✓ Funciona OFFLINE 100% (privacidad garantizada)
-    ✓ Clasifica urgencias automáticamente (riesgo de vida, menores)
-    ✓ Detecta palabras clave de peligro
-    ✓ Redacta respuestas borrador legales
-    ✓ Acceso a base de datos local de emergencias
-    ✓ Sin conexión a internet (datos seguros)
-    ✓ Opera sin requisitos técnicos avanzados
-    """,
-    
-    "how_it_works": """
-    🔧 CÓMO FUNCIONA:
-    
-    1. Recibir: Operador ingresa mensaje/transcripción de víctima
-    2. Analizar: Sistema detecta palabras clave de urgencia
-    3. Clasificar: Asigna nivel de urgencia (Muy Alta/Alta/Media/Baja)
-    4. Sugerir: Recomienda recursos locales (hospitales, abogados, refugios)
-    5. Redactar: Genera respuesta borrador con pasos legales
-    6. Responder: Operador revisa y envía (criterio humano siempre)
-    
-    ⏱️ Todo en <500ms. 100% local.
-    """,
-    
-    "features": [
-        "🎯 Detección de Urgencias (IA local, reglas)",
-        "📞 Base de Datos de Emergencias Actualizada",
-        "📝 Redactor Automático de Respuestas",
-        "🔐 Cifrado AES-256 (datos en reposo)",
-        "👤 Autenticación (acceso protegido)",
-        "📊 Auditoría Completa (registro de acciones)",
-        "🌍 Soporte Multi-Región (CABA, GBA, etc)",
-        "🌓 Tema Claro/Oscuro",
-        "⚙️ Configurable para cada ONG",
-        "📦 Distribución en Pendrive"
-    ]
-}
+logger = logging.getLogger(__name__)
 
 
-class DashboardPanel(ctk.CTkFrame):
-    """Panel de dashboard con información del proyecto."""
+class CaseStats:
+    """Estadísticas de casos."""
+    
+    def __init__(self):
+        self.total_cases = 0
+        self.by_urgency = {
+            "Muy Alta": 0,
+            "Alta": 0,
+            "Media": 0,
+            "Baja": 0
+        }
+        self.by_category = {}
+        self.cases_today = 0
+        self.cases_this_week = 0
+    
+    def add_case(self, urgency: str, category: str):
+        """Agrega un caso a las estadísticas."""
+        self.total_cases += 1
+        self.by_urgency[urgency] = self.by_urgency.get(urgency, 0) + 1
+        self.by_category[category] = self.by_category.get(category, 0) + 1
+        self.cases_today += 1
+        self.cases_this_week += 1
+        logger.info(f"📊 Caso agregado: {urgency} - {category}")
+
+
+class DashboardFrame(ctk.CTkFrame):
+    """Dashboard con métricas y estadísticas."""
     
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
+        self.stats = CaseStats()
+        self.cases_history = []
         self._setup_ui()
     
     def _setup_ui(self):
-        """Configura el dashboard."""
-        
-        # Scroll principal
-        scroll = ctk.CTkScrollableFrame(self, fg_color="transparent")
-        scroll.pack(fill="both", expand=True, padx=SPACING["md"], pady=SPACING["md"])
+        """Configura dashboard."""
         
         # Título
         title = ctk.CTkLabel(
-            scroll,
-            text=PROJECT_INFO["title"],
-            font=("Helvetica", 24, "bold"),
-            text_color=COLORS["primary"]
-        )
-        title.pack(anchor="w", pady=(0, 5))
-        
-        # Subtítulo
-        subtitle = ctk.CTkLabel(
-            scroll,
-            text=PROJECT_INFO["subtitle"],
-            font=("Helvetica", 14),
-            text_color=COLORS["text_muted"]
-        )
-        subtitle.pack(anchor="w", pady=(0, SPACING["md"]))
-        
-        # Versión
-        version = ctk.CTkLabel(
-            scroll,
-            text=PROJECT_INFO["version"],
-            font=FONTS["small"],
-            text_color=COLORS["text_muted"]
-        )
-        version.pack(anchor="w", pady=(0, SPACING["lg"]))
-        
-        # --- EL PROBLEMA ---
-        self._create_section(scroll, PROJECT_INFO["problem"], COLORS["danger"])
-        
-        # --- LA SOLUCIÓN ---
-        self._create_section(scroll, PROJECT_INFO["solution"], COLORS["primary"])
-        
-        # --- CÓMO FUNCIONA ---
-        self._create_section(scroll, PROJECT_INFO["how_it_works"], COLORS["text"])
-        
-        # --- CARACTERÍSTICAS ---
-        self._create_features_section(scroll)
-        
-        # Footer
-        footer = ctk.CTkLabel(
-            scroll,
-            text="Desarrollado por Sarah Lee Olivera\nPara organizaciones que luchan por la justicia social",
-            font=FONTS["small"],
-            text_color=COLORS["text_muted"],
-            justify="center"
-        )
-        footer.pack(pady=SPACING["lg"], anchor="center")
-    
-    def _create_section(self, parent, text: str, color: str):
-        """Crea una sección de contenido."""
-        
-        section = ctk.CTkFrame(parent, fg_color=COLORS["surface"], corner_radius=10)
-        section.pack(fill="x", pady=SPACING["md"])
-        
-        content = ctk.CTkLabel(
-            section,
-            text=text,
-            font=FONTS["small"],
-            text_color=color,
-            justify="left",
-            wraplength=600
-        )
-        content.pack(padx=SPACING["md"], pady=SPACING["md"], anchor="w")
-    
-    def _create_features_section(self, parent):
-        """Crea sección de características."""
-        
-        features_title = ctk.CTkLabel(
-            parent,
-            text="✨ CARACTERÍSTICAS",
+            self,
+            text="📊 Dashboard",
             font=FONTS["heading"],
             text_color=COLORS["primary"]
         )
-        features_title.pack(anchor="w", pady=(SPACING["lg"], SPACING["sm"]))
+        title.pack(anchor="w", pady=(0, SPACING["md"]), padx=SPACING["md"])
         
-        features_frame = ctk.CTkFrame(parent, fg_color=COLORS["surface"], corner_radius=10)
-        features_frame.pack(fill="x", pady=(0, SPACING["md"]))
+        # Frame de métricas principales
+        metrics_frame = ctk.CTkFrame(self, fg_color="transparent")
+        metrics_frame.pack(fill="x", padx=SPACING["md"], pady=(0, SPACING["md"]))
         
-        for feature in PROJECT_INFO["features"]:
-            feature_label = ctk.CTkLabel(
-                features_frame,
-                text=feature,
-                font=FONTS["small"],
-                text_color=COLORS["text"],
-                justify="left"
-            )
-            feature_label.pack(anchor="w", padx=SPACING["md"], pady=SPACING["xs"])
+        # Métrica 1: Total de casos
+        self._create_metric(metrics_frame, "📋 Total", "0", 0)
+        
+        # Métrica 2: Muy Altas
+        self._create_metric(metrics_frame, "🔴 Muy Alta", "0", 1)
+        
+        # Métrica 3: Hoy
+        self._create_metric(metrics_frame, "📅 Hoy", "0", 2)
+        
+        # Métrica 4: Esta semana
+        self._create_metric(metrics_frame, "📆 Semana", "0", 3)
+        
+        # Frame de scroll para historial
+        scroll_label = ctk.CTkLabel(
+            self,
+            text="📜 Historial de Casos",
+            font=FONTS["normal"],
+            text_color=COLORS["text"]
+        )
+        scroll_label.pack(anchor="w", padx=SPACING["md"], pady=(SPACING["md"], SPACING["sm"]))
+        
+        self.history_scroll = ctk.CTkScrollableFrame(
+            self,
+            fg_color=COLORS["surface"]
+        )
+        self.history_scroll.pack(fill="both", expand=True, padx=SPACING["md"], pady=(0, SPACING["md"]))
+        
+        # Placeholder
+        self.history_placeholder = ctk.CTkLabel(
+            self.history_scroll,
+            text="No hay casos registrados aún",
+            text_color=COLORS["text_muted"],
+            font=FONTS["small"]
+        )
+        self.history_placeholder.pack(pady=SPACING["lg"])
+    
+    def _create_metric(self, parent, label: str, value: str, column: int):
+        """Crea una métrica visual."""
+        metric_frame = ctk.CTkFrame(parent, fg_color=COLORS["surface"], corner_radius=8)
+        metric_frame.grid(row=0, column=column, padx=SPACING["sm"], sticky="nsew", ipadx=10, ipady=10)
+        parent.grid_columnconfigure(column, weight=1)
+        
+        label_w = ctk.CTkLabel(metric_frame, text=label, font=FONTS["small"], text_color=COLORS["text_muted"])
+        label_w.pack()
+        
+        value_w = ctk.CTkLabel(metric_frame, text=value, font=("Helvetica", 24, "bold"), text_color=COLORS["primary"])
+        value_w.pack()
+        
+        # Guardar referencia para actualizar
+        if column == 0:
+            self.metric_total = value_w
+        elif column == 1:
+            self.metric_muy_alta = value_w
+        elif column == 2:
+            self.metric_today = value_w
+        elif column == 3:
+            self.metric_week = value_w
+    
+    def update_stats(self, urgency: str, category: str, case_number: str):
+        """Actualiza estadísticas con nuevo caso."""
+        self.stats.add_case(urgency, category)
+        
+        # Actualizar métricas
+        self.metric_total.configure(text=str(self.stats.total_cases))
+        self.metric_muy_alta.configure(text=str(self.stats.by_urgency["Muy Alta"]))
+        self.metric_today.configure(text=str(self.stats.cases_today))
+        self.metric_week.configure(text=str(self.stats.cases_this_week))
+        
+        # Agregar al historial
+        self._add_to_history(case_number, urgency, category)
+    
+    def _add_to_history(self, case_number: str, urgency: str, category: str):
+        """Agrega caso al historial."""
+        # Limpiar placeholder si es el primer caso
+        if self.stats.total_cases == 1:
+            self.history_placeholder.destroy()
+        
+        # Crear tarjeta de caso
+        case_card = ctk.CTkFrame(self.history_scroll, fg_color=COLORS["border"], corner_radius=6)
+        case_card.pack(fill="x", pady=SPACING["sm"])
+        
+        # Encabezado con número y urgencia
+        header = ctk.CTkFrame(case_card, fg_color="transparent")
+        header.pack(fill="x", padx=SPACING["sm"], pady=(SPACING["sm"], 0))
+        
+        case_label = ctk.CTkLabel(
+            header,
+            text=f"📋 {case_number}",
+            font=FONTS["normal"],
+            text_color=COLORS["text"]
+        )
+        case_label.pack(side="left")
+        
+        urgency_color = self._get_urgency_color(urgency)
+        urgency_label = ctk.CTkLabel(
+            header,
+            text=urgency,
+            font=FONTS["small"],
+            text_color=urgency_color
+        )
+        urgency_label.pack(side="right")
+        
+        # Info
+        time_label = ctk.CTkLabel(
+            case_card,
+            text=f"{category} • {datetime.now().strftime('%H:%M')}",
+            font=FONTS["small"],
+            text_color=COLORS["text_muted"]
+        )
+        time_label.pack(anchor="w", padx=SPACING["sm"], pady=(0, SPACING["sm"]))
+    
+    @staticmethod
+    def _get_urgency_color(urgency: str) -> str:
+        """Retorna color según urgencia."""
+        colors = {
+            "Muy Alta": COLORS["danger"],
+            "Alta": COLORS["warning"],
+            "Media": COLORS["primary"],
+            "Baja": COLORS["muted"]
+        }
+        return colors.get(urgency, COLORS["muted"])
