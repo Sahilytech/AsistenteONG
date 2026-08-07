@@ -21,19 +21,19 @@ def main():
     logger.info("🆘 Iniciando Asistente ONG...")
     
     try:
-        # Import relativo
-        from ui.main_window import MainWindow
+        # Import RELATIVO (con punto)
+        from .ui.main_window import MainWindow
         
         logger.info("✅ Cargando interfaz gráfica...")
         app = MainWindow()
         app.run()
         
     except ImportError as e:
-        logger.error(f"Error de importación: {e}")
+        logger.error(f"❌ Error de importación: {e}")
         print(f"❌ Error de importación: {e}")
         sys.exit(1)
     except Exception as e:
-        logger.error(f"Error: {e}", exc_info=True)
+        logger.error(f"❌ Error: {e}", exc_info=True)
         print(f"❌ Error: {e}")
         sys.exit(1)
 
