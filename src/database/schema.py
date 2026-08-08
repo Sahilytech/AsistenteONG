@@ -1,15 +1,21 @@
 """
-Esquema de base de datos SQLite
+Esquema de base de datos SQLite - Inicialización robusta
 """
 
 import sqlite3
 from pathlib import Path
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
 
-# Ruta de la base de datos
-DB_PATH = Path(__file__).parent.parent.parent / "data" / "asistente.db"
+# Ruta de la base de datos (portable)
+if getattr(sys, 'frozen', False):
+    BASE_DIR = Path(sys.executable).parent
+else:
+    BASE_DIR = Path(__file__).parent.parent.parent
+
+DB_PATH = BASE_DIR / "data" / "asistente.db"
 
 
 SCHEMA = """
@@ -89,22 +95,22 @@ def init_database():
     """Inicializa la base de datos con el esquema."""
     try:
         DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-        
+
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-        
+
         # Ejecutar schema
         for statement in SCHEMA.split(';'):
             if statement.strip():
                 cursor.execute(statement)
-        
+
         conn.commit()
         conn.close()
-        
-        logger.info(f"Base de datos inicializada en {DB_PATH}")
-        
+
+        logger.info(f"✅ Base de datos inicializada en {DB_PATH}")
+
     except Exception as e:
-        logger.error(f"Error inicializando base de datos: {e}")
+        logger.error(f"❌ Error inicializando base de datos: {e}")
         raise
 
 
