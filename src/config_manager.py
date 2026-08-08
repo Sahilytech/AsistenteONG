@@ -1,6 +1,7 @@
 """
 Gestor de configuración - Palabras clave expandidas, plantillas, urgencia
 +200 palabras clave en 9 categorías
+Corregido: detección de salud/alergias, no confunde con legal
 """
 
 from dataclasses import dataclass, field
@@ -14,10 +15,9 @@ logger = logging.getLogger(__name__)
 @dataclass
 class UrgencyConfig:
     """Configuración de detectores de urgencia - EXPANDIDA."""
-    
+
     # 🔴 RIESGO DE VIDA (Muy Alta) - +40 palabras clave
     risk_of_death: Set[str] = field(default_factory=lambda: {
-        # Suicidio
         "suicidio", "me voy a matar", "no quiero vivir", "quiero morir",
         "intento de suicidio", "suicidarme", "suicida", "suicidas",
         "ahorcarse", "ahorcado", "cuerda", "veneno", "venenos",
@@ -27,12 +27,11 @@ class UrgencyConfig:
         "me quiero morir", "pensamiento suicida", "ideación suicida",
         "plan de suicidio", "intento suicida", "riesgo inmediato",
         "riesgo de vida", "peligro de muerte", "riesgo mortales",
-        # Armas
         "arma", "armas", "revolver", "pistola", "cuchillo",
         "escopeta", "rifle", "ballesta", "navaja", "hacha",
         "muerte", "morir", "matar", "asesinato"
     })
-    
+
     # 🔴 VIOLENCIA SEVERA (Muy Alta) - +50 palabras clave
     severe_violence: Set[str] = field(default_factory=lambda: {
         "violencia", "violencias", "violento", "violenta",
@@ -55,7 +54,7 @@ class UrgencyConfig:
         "privación", "encierro", "encerrada", "encerrado",
         "cautiverio", "retenida", "retenido", "retención"
     })
-    
+
     # 🔴 MENORES INVOLUCRADOS (Muy Alta) - +40 palabras clave
     minors_involved: Set[str] = field(default_factory=lambda: {
         "niño", "niña", "niños", "niñas", "menor", "menores",
@@ -77,7 +76,7 @@ class UrgencyConfig:
         "sustracción de menores", "secuestro de menores",
         "riesgo de menores", "en peligro", "desprotección"
     })
-    
+
     # 🔴 VIOLENCIA SEXUAL (Muy Alta) - +45 palabras clave
     sexual_violence: Set[str] = field(default_factory=lambda: {
         "violación", "violada", "violado", "violar",
@@ -101,7 +100,7 @@ class UrgencyConfig:
         "violación en cita", "violación en fiesta",
         "drogas y sexo", "drogas para abuso"
     })
-    
+
     # 🟠 VIOLENCIA DOMÉSTICA (Alta) - +50 palabras clave
     domestic_violence: Set[str] = field(default_factory=lambda: {
         "pareja", "parejas", "ex pareja", "expareja",
@@ -133,7 +132,7 @@ class UrgencyConfig:
         "no para de pelear", "constantemente pelea",
         "demanda de atención", "demandante", "controlador"
     })
-    
+
     # 🟠 SALUD MENTAL (Alta) - +40 palabras clave
     mental_health: Set[str] = field(default_factory=lambda: {
         "depresión", "deprimida", "deprimido", "depresivo",
@@ -162,7 +161,42 @@ class UrgencyConfig:
         "trauma", "traumatizada", "traumatizado",
         "TEPT", "estrés postraumático"
     })
-    
+
+    # 🟡 SALUD FÍSICA / ALERGIAS / EMERGENCIAS MÉDICAS (Media-Alta)
+    health_issues: Set[str] = field(default_factory=lambda: {
+        "alergia", "alergias", "alérgica", "alérgico", "alérgica a",
+        "reacción alérgica", "shock anafiláctico", "anafilaxia",
+        "alergia alimentaria", "alergia al polen", "alergia al polvo",
+        "rinitis", "asma", "urticaria", "eccema", "dermatitis",
+        "hinchazón", "hinchado", "inflamación", "inflamado",
+        "dificultad para respirar", "no puedo respirar", "falta de aire",
+        "sibilancias", "tos", "tos persistente", "tos seca",
+        "picazón", "comezón", "piel roja", "erupción", "erupciones",
+        "ojos llorosos", "ojos rojos", "ojos hinchados",
+        "náuseas", "vómitos", "diarrea", "dolor de estómago",
+        "dolor de cabeza", "migraña", "cefalea",
+        "fiebre", "temperatura alta", "calentura",
+        "convulsiones", "ataques", "desmayo", "desmayos",
+        "mareos", "vértigo", "desorientación",
+        "dolor de pecho", "presión en el pecho", "palpitaciones",
+        "dificultad para tragar", "garganta cerrada",
+        "medicamento", "medicamentos", "pastillas", "remedio",
+        "epinefrina", "adrenalina", "epipen", "antihistamínico",
+        "hospital", "clínica", "médico", "doctor", "doctora",
+        "ambulancia", "emergencia médica", "urgencia médica",
+        "enfermedad", "enfermo", "enferma", "síntomas", "síntoma",
+        "infección", "infecciones", "virus", "bacteria",
+        "dolor", "dolores", "dolor intenso", "dolor agudo",
+        "fractura", "esguince", "torcedura", "luxación",
+        "quemadura", "quemaduras", "corte", "cortes",
+        "hemorragia", "sangrado", "sangrando",
+        "embarazo", "embarazada", "gestación", "parto",
+        "diabetes", "hipertensión", "presión alta", "presión baja",
+        "epilepsia", "asma", "cáncer", "tumor",
+        "vacuna", "vacunación", "inmunización",
+        "rehabilitación", "fisioterapia", "terapia ocupacional"
+    })
+
     # 🟠 NECESIDAD INMEDIATA (Alta) - +30 palabras clave
     immediate_need: Set[str] = field(default_factory=lambda: {
         "ahora", "ahorita", "ya", "urgente", "urgencia",
@@ -181,7 +215,7 @@ class UrgencyConfig:
         "sangrado", "hemorragia", "pérdida de conciencia",
         "inconsciente", "desmayada", "convulsiones"
     })
-    
+
     # 🟡 ASESORÍA LEGAL (Media) - +35 palabras clave
     legal_advice: Set[str] = field(default_factory=lambda: {
         "abogado", "abogada", "abogados", "legal",
@@ -208,7 +242,7 @@ class UrgencyConfig:
         "antecedentes penales", "antecedentes",
         "compensación", "indemnización"
     })
-    
+
     # 🟡 RECURSOS (Media) - +35 palabras clave
     resources: Set[str] = field(default_factory=lambda: {
         "refugio", "refugios", "alojamiento", "albergue",
@@ -234,52 +268,97 @@ class UrgencyConfig:
         "capacitación", "entrenamiento", "curso"
     })
 
+    # 🟢 DISCRIMINACIÓN / DERECHOS (Baja-Media)
+    discrimination: Set[str] = field(default_factory=lambda: {
+        "discriminación", "discriminada", "discriminado",
+        "racismo", "racista", "racial",
+        "homofobia", "homofóbico", "homofóbica",
+        "transfobia", "transfóbico", "transfóbica",
+        "xenofobia", "xenófobo", "xenófoba",
+        "misoginia", "misógino", "misógina",
+        "machismo", "machista",
+        "acoso laboral", "mobbing", "acoso escolar",
+        "bullying", "ciberbullying",
+        "derechos humanos", "derechos civiles",
+        "igualdad", "equidad", "inclusión",
+        "accesibilidad", "discapacidad", "discapacitado", "discapacitada",
+        "minoría", "minorías", "grupo vulnerable",
+        "migrante", "inmigrante", "refugiado", "refugiada",
+        "asilo", "extranjero", "extranjera",
+        "comunidad lgbt", "lgbtq", "lgbtqi+",
+        "género", "identidad de género", "orientación sexual",
+        "religión", "creencias", "libertad de culto"
+    })
+
     def detect_urgency(self, text: str) -> tuple[str, List[str]]:
-        """Detecta urgencia y keywords."""
+        """Detecta urgencia y keywords - CORREGIDO para salud/alergias."""
         text_lower = text.lower()
         found_keywords = []
-        
-        # Buscar por orden de importancia
+
+        # ===== ORDEN DE PRIORIDAD (del más grave al menos grave) =====
+
+        # 1. RIESGO DE VIDA (Muy Alta)
         if self._check_keywords(text_lower, self.risk_of_death):
             found_keywords.extend(["🔴 RIESGO DE VIDA"])
             return "Muy Alta", found_keywords
-        
+
+        # 2. VIOLENCIA SEVERA (Muy Alta)
         if self._check_keywords(text_lower, self.severe_violence):
             found_keywords.extend(["🔴 VIOLENCIA SEVERA"])
             if self._check_keywords(text_lower, self.immediate_need):
                 return "Muy Alta", found_keywords
             return "Alta", found_keywords
-        
+
+        # 3. MENORES INVOLUCRADOS (Muy Alta)
         if self._check_keywords(text_lower, self.minors_involved):
             found_keywords.extend(["🔴 MENORES INVOLUCRADOS"])
             return "Muy Alta", found_keywords
-        
+
+        # 4. VIOLENCIA SEXUAL (Muy Alta)
         if self._check_keywords(text_lower, self.sexual_violence):
             found_keywords.extend(["🔴 VIOLENCIA SEXUAL"])
             return "Muy Alta", found_keywords
-        
+
+        # 5. VIOLENCIA DOMÉSTICA (Alta)
         if self._check_keywords(text_lower, self.domestic_violence):
             found_keywords.extend(["🟠 VIOLENCIA DOMÉSTICA"])
             return "Alta", found_keywords
-        
+
+        # 6. SALUD MENTAL (Alta)
         if self._check_keywords(text_lower, self.mental_health):
             found_keywords.extend(["🟠 SALUD MENTAL"])
             return "Alta", found_keywords
-        
+
+        # 7. SALUD FÍSICA / ALERGIAS / EMERGENCIAS MÉDICAS (Media-Alta)
+        # ¡IMPORTANTE! Se evalúa ANTES de legal para no confundir
+        if self._check_keywords(text_lower, self.health_issues):
+            found_keywords.extend(["🟡 SALUD / ALERGIAS / EMERGENCIA MÉDICA"])
+            if self._check_keywords(text_lower, self.immediate_need):
+                return "Alta", found_keywords
+            return "Media", found_keywords
+
+        # 8. NECESIDAD INMEDIATA (Alta)
         if self._check_keywords(text_lower, self.immediate_need):
             found_keywords.extend(["🟠 NECESIDAD INMEDIATA"])
             return "Alta", found_keywords
-        
+
+        # 9. ASESORÍA LEGAL (Media)
         if self._check_keywords(text_lower, self.legal_advice):
             found_keywords.extend(["🟡 ASESORÍA LEGAL"])
             return "Media", found_keywords
-        
+
+        # 10. RECURSOS (Media)
         if self._check_keywords(text_lower, self.resources):
             found_keywords.extend(["🟡 RECURSOS"])
             return "Media", found_keywords
-        
+
+        # 11. DISCRIMINACIÓN (Baja-Media)
+        if self._check_keywords(text_lower, self.discrimination):
+            found_keywords.extend(["🟢 DISCRIMINACIÓN / DERECHOS"])
+            return "Baja", found_keywords
+
         return "Baja", []
-    
+
     @staticmethod
     def _check_keywords(text: str, keywords: Set[str]) -> bool:
         """Verifica si alguna palabra clave está en el texto."""
@@ -292,7 +371,7 @@ class UrgencyConfig:
 @dataclass
 class ResponseTemplate:
     """Plantilla de respuesta automática."""
-    
+
     urgency_level: str
     category: str
     template: str
@@ -302,14 +381,14 @@ class ResponseTemplate:
 
 class TemplateManager:
     """Gestor de plantillas de respuesta."""
-    
+
     def __init__(self):
         self.templates: Dict[str, List[ResponseTemplate]] = {}
         self._init_templates()
-    
+
     def _init_templates(self):
         """Inicializa plantillas por defecto."""
-        
+
         self.templates["Muy Alta"] = [
             ResponseTemplate(
                 urgency_level="Muy Alta",
@@ -332,7 +411,7 @@ Tu privacidad está protegida. Nada de lo que digas será compartido sin tu cons
                 resources_suggested=["linea_crisis", "hospital", "psicólogo"]
             ),
         ]
-        
+
         self.templates["Alta"] = [
             ResponseTemplate(
                 urgency_level="Alta",
@@ -356,7 +435,7 @@ Reconocemos que estás en una situación difícil. Aquí hay pasos que puedes to
                 resources_suggested=["refugio", "abogado", "psicólogo"]
             ),
         ]
-        
+
         self.templates["Media"] = [
             ResponseTemplate(
                 urgency_level="Media",
@@ -378,10 +457,30 @@ Entendemos que necesitas orientación legal. Podemos conectarte con profesionale
 Conectaremos tu caso con un abogado dentro de 24 horas.""",
                 resources_suggested=["abogado", "defensoría"]
             ),
+            ResponseTemplate(
+                urgency_level="Media",
+                category="salud",
+                template="""🏥 ORIENTACIÓN DE SALUD
+
+Hemos recibido tu consulta sobre salud/alergias.
+
+⚠️ IMPORTANTE:
+• Esta herramienta NO reemplaza la atención médica profesional
+• Si es una emergencia médica, llamá al 107 o 911
+• Consultá siempre con un médico para diagnóstico y tratamiento
+
+📋 RECURSOS DE SALUD:
+• Hospital más cercano: 911
+• Línea de salud: 0800-222-1002
+• Guardia de emergencias: consultá en tu localidad
+
+Tu bienestar es importante. Buscá atención profesional.""",
+                resources_suggested=["hospital", "linea_salud"]
+            ),
         ]
-        
+
         logger.info("✅ Plantillas inicializadas")
-    
+
     def get_template(self, urgency: str, category: str) -> ResponseTemplate:
         """Obtiene plantilla según urgencia y categoría."""
         templates = self.templates.get(urgency, self.templates.get("Media", []))
@@ -392,17 +491,27 @@ Conectaremos tu caso con un abogado dentro de 24 horas.""",
 
 class ConfigManager:
     """Gestor central de configuración."""
-    
+
     def __init__(self):
         self.urgency_config = UrgencyConfig()
         self.templates = TemplateManager()
         logger.info("✅ ConfigManager inicializado")
-    
+
     def analyze(self, text: str) -> dict:
         """Analiza texto y retorna configuración completa."""
         urgency, keywords = self.urgency_config.detect_urgency(text)
-        template = self.templates.get_template(urgency, "general")
-        
+
+        # Determinar categoría para plantilla
+        category = "general"
+        if "SALUD" in str(keywords):
+            category = "salud"
+        elif "LEGAL" in str(keywords):
+            category = "legal"
+        elif "VIOLENCIA" in str(keywords):
+            category = "violencia"
+
+        template = self.templates.get_template(urgency, category)
+
         return {
             "urgency": urgency,
             "keywords": keywords,
