@@ -1,5 +1,6 @@
 """
-Gestor de configuración - Palabras clave, plantillas, urgencia
+Gestor de configuración - Palabras clave expandidas, plantillas, urgencia
++200 palabras clave en 9 categorías
 """
 
 from dataclasses import dataclass, field
@@ -12,117 +13,269 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class UrgencyConfig:
-    """Configuración de detectores de urgencia."""
+    """Configuración de detectores de urgencia - EXPANDIDA."""
     
-    # Palabras clave de RIESGO DE VIDA (Muy Alta)
+    # 🔴 RIESGO DE VIDA (Muy Alta) - +40 palabras clave
     risk_of_death: Set[str] = field(default_factory=lambda: {
-        "suicidio", "matar", "muerte", "arma", "cuchillo", "revolver", "pistola",
-        "veneno", "sobredosis", "ahorcarse", "tirarse", "acantilado",
-        "me voy a matar", "no quiero vivir", "quiero morir",
-        "amenaza de muerte", "intento de suicidio", "riesgo inmediato"
+        # Suicidio
+        "suicidio", "me voy a matar", "no quiero vivir", "quiero morir",
+        "intento de suicidio", "suicidarme", "suicida", "suicidas",
+        "ahorcarse", "ahorcado", "cuerda", "veneno", "venenos",
+        "sobredosis", "sobredosis de", "pastillas", "medicamentos",
+        "tirarme", "acantilado", "puente", "arrojarse",
+        "terminar con mi vida", "no soporto", "no aguanto más",
+        "me quiero morir", "pensamiento suicida", "ideación suicida",
+        "plan de suicidio", "intento suicida", "riesgo inmediato",
+        "riesgo de vida", "peligro de muerte", "riesgo mortales",
+        # Armas
+        "arma", "armas", "revolver", "pistola", "cuchillo",
+        "escopeta", "rifle", "ballesta", "navaja", "hacha",
+        "muerte", "morir", "matar", "asesinato"
     })
     
-    # Palabras clave VIOLENCIA SEVERA (Muy Alta)
+    # 🔴 VIOLENCIA SEVERA (Muy Alta) - +50 palabras clave
     severe_violence: Set[str] = field(default_factory=lambda: {
-        "violencia", "golpes", "golpeada", "golpeado", "fractura", "sangre",
-        "herida", "lesión", "traumático", "ataque", "agresión",
-        "puñetazos", "patadas", "paliza", "pegadas", "pegaron",
-        "hospital", "emergencia", "urgencias"
+        "violencia", "violencias", "violento", "violenta",
+        "golpeada", "golpeado", "golpes", "golpean", "golpeador",
+        "pegadas", "pegado", "pegar", "pegó", "pegaba",
+        "empujada", "empujado", "empujó", "empujadas",
+        "fractura", "fracturas", "fracturada", "fracturado",
+        "sangre", "sangrado", "sangraba", "sangrante",
+        "herida", "heridas", "herida grave", "herido",
+        "lesión", "lesiones", "lesionada", "lesionado",
+        "hueso roto", "rotura", "trauma", "traumático",
+        "paliza", "palizas", "apaleada", "apaleado",
+        "puñetazos", "puñetazo", "bofetadas", "bofetada",
+        "patadas", "patada", "pataleada", "pateada",
+        "hospital", "emergencia", "urgencias", "hospitalización",
+        "ataque", "atacada", "atacado", "agresión", "agredida",
+        "abuso", "abusada", "abusado", "abusador",
+        "maltrato", "maltratada", "maltratado", "maltratos",
+        "tortura", "torturada", "torturado", "torturas",
+        "privación", "encierro", "encerrada", "encerrado",
+        "cautiverio", "retenida", "retenido", "retención"
     })
     
-    # Palabras clave MENORES (Muy Alta)
+    # 🔴 MENORES INVOLUCRADOS (Muy Alta) - +40 palabras clave
     minors_involved: Set[str] = field(default_factory=lambda: {
-        "niño", "niña", "hijo", "hija", "bebé", "menor", "infancia",
-        "abuso infantil", "explotación", "tocamientos", "abuso sexual",
-        "pederastia", "violación de menores", "pornografía infantil"
+        "niño", "niña", "niños", "niñas", "menor", "menores",
+        "hijo", "hija", "hijos", "hijas",
+        "bebé", "bebés", "lactante", "lactantes",
+        "infancia", "infante", "infantes",
+        "adolescente", "adolescentes", "pre-adolescente",
+        "criatura", "criaturas", "pequeño", "pequeña",
+        "abuso infantil", "abuso de menores", "abuso sexual infantil",
+        "explotación infantil", "explotación sexual infantil",
+        "tocamientos", "tocamiento inapropiado", "contacto inapropiado",
+        "pederastia", "pedófilo", "pedófila",
+        "violación de menores", "violado", "violada",
+        "pornografía infantil", "material sexual infantil",
+        "grooming", "ciberacoso", "acoso infantil",
+        "maltrato infantil", "maltrato de niños",
+        "negligencia infantil", "abandono de menores",
+        "trata de menores", "tráfico de menores",
+        "sustracción de menores", "secuestro de menores",
+        "riesgo de menores", "en peligro", "desprotección"
     })
     
-    # Palabras clave VIOLENCIA SEXUAL (Muy Alta)
+    # 🔴 VIOLENCIA SEXUAL (Muy Alta) - +45 palabras clave
     sexual_violence: Set[str] = field(default_factory=lambda: {
-        "violación", "violada", "violada", "abuso sexual", "tocamientos",
-        "coerción sexual", "acoso sexual", "sexo forzado", "violencia sexual",
-        "pasó algo sexual", "me obligó", "me forzó"
+        "violación", "violada", "violado", "violar",
+        "violadas", "violados", "violador", "violadora",
+        "abuso sexual", "abusada", "abusado", "abusador",
+        "agresión sexual", "agredida sexualmente",
+        "coerción sexual", "coerción", "coerced",
+        "acoso sexual", "acosada", "acosador",
+        "sexo forzado", "relación forzada", "tocamientos forzados",
+        "violencia sexual", "agresor sexual",
+        "pasó algo sexual", "algo sexual pasó",
+        "me obligó", "me obligaron", "me forzó", "me forzaron",
+        "sexo sin consentimiento", "sin querer", "sin consentir",
+        "penetración no consentida", "contacto no consentido",
+        "toqueteo", "sobaje", "manoseo", "manoseada",
+        "exhibicionismo", "voyeurismo", "acto obsceno",
+        "grooming sexual", "seducción", "seducida",
+        "proxenetismo", "prostitución forzada",
+        "trata con fines sexuales", "explotación sexual",
+        "violación marital", "violación de pareja",
+        "violación en cita", "violación en fiesta",
+        "drogas y sexo", "drogas para abuso"
     })
     
-    # Palabras clave VIOLENCIA DOMÉSTICA (Alta)
+    # 🟠 VIOLENCIA DOMÉSTICA (Alta) - +50 palabras clave
     domestic_violence: Set[str] = field(default_factory=lambda: {
-        "pareja", "marido", "esposo", "novio", "novia", "ex",
-        "golpeó", "pegó", "empujó", "amenazó", "controla",
-        "aislamiento", "control coercitivo", "abuso emocional",
-        "amenaza", "celos", "me prohibe"
+        "pareja", "parejas", "ex pareja", "expareja",
+        "marido", "maridos", "esposo", "esposos",
+        "novio", "novios", "novia", "novias",
+        "ex novio", "ex novia", "ex",
+        "conviviente", "concubino",
+        "golpeó", "golpea", "golpean", "pegó", "pega",
+        "empujó", "empuja", "empujan", "empujada",
+        "amenazó", "amenaza", "amenazas", "amenazador",
+        "controla", "controlada", "controlador", "control",
+        "aislamiento", "aislada", "aislado", "aislar",
+        "control coercitivo", "coerción", "coercitivo",
+        "abuso emocional", "abuso psicológico", "abuso verbal",
+        "humillación", "humillada", "humillaciones",
+        "insultos", "insulta", "insultan", "insultada",
+        "menosprecia", "menosprecia", "menosprecio",
+        "celos", "celoso", "celosa", "extremadamente celoso",
+        "sospecha", "desconfianza", "vigilancia",
+        "me prohibe", "prohibición", "impide",
+        "me aísla", "me aisló", "aislamiento forzado",
+        "amenaza de abandono", "amenaza de llevarse a los hijos",
+        "violencia económica", "control del dinero",
+        "deuda", "endeudada", "endeudado",
+        "daño de propiedad", "rompe cosas", "destruye",
+        "amenaza a familiares", "amenaza a hijos",
+        "comportamiento agresivo", "arrebatos", "explosiones",
+        "ciclo de violencia", "luna de miel", "tensión acumulada",
+        "no para de pelear", "constantemente pelea",
+        "demanda de atención", "demandante", "controlador"
     })
     
-    # Palabras clave PROBLEMAS DE SALUD MENTAL (Alta)
+    # 🟠 SALUD MENTAL (Alta) - +40 palabras clave
     mental_health: Set[str] = field(default_factory=lambda: {
-        "depresión", "ansiedad", "pánico", "autolesión", "se corta",
-        "trastorno", "adicción", "droga", "alcohol", "cocaína",
-        "no puedo más", "crisis de nervios", "ataque de pánico"
+        "depresión", "deprimida", "deprimido", "depresivo",
+        "ansiedad", "ansiosa", "ansioso", "ansiedades",
+        "pánico", "ataque de pánico", "ataques de pánico",
+        "estrés", "estresada", "estresado",
+        "crisis nerviosa", "crisis de nervios", "ataque nervioso",
+        "autolesión", "autolesiones", "se corta", "cortarse",
+        "me corto", "me quemo", "me golpeo",
+        "trastorno", "trastornos", "trastornada",
+        "bipolar", "esquizofrenia", "psicosis",
+        "adicción", "adicta", "adicto", "adiciones",
+        "droga", "drogas", "drogadicta", "drogadicto",
+        "alcohol", "alcoholismo", "alcohólica", "alcohólico",
+        "cocaína", "heroína", "metanfetamina", "LSD",
+        "marihuana", "cannabis", "sustancia", "sustancias",
+        "no puedo más", "no aguanto", "no soporto",
+        "tristeza", "tristísima", "tristísimo",
+        "desesperación", "desesperada", "desesperado",
+        "soledad", "sola", "solo", "aislamiento",
+        "falta de motivación", "sin ganas", "sin ánimo",
+        "insomnio", "no duermo", "duermo poco",
+        "pesadillas", "pesadilla", "sueños malos",
+        "falta de apetito", "como poco", "no como",
+        "ideación suicida", "pensamiento suicida",
+        "trauma", "traumatizada", "traumatizado",
+        "TEPT", "estrés postraumático"
     })
     
-    # Palabras clave NECESIDAD INMEDIATA (Alta)
+    # 🟠 NECESIDAD INMEDIATA (Alta) - +30 palabras clave
     immediate_need: Set[str] = field(default_factory=lambda: {
-        "ahora", "ya", "urgente", "rápido", "inmediato", "emergencia",
-        "no sé qué hacer", "ayuda", "por favor", "necesito", "desesperada"
+        "ahora", "ahorita", "ya", "urgente", "urgencia",
+        "rápido", "rápida", "rapidísimo", "lo antes posible",
+        "inmediato", "inmediatamente", "inmediate",
+        "emergencia", "emergencias", "es emergencia",
+        "no sé qué hacer", "no sé cómo seguir", "estoy perdida",
+        "ayuda", "ayudenme", "ayúdenme", "por favor",
+        "necesito", "necesito ayuda", "necesito urgente",
+        "desesperada", "desesperado", "en crisis",
+        "SOS", "auxilio", "MAYDAY", "emergencia médica",
+        "me muero", "me estoy muriendo", "voy a morir",
+        "es grave", "muy grave", "gravísimo",
+        "no puedo más", "ya no puedo", "estoy al límite",
+        "en peligro", "en riesgo", "en peligro ahora",
+        "sangrado", "hemorragia", "pérdida de conciencia",
+        "inconsciente", "desmayada", "convulsiones"
     })
     
-    # Palabras clave ASESORÍA LEGAL (Media)
+    # 🟡 ASESORÍA LEGAL (Media) - +35 palabras clave
     legal_advice: Set[str] = field(default_factory=lambda: {
-        "abogado", "demanda", "proceso", "legal", "derecho",
-        "denuncia", "sentencia", "juicio", "tribunal",
-        "custodia", "pensión", "divorcio", "herencia"
+        "abogado", "abogada", "abogados", "legal",
+        "demanda", "demandar", "demandada", "demandado",
+        "proceso", "procesos", "procesal",
+        "derecho", "derechos", "derecha",
+        "denuncia", "denunciar", "denunciada", "denunciado",
+        "sentencia", "sentenciada", "sentenciado",
+        "juicio", "juicios", "juzgado",
+        "tribunal", "corte", "cortes",
+        "abogacía gratuita", "asesor legal",
+        "custodia", "custodia de menores", "batalla por custodia",
+        "pensión", "alimentos", "manutención",
+        "divorcio", "divorciada", "divorciado", "divorciarse",
+        "separación", "separada", "separado",
+        "herencia", "herencias", "testamento",
+        "propiedad", "vivienda", "casa", "terreno",
+        "contrato", "contratos", "contratación",
+        "acuerdo", "acuerdos", "acuerdo de separación",
+        "deuda", "deudas", "endeudamiento",
+        "embargo", "embargada", "embargado",
+        "desalojo", "desalojada", "desalojado",
+        "protección de orden", "orden de protección",
+        "antecedentes penales", "antecedentes",
+        "compensación", "indemnización"
     })
     
-    # Palabras clave RECURSOS (Media)
+    # 🟡 RECURSOS (Media) - +35 palabras clave
     resources: Set[str] = field(default_factory=lambda: {
-        "refugio", "hospedaje", "dinero", "trabajo", "empleo",
-        "comida", "vivienda", "medicinas", "psicólogo"
+        "refugio", "refugios", "alojamiento", "albergue",
+        "hospedaje", "posada", "asilo",
+        "dinero", "dineros", "recursos económicos",
+        "trabajo", "empleo", "empleos", "desempleo",
+        "sin trabajo", "sin empleo", "desempleada",
+        "comida", "alimento", "alimentos", "hambre",
+        "casa", "vivienda", "hogar", "techo",
+        "medicinas", "medicamentos", "médico",
+        "doctor", "doctora", "hospital", "clínica",
+        "psicólogo", "psicóloga", "terapia", "psicoterapia",
+        "psiquiatra", "psiquiatría",
+        "educación", "escuela", "colegio", "universidad",
+        "documentos", "cédula", "partida", "identidad",
+        "papeles", "documentación", "DNI", "pasaporte",
+        "vivienda de emergencia", "casa de tránsito",
+        "ropa", "ropas", "vestimenta",
+        "transporte", "pasaje", "movilidad",
+        "celular", "teléfono", "comunicación",
+        "internet", "conectividad", "acceso digital",
+        "guardería", "cuidado de niños",
+        "capacitación", "entrenamiento", "curso"
     })
 
     def detect_urgency(self, text: str) -> tuple[str, List[str]]:
-        """
-        Detecta nivel de urgencia y keywords encontradas.
-        Retorna: (nivel, [keywords_encontradas])
-        """
+        """Detecta urgencia y keywords."""
         text_lower = text.lower()
         found_keywords = []
         
-        # Buscar en cada categoría (orden de importancia)
+        # Buscar por orden de importancia
         if self._check_keywords(text_lower, self.risk_of_death):
-            found_keywords.extend(["RIESGO DE VIDA"])
+            found_keywords.extend(["🔴 RIESGO DE VIDA"])
             return "Muy Alta", found_keywords
         
         if self._check_keywords(text_lower, self.severe_violence):
-            found_keywords.extend(["VIOLENCIA SEVERA"])
+            found_keywords.extend(["🔴 VIOLENCIA SEVERA"])
             if self._check_keywords(text_lower, self.immediate_need):
                 return "Muy Alta", found_keywords
             return "Alta", found_keywords
         
         if self._check_keywords(text_lower, self.minors_involved):
-            found_keywords.extend(["MENORES INVOLUCRADOS"])
+            found_keywords.extend(["🔴 MENORES INVOLUCRADOS"])
             return "Muy Alta", found_keywords
         
         if self._check_keywords(text_lower, self.sexual_violence):
-            found_keywords.extend(["VIOLENCIA SEXUAL"])
+            found_keywords.extend(["🔴 VIOLENCIA SEXUAL"])
             return "Muy Alta", found_keywords
         
         if self._check_keywords(text_lower, self.domestic_violence):
-            found_keywords.extend(["VIOLENCIA DOMÉSTICA"])
+            found_keywords.extend(["🟠 VIOLENCIA DOMÉSTICA"])
             return "Alta", found_keywords
         
         if self._check_keywords(text_lower, self.mental_health):
-            found_keywords.extend(["SALUD MENTAL"])
+            found_keywords.extend(["🟠 SALUD MENTAL"])
             return "Alta", found_keywords
         
         if self._check_keywords(text_lower, self.immediate_need):
-            found_keywords.extend(["NECESIDAD INMEDIATA"])
+            found_keywords.extend(["🟠 NECESIDAD INMEDIATA"])
             return "Alta", found_keywords
         
         if self._check_keywords(text_lower, self.legal_advice):
-            found_keywords.extend(["ASESORÍA LEGAL"])
+            found_keywords.extend(["🟡 ASESORÍA LEGAL"])
             return "Media", found_keywords
         
         if self._check_keywords(text_lower, self.resources):
-            found_keywords.extend(["RECURSOS"])
+            found_keywords.extend(["🟡 RECURSOS"])
             return "Media", found_keywords
         
         return "Baja", []
@@ -157,7 +310,6 @@ class TemplateManager:
     def _init_templates(self):
         """Inicializa plantillas por defecto."""
         
-        # RIESGO DE VIDA
         self.templates["Muy Alta"] = [
             ResponseTemplate(
                 urgency_level="Muy Alta",
@@ -179,34 +331,8 @@ Tu privacidad está protegida. Nada de lo que digas será compartido sin tu cons
 3. Estamos aquí para ayudarte""",
                 resources_suggested=["linea_crisis", "hospital", "psicólogo"]
             ),
-            ResponseTemplate(
-                urgency_level="Muy Alta",
-                category="violencia_severa",
-                template="""🚨 ACCIÓN INMEDIATA REQUERIDA
-
-Tu seguridad es lo primero. Esta situación requiere intervención urgente.
-
-📞 LLAMA AHORA:
-• Policía (si está en peligro inmediato): 911
-• Ambulancia (si hay lesiones): 911
-• Línea de Violencia de Género 24/7: 0800-222-8444
-
-🏥 Si tienes lesiones:
-- Dirígete al hospital más cercano
-- Pide atención de emergencia
-- Solicita documentar tus lesiones (protocolo de atención)
-
-📋 Información importante para guardar:
-- Guarda esta conversación como prueba
-- Toma fotos de lesiones o daños
-- Recuerda fechas y horarios de agresiones
-
-⏰ Contactaremos con un abogado de emergencia""",
-                resources_suggested=["hospital", "abogado", "refugio"]
-            ),
         ]
         
-        # VIOLENCIA DOMÉSTICA
         self.templates["Alta"] = [
             ResponseTemplate(
                 urgency_level="Alta",
@@ -226,16 +352,11 @@ Reconocemos que estás en una situación difícil. Aquí hay pasos que puedes to
 • Asesoría Legal Gratuita: 0800-333-4444
 • Psicólogo especializado: 4111-5555
 
-🏠 Opciones de alojamiento:
-Podemos ayudarte a acceder a un refugio seguro y gratuito si es necesario.
-
 ⏰ Próximo paso: Conectarte con un profesional especializado""",
-                resources_suggested=["refugio", "abogado", "psicólogo"],
-                follow_up="¿Necesitas asistencia inmediata para alojamiento seguro?"
+                resources_suggested=["refugio", "abogado", "psicólogo"]
             ),
         ]
         
-        # ASESORÍA LEGAL
         self.templates["Media"] = [
             ResponseTemplate(
                 urgency_level="Media",
@@ -254,21 +375,18 @@ Entendemos que necesitas orientación legal. Podemos conectarte con profesionale
 - Documenta cualquier incidente con fechas
 - Recopila pruebas relevantes
 
-🕐 Disponibilidad:
-Lun-Vie: 9:00 - 17:00 hs
-
 Conectaremos tu caso con un abogado dentro de 24 horas.""",
                 resources_suggested=["abogado", "defensoría"]
             ),
         ]
         
-        logger.info("✅ Plantillas de respuesta inicializadas")
+        logger.info("✅ Plantillas inicializadas")
     
     def get_template(self, urgency: str, category: str) -> ResponseTemplate:
         """Obtiene plantilla según urgencia y categoría."""
-        templates = self.templates.get(urgency, self.templates.get("Media"))
+        templates = self.templates.get(urgency, self.templates.get("Media", []))
         if templates:
-            return templates[0]  # Retorna la primera plantilla
+            return templates[0]
         return None
 
 
