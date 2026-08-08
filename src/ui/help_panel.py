@@ -1,164 +1,250 @@
 """
-Panel de Ayuda - Tutorial e Instrucciones
+Panel de ayuda - Tutorial interactivo paso a paso
 """
 
 import customtkinter as ctk
+from typing import List, Dict
+import logging
+
 from .styles import COLORS, FONTS, SPACING
 
+logger = logging.getLogger(__name__)
+
+
+TUTORIAL_STEPS = [
+    {
+        "title": "1️⃣ Bienvenida",
+        "content": """Bienvenido al Asistente ONG.
+
+Esta herramienta te ayuda a:
+• Organizar casos de lineas de ayuda
+• Detectar urgencias automaticamente
+• Encontrar recursos relevantes
+• Generar borradores de respuesta
+• Crear informes sociales profesionales
+
+Todo funciona 100% OFFLINE. Sin internet."""
+    },
+    {
+        "title": "2️⃣ Crear un caso",
+        "content": """Para crear un caso:
+
+1. El numero se genera automaticamente
+2. Escribi la descripcion en el panel izquierdo
+3. Hace clic en "Analizar y Guardar caso"
+4. El sistema detecta la urgencia y categoria
+
+💡 Tip: Cuanto mas detalle des, mejor el analisis."""
+    },
+    {
+        "title": "3️⃣ Revisar el analisis",
+        "content": """En la pestana "Analisis" vas a ver:
+
+• 🚨 Nivel de urgencia (Muy Alta a Baja)
+• 🔑 Palabras clave detectadas
+• 📨 Borrador de respuesta automatico
+• 📞 Recursos sugeridos
+
+⚠️ IMPORTANTE: El borrador es solo una guia.
+Siempre revisalo antes de enviarlo."""
+    },
+    {
+        "title": "4️⃣ Informes Sociales",
+        "content": """En la pestana "Informes":
+
+• Completa los 7 tabs con datos del caso
+• Agrega miembros de la unidad de convivencia
+• Guarda el informe en la base de datos
+• Exporta a PDF profesional
+
+Los informes siguen la estructura estandar
+de trabajo social con todas las secciones
+requeridas."""
+    },
+    {
+        "title": "5️⃣ Buscar recursos",
+        "content": """En la pestana "Recursos":
+
+• Filtra por tipo (salud, legal, etc.)
+• Filtra por region
+• Hace clic en "Copiar telefono"
+• Los datos vienen de la base local
+
+💡 Si no encontras algo, podes agregarlo
+en Configuracion."""
+    },
+    {
+        "title": "6️⃣ Dashboard",
+        "content": """El Dashboard muestra:
+
+• 📋 Total de casos
+• 🔴 Casos de muy alta urgencia
+• 📅 Casos de hoy y esta semana
+• 📜 Historial reciente
+
+Todo se guarda automaticamente en la base
+de datos local."""
+    },
+    {
+        "title": "7️⃣ Configuracion",
+        "content": """En Configuracion podes:
+
+• Cambiar entre tema claro/oscuro
+• Ver estado de la IA local
+• Exportar/Importar datos
+• Configurar el modelo de IA
+
+💡 Para usar IA avanzada, descarga un
+modelo GGUF en la carpeta /models."""
+    },
+    {
+        "title": "8️⃣ Modo offline",
+        "content": """La app funciona sin internet:
+
+• ✅ Analisis por reglas (siempre)
+• ✅ Base de datos local
+• ✅ Recursos locales
+• ✅ Informes y PDFs
+• ⚠️ IA avanzada (solo si descargaste modelo)
+
+Para actualizar recursos necesitas internet
+temporalmente."""
+    },
+    {
+        "title": "9️⃣ Privacidad",
+        "content": """Tus datos estan protegidos:
+
+• 🔒 Todo queda en tu computadora
+• 🔒 Sin enviar a servidores externos
+• 🔒 Sin conexion a internet requerida
+• 🔒 Base de datos local cifrada
+
+Solo vos tenes acceso a la informacion."""
+    },
+    {
+        "title": "🔟 Atajos de teclado",
+        "content": """Atajos utiles:
+
+• Ctrl+N: Nuevo caso
+• Ctrl+S: Guardar informe
+• Ctrl+E: Exportar PDF
+• Ctrl+T: Cambiar tema
+• F1: Esta ayuda
+
+💡 El sistema guarda automaticamente
+cada 30 segundos."""
+    }
+]
+
+
 class HelpPanel(ctk.CTkFrame):
-    """Panel con tutorial e instrucciones."""
-    
+    """Panel de ayuda con tutorial paso a paso."""
+
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
+        self.current_step = 0
         self._setup_ui()
-    
+
     def _setup_ui(self):
-        """Configura panel de ayuda."""
-        
-        scroll = ctk.CTkScrollableFrame(self, fg_color="transparent")
-        scroll.pack(fill="both", expand=True, padx=15, pady=15)
-        
-        # Título
-        ctk.CTkLabel(
-            scroll,
-            text="📚 TUTORIAL Y AYUDA",
-            font=("Helvetica", 20, "bold"),
-            text_color=COLORS["primary"]
-        ).pack(anchor="w", pady=(0, 20))
-        
-        # Sección 1: Inicio Rápido
-        self._section(scroll, "🚀 INICIO RÁPIDO (3 pasos)", [
-            "1. Ingresa el NÚMERO DE CASO en el panel izquierdo",
-            "2. Escribe la DESCRIPCIÓN del caso (qué pasó, quién llama)",
-            "3. Clic en '✅ Analizar caso'",
-            "",
-            "El sistema detectará automáticamente:",
-            "   • Nivel de urgencia (Muy Alta, Alta, Media, Baja)",
-            "   • Palabras clave encontradas",
-            "   • Respuesta borrador personalizada",
-            "   • Recursos sugeridos"
-        ])
-        
-        # Sección 2: Cómo Usar Cada Tab
-        self._section(scroll, "📋 CÓMO USAR CADA TAB", [
-            "📊 DASHBOARD:",
-            "   • Ver total de casos procesados",
-            "   • Estadísticas de urgencia",
-            "   • Historial de casos de hoy y esta semana",
-            "",
-            "📊 ANÁLISIS:",
-            "   • Ver resultado del análisis automático",
-            "   • Editar respuesta borrador",
-            "   • Copiar al portapapeles",
-            "   • Ver recursos sugeridos",
-            "",
-            "📞 RECURSOS:",
-            "   • Buscar por tipo (Hospital, Refugio, etc)",
-            "   • Filtrar por región",
-            "   • Copiar teléfonos directamente",
-            "",
-            "⚙️ CONFIGURACIÓN:",
-            "   • Ver palabras clave de cada categoría",
-            "   • Editar plantillas de respuesta",
-            "",
-            "❓ AYUDA:",
-            "   • Ves este tutorial"
-        ])
-        
-        # Sección 3: Niveles de Urgencia
-        self._section(scroll, "🚨 ENTENDER LOS NIVELES DE URGENCIA", [
-            "🔴 MUY ALTA (Emergencia inmediata):",
-            "   → Riesgo de vida (suicidio, armas)",
-            "   → Violencia severa con hospitalizaciones",
-            "   → Menores en peligro",
-            "   → Violencia sexual",
-            "   ⏰ ACCIÓN: Contactar emergencias YA",
-            "",
-            "🟠 ALTA (Requiere atención urgente):",
-            "   → Violencia doméstica activa",
-            "   → Crisis de salud mental",
-            "   → Necesidad inmediata",
-            "   ⏰ ACCIÓN: Contactar en horas",
-            "",
-            "🟡 MEDIA (Orientación necesaria):",
-            "   → Asesoría legal",
-            "   → Necesidad de recursos",
-            "   ⏰ ACCIÓN: Dentro de 24 horas",
-            "",
-            "⚪ BAJA (Información):",
-            "   → Sin palabras clave detectadas",
-            "   ⏰ ACCIÓN: Seguimiento rutinario"
-        ])
-        
-        # Sección 4: Palabras Clave Importantes
-        self._section(scroll, "🔑 PALABRAS CLAVE QUE BUSCA EL SISTEMA", [
-            "🔴 Riesgo de Vida:",
-            "   suicidio, matar, muerte, arma, veneno, sobredosis",
-            "",
-            "🔴 Violencia Severa:",
-            "   golpes, sangre, fractura, trauma, hospital, emergency",
-            "",
-            "🔴 Menores:",
-            "   niño, niña, hijo, hija, bebé, abuso infantil",
-            "",
-            "🔴 Violencia Sexual:",
-            "   violación, abuso sexual, tocamientos, forzada",
-            "",
-            "🟠 Violencia Doméstica:",
-            "   pareja, marido, novio, golpeó, amenaza, controla",
-            "",
-            "🟠 Salud Mental:",
-            "   depresión, ansiedad, pánico, autolesión, adicción",
-            "",
-            "🟠 Necesidad Inmediata:",
-            "   ahora, urgente, emergencia, ayuda, SOS",
-            "",
-            "🟡 Legal:",
-            "   abogado, demanda, custodia, divorcio, derechos",
-            "",
-            "🟡 Recursos:",
-            "   refugio, dinero, trabajo, comida, vivienda, medicinas"
-        ])
-        
-        # Sección 5: Tips Importantes
-        self._section(scroll, "💡 TIPS PARA OPERADORES", [
-            "✅ SER EMPÁTICO: La persona está pasando algo difícil",
-            "✅ USAR LA RESPUESTA COMO BORRADOR: Personaliza según el caso",
-            "✅ SIEMPRE PRIORIZAR SEGURIDAD: Si es Muy Alta, llamá ahora",
-            "✅ GUARDAR DATOS: Los datos quedan en el historial",
-            "✅ OFFLINE FUNCIONA: Sin internet sigue funcionando TODO",
-            "✅ TELÉFONOS A MANO: Ten los números de emergencia listos",
-            "✅ ESCUCHAR: A veces la persona solo necesita ser escuchada",
-            "✅ NO ES REEMPLAZO: Somos asistentes, no reemplazamos a profesionales"
-        ])
-        
-        # Sección 6: Privacidad
-        self._section(scroll, "🔒 PRIVACIDAD Y SEGURIDAD", [
-            "✅ TODO ES LOCAL: Los datos no salen de esta computadora",
-            "✅ SIN INTERNET: No necesita conexión para funcionar",
-            "✅ CIFRADO: Los datos sensibles están protegidos",
-            "✅ CONFIDENCIAL: Las víctimas pueden confiar en la privacidad",
-            "✅ CUMPLE GDPR: Compatible con leyes de protección de datos"
-        ])
-    
-    def _section(self, parent, title: str, items: list):
-        """Crea una sección de ayuda."""
-        ctk.CTkLabel(
-            parent,
-            text=title,
-            font=("Helvetica", 14, "bold"),
-            text_color=COLORS["primary"]
-        ).pack(anchor="w", pady=(15, 10))
-        
-        for item in items:
-            if item == "":
-                ctk.CTkFrame(parent, height=5, fg_color="transparent").pack()
-            else:
-                ctk.CTkLabel(
-                    parent,
-                    text=item,
-                    font=("Helvetica", 11),
-                    text_color=COLORS["text"],
-                    justify="left",
-                    wraplength=400
-                ).pack(anchor="w", padx=10, pady=2)
+        """Configura el panel de ayuda."""
+
+        # Titulo
+        title = ctk.CTkLabel(
+            self,
+            text="❓ Centro de Ayuda",
+            font=FONTS["heading"],
+            text_color="#0e98d6"
+        )
+        title.pack(anchor="w", pady=(0, 16), padx=16)
+
+        # Indicador de paso
+        self.step_indicator = ctk.CTkLabel(
+            self,
+            text=f"Paso 1 de {len(TUTORIAL_STEPS)}",
+            font=FONTS["small"],
+            text_color=COLORS["text_muted"]
+        )
+        self.step_indicator.pack(anchor="w", padx=16)
+
+        # Barra de progreso
+        self.progress = ctk.CTkProgressBar(self, width=400)
+        self.progress.pack(fill="x", padx=16, pady=8)
+        self.progress.set(1 / len(TUTORIAL_STEPS))
+
+        # Frame del contenido
+        self.content_frame = ctk.CTkFrame(self, fg_color=COLORS["surface"], corner_radius=8)
+        self.content_frame.pack(fill="both", expand=True, padx=16, pady=16)
+
+        # Titulo del paso
+        self.step_title = ctk.CTkLabel(
+            self.content_frame,
+            text="",
+            font=FONTS["heading"],
+            text_color="#0e98d6",
+            wraplength=500,
+            justify="left"
+        )
+        self.step_title.pack(anchor="w", padx=16, pady=(16, 8))
+
+        # Contenido del paso
+        self.step_content = ctk.CTkLabel(
+            self.content_frame,
+            text="",
+            font=FONTS["normal"],
+            text_color=COLORS["text"],
+            wraplength=500,
+            justify="left"
+        )
+        self.step_content.pack(anchor="w", padx=16, pady=(0, 16))
+
+        # Botones de navegacion
+        nav_frame = ctk.CTkFrame(self, fg_color="transparent")
+        nav_frame.pack(fill="x", padx=16, pady=16)
+
+        self.prev_btn = ctk.CTkButton(
+            nav_frame,
+            text="◀ Anterior",
+            command=self._prev_step,
+            fg_color=COLORS["muted"],
+            text_color="white",
+            width=120
+        )
+        self.prev_btn.pack(side="left")
+
+        self.next_btn = ctk.CTkButton(
+            nav_frame,
+            text="Siguiente ▶",
+            command=self._next_step,
+            fg_color="#0e98d6",
+            text_color="white",
+            width=120
+        )
+        self.next_btn.pack(side="right")
+
+        # Mostrar primer paso
+        self._show_step(0)
+
+    def _show_step(self, index: int):
+        """Muestra un paso especifico."""
+        if 0 <= index < len(TUTORIAL_STEPS):
+            step = TUTORIAL_STEPS[index]
+            self.step_title.configure(text=step["title"])
+            self.step_content.configure(text=step["content"])
+            self.step_indicator.configure(text=f"Paso {index + 1} de {len(TUTORIAL_STEPS)}")
+            self.progress.set((index + 1) / len(TUTORIAL_STEPS))
+
+            # Actualizar botones
+            self.prev_btn.configure(state="normal" if index > 0 else "disabled")
+            self.next_btn.configure(state="normal" if index < len(TUTORIAL_STEPS) - 1 else "disabled")
+
+            self.current_step = index
+
+    def _next_step(self):
+        """Paso siguiente."""
+        if self.current_step < len(TUTORIAL_STEPS) - 1:
+            self._show_step(self.current_step + 1)
+
+    def _prev_step(self):
+        """Paso anterior."""
+        if self.current_step > 0:
+            self._show_step(self.current_step - 1)
