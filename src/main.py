@@ -19,18 +19,24 @@ logger = logging.getLogger(__name__)
 def main():
     """Función principal."""
     logger.info("🆘 Iniciando Asistente ONG...")
-    
+
     try:
-        # Import RELATIVO (con punto)
-        from .ui.main_window import MainWindow
-        
+        # Inicializar base de datos
+        from src.database.schema import init_database
+        init_database()
+        logger.info("✅ Base de datos inicializada")
+
+        # Importar y ejecutar UI
+        from src.ui.main_window import MainWindow
+
         logger.info("✅ Cargando interfaz gráfica...")
         app = MainWindow()
         app.run()
-        
+
     except ImportError as e:
         logger.error(f"❌ Error de importación: {e}")
         print(f"❌ Error de importación: {e}")
+        print("Asegurate de tener instaladas las dependencias: pip install -r requirements.txt")
         sys.exit(1)
     except Exception as e:
         logger.error(f"❌ Error: {e}", exc_info=True)
