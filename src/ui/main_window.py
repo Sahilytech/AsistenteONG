@@ -14,6 +14,7 @@ from .resources_panel import ResourcesPanel
 from .dashboard import DashboardFrame
 from .config_panel import ConfigPanel
 from .help_panel import HelpPanel
+from ..reports.report_panel import ReportPanel
 from .branding import BRAND_COLORS, PROJECT_INFO
 from .styles import COLORS, FONTS, SPACING, get_theme_colors, set_theme, get_current_theme
 
@@ -108,7 +109,7 @@ class MainWindow:
         self._setup_ui()
 
     def _setup_ui(self):
-        """Configura UI completa con 6 tabs."""
+        """Configura UI completa con 7 tabs."""
 
         main_frame = ctk.CTkFrame(self.root)
         main_frame.grid(row=0, column=0, sticky="nsew")
@@ -194,27 +195,32 @@ class MainWindow:
         self.results = ResultsFrame(analysis_tab, fg_color="#161b22")
         self.results.pack(fill="both", expand=True)
 
-        # Tab 3: Recursos
+        # Tab 3: Informes Sociales (NUEVO)
+        report_tab = self.tab_view.add("📄 Informes")
+        self.report_panel = ReportPanel(report_tab, fg_color="#0d0d0d")
+        self.report_panel.pack(fill="both", expand=True)
+
+        # Tab 4: Recursos
         resources_tab = self.tab_view.add("📞 Recursos")
         self.resources = ResourcesPanel(resources_tab, fg_color="#0d0d0d")
         self.resources.pack(fill="both", expand=True)
 
-        # Tab 4: Configuración
+        # Tab 5: Configuración
         config_tab = self.tab_view.add("⚙️ Config")
         self.config = ConfigPanel(config_tab, fg_color="#0d0d0d")
         self.config.pack(fill="both", expand=True)
 
-        # Tab 5: AYUDA
+        # Tab 6: AYUDA
         help_tab = self.tab_view.add("❓ Ayuda")
         self.help = HelpPanel(help_tab, fg_color="#0d0d0d")
         self.help.pack(fill="both", expand=True)
 
-        # Tab 6: Acerca de
+        # Tab 7: Acerca de
         about_tab = self.tab_view.add("ℹ️ Acerca de")
         self.about = AboutPanel(about_tab, fg_color="#0d0d0d")
         self.about.pack(fill="both", expand=True)
 
-        logger.info("✅ UI PROFESIONAL COMPLETADA v0.9")
+        logger.info("✅ UI PROFESIONAL COMPLETADA v0.9 - 7 tabs")
 
     def _on_case_submit(self, case_number: str, case_text: str):
         """Procesa nuevo caso."""
