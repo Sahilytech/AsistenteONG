@@ -1,35 +1,24 @@
 """
-Configuración de branding y estilos personalizados
-Sarah Lee Olivera - Desarrolladora del proyecto
+Configuración de branding - Sin foto personal
 """
 
 # Colores personalizados
 BRAND_COLORS = {
-    "primary": "#0e98d6",      # Azul principal
+    "primary": "#0e98d6",
     "white": "#FFFFFF",
     "black": "#000000",
     "gray_light": "#F5F5F5",
     "gray_dark": "#1a1a1a",
 }
 
-# Biografía de la creadora
-AUTHOR_BIO = {
-    "name": "Sarah Lee Olivera",
-    "title": "Desarrolladora & Creadora del Proyecto",
-    "email": "sarahleeoliveraok@gmail.com",
-    "bio": """Soy una estudiante y desarrolladora de software de Argentina apasionada por crear tecnología con impacto social.
+# Info del proyecto (NO foto personal)
+PROJECT_INFO = {
+    "name": "Asistente ONG",
+    "version": "v0.9",
+    "subtitle": "Triaje y Canalización Profesional",
+    "description": """Herramienta offline 100% para líneas de ayuda, ONGs y organizaciones sociales.
 
-Creo que la inteligencia artificial debe ser una herramienta para asistir a las personas, proteger su privacidad y facilitar el trabajo de quienes ayudan a otros.
-
-Este proyecto es una solución que funciona incluso sin conexión a Internet, pensada para que organizaciones sociales, fundaciones y equipos de asistencia puedan responder con mayor rapidez sin comprometer la confidencialidad.
-
-Mi interés se centra en:
-• Desarrollo de aplicaciones
-• Inteligencia artificial local (offline)
-• Accesibilidad
-• Herramientas para contextos con recursos limitados
-
-Este software es código abierto orientado al bien común. Apoya el trabajo de profesionales y voluntarios, nunca reemplaza su criterio ni la atención humana."""
+Desarrollada con enfoque en privacidad, accesibilidad y bien común."""
 }
 
 # Tema claro
