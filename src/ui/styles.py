@@ -1,25 +1,40 @@
 """
-Estilos y temas para la aplicación
-Colores personalizados: Azul #0e98d6, Blanco, Negro
+Estilos y temas para la aplicación - Modo Claro y Oscuro completos
 """
 
-# Colores
+# Colores base (modo oscuro por defecto)
 COLORS = {
-    "primary": "#0e98d6",      # Azul personalizado
-    "success": "#2da44e",      # Verde
-    "warning": "#d29922",      # Naranja
-    "danger": "#da3633",       # Rojo
-    "muted": "#6e7681",        # Gris
-    
-    "background": "#0d0d0d",   # Negro
-    "surface": "#161b22",      # Superficie gris oscuro
-    "border": "#30363d",       # Borde
-    
-    "text": "#ffffff",         # Blanco
-    "text_muted": "#8b949e",   # Gris claro
+    "primary": "#0e98d6",
+    "success": "#2da44e",
+    "warning": "#d29922",
+    "danger": "#da3633",
+    "muted": "#6e7681",
+
+    "background": "#0d0d0d",
+    "surface": "#161b22",
+    "border": "#30363d",
+
+    "text": "#ffffff",
+    "text_muted": "#8b949e",
 }
 
-# Urgencia - colores
+# Colores para MODO CLARO
+LIGHT_COLORS = {
+    "primary": "#0e98d6",
+    "success": "#2da44e",
+    "warning": "#d29922",
+    "danger": "#da3633",
+    "muted": "#6e7681",
+
+    "background": "#f6f8fa",
+    "surface": "#ffffff",
+    "border": "#d0d7de",
+
+    "text": "#1f2328",
+    "text_muted": "#656d76",
+}
+
+# Urgencia - colores (funcionan en ambos modos)
 URGENCY_COLORS = {
     "Muy Alta": COLORS["danger"],
     "Alta": COLORS["warning"],
@@ -45,7 +60,24 @@ SPACING = {
     "xl": 32,
 }
 
+# Tema activo (se actualiza dinámicamente)
+_current_theme = "dark"
 
 def get_urgency_color(urgency: str) -> str:
     """Obtiene color para urgencia."""
     return URGENCY_COLORS.get(urgency, COLORS["muted"])
+
+def get_theme_colors():
+    """Retorna colores según tema activo."""
+    if _current_theme == "light":
+        return LIGHT_COLORS
+    return COLORS
+
+def set_theme(theme: str):
+    """Cambia el tema activo."""
+    global _current_theme
+    _current_theme = theme
+
+def get_current_theme():
+    """Retorna tema actual."""
+    return _current_theme
