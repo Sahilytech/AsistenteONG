@@ -1,77 +1,103 @@
-"""Splash de Asistente ONG: animación de circuitos, identidad NubiWorks y carga progresiva."""
+"""Pantalla de inicio profesional, adaptable y completamente local."""
 import tkinter as tk
 from pathlib import Path
 from PIL import Image, ImageTk
+
 WHITE="#FFFFFF"; BLUE="#0e98d6"; DARK="#111111"; LIGHT="#E7F5FB"; MUTED="#66717A"
 
 class SplashScreen:
     def __init__(self,on_complete=None):
-        self.on_complete=on_complete; self.root=tk.Tk(); self.root.overrideredirect(True); self.root.configure(bg=WHITE)
-        self.width,self.height=1000,650; sw,sh=self.root.winfo_screenwidth(),self.root.winfo_screenheight(); self.root.geometry(f"{self.width}x{self.height}+{(sw-self.width)//2}+{(sh-self.height)//2}")
-        self.canvas=tk.Canvas(self.root,width=self.width,height=self.height,bg=WHITE,highlightthickness=0); self.canvas.pack()
-        self._particles=[]; self._nodes=[]; self._rings=[]; self._after_ids=[]; self._closing=False; self._tick=0; self._logo_y=250
+        self.on_complete=on_complete
+        self.root=tk.Tk(); self.root.overrideredirect(True); self.root.configure(bg=WHITE)
+        sw,sh=self.root.winfo_screenwidth(),self.root.winfo_screenheight()
+        self.width=min(900,max(680,sw-80)); self.height=min(590,max(500,sh-100))
+        self.root.geometry(f"{self.width}x{self.height}+{(sw-self.width)//2}+{(sh-self.height)//2}")
+        self.canvas=tk.Canvas(self.root,width=self.width,height=self.height,bg=WHITE,highlightthickness=0)
+        self.canvas.pack(fill="both",expand=True)
+        self._particles=[]; self._nodes=[]; self._rings=[]; self._after_ids=[]; self._closing=False; self._tick=0
+        self._logo_y=int(self.height*.39)
         self._draw_background(); self._load_logo(); self._draw_content(); self._create_progress()
+
     def _draw_background(self):
-        self.canvas.create_rectangle(18,18,982,632,outline=LIGHT,width=2)
-        self.canvas.create_rectangle(34,34,966,616,outline="#F4FAFD",width=1)
-        # Circuitos superiores e inferiores.
-        for y,direction in ((58,1),(592,-1)):
-            self.canvas.create_line(55,y,945,y,fill=LIGHT,width=2)
-            for x in range(70,930,72):
-                self.canvas.create_line(x,y,x+34*direction,y,fill=BLUE,width=1)
+        m=18; right=self.width-m; bottom=self.height-m
+        self.canvas.create_rectangle(m,m,right,bottom,outline=LIGHT,width=2)
+        self.canvas.create_rectangle(m+16,m+16,right-16,bottom-16,outline="#F4FAFD",width=1)
+        for y,direction in ((42,1),(bottom-40,-1)):
+            self.canvas.create_line(40,y,right-40,y,fill=LIGHT,width=2)
+            for x in range(55,right-50,65):
+                self.canvas.create_line(x,y,x+28*direction,y,fill=BLUE,width=1)
                 node=self.canvas.create_oval(x-3,y-3,x+3,y+3,fill=LIGHT,outline=""); self._nodes.append(node)
-        branches=[(75,58,75,130),(160,58,160,105),(270,58,270,145),(730,58,730,125),(840,58,840,105),(925,58,925,150),(75,592,75,520),(170,592,170,545),(280,592,280,500),(720,592,720,525),(835,592,835,550),(925,592,925,505)]
+        branches=[(55,42,55,105),(150,42,150,88),(255,42,255,120),(right-255,42,right-255,105),(right-150,42,right-150,88),(right-55,42,right-55,120)]
         for x1,y1,x2,y2 in branches:
             self.canvas.create_line(x1,y1,x2,y2,fill=BLUE,width=1); self.canvas.create_oval(x2-4,y2-4,x2+4,y2+4,fill=BLUE,outline="")
-        # Circuitos laterales.
-        for x,sgn in ((55,1),(945,-1)):
-            for i in range(5):
-                y=170+i*70; end=x+sgn*70; self.canvas.create_line(x,y,end,y,fill=LIGHT,width=2); self.canvas.create_line(end,y,end,y+24,fill=BLUE,width=1); self.canvas.create_oval(end-4,y+20,end+4,y+28,fill=LIGHT,outline="")
-        # Órbitas alrededor del logo.
-        for r in (112,128,144): self._rings.append(self.canvas.create_oval(500-r,self._logo_y-r,500+r,self._logo_y+r,outline=LIGHT,width=1))
-        for i in range(22):
-            p=self.canvas.create_oval(0,0,6,6,fill=BLUE,outline=""); self._particles.append({"id":p,"x":55+(i*41)%890,"y":90+(i*23)%470,"dx":0.8 if i%2 else -0.6})
+        for x,sgn in ((55,1),(right-55,-1)):
+            for i in range(4):
+                y=170+i*75; end=x+sgn*55
+                self.canvas.create_line(x,y,end,y,fill=LIGHT,width=2)
+                self.canvas.create_line(end,y,end,y+22,fill=BLUE,width=1)
+        for r in (92,108,124):
+            self._rings.append(self.canvas.create_oval(self.width//2-r,self._logo_y-r,self.width//2+r,self._logo_y+r,outline=LIGHT,width=1))
+        for i in range(16):
+            p=self.canvas.create_oval(0,0,6,6,fill=BLUE,outline="")
+            self._particles.append({"id":p,"x":55+(i*53)%(right-110),"y":100+(i*29)%(bottom-190),"dx":0.65 if i%2 else -0.5})
+
     def _load_logo(self):
         paths=[Path(__file__).parent.parent.parent/"assets"/"logo.png",Path(__file__).parent.parent.parent/"assets"/"logo_g.png",Path("assets/logo.png"),Path("assets/logo_g.png")]
         for path in paths:
             if path.exists():
-                img=Image.open(path).convert("RGBA"); img.thumbnail((230,230)); self.logo_img=ImageTk.PhotoImage(img); self.logo=self.canvas.create_image(500,self._logo_y,image=self.logo_img); return
-        self.logo=self.canvas.create_text(500,self._logo_y,text="C",font=("Helvetica",90,"bold"),fill=BLUE)
+                img=Image.open(path).convert("RGBA"); img.thumbnail((190,190)); self.logo_img=ImageTk.PhotoImage(img)
+                self.logo=self.canvas.create_image(self.width//2,self._logo_y,image=self.logo_img); return
+        self.logo=self.canvas.create_text(self.width//2,self._logo_y,text="A",font=("Helvetica",82,"bold"),fill=BLUE)
+
     def _draw_content(self):
-        self.canvas.create_text(500,390,text="ASISTENTE ONG",font=("Helvetica",34,"bold"),fill=DARK)
-        self.canvas.create_text(500,425,text="Triaje y Canalización",font=("Helvetica",14),fill=MUTED)
-        self.canvas.create_text(500,450,text="TECNOLOGÍA LOCAL  ·  PRIVACIDAD  ·  APOYO PROFESIONAL",font=("Helvetica",9,"bold"),fill=BLUE)
-        self.loading_text=self.canvas.create_text(500,492,text="Preparando entorno local...",font=("Helvetica",10),fill=MUTED)
-        self.percent_text=self.canvas.create_text(500,516,text="0%",font=("Helvetica",9,"bold"),fill=BLUE)
-        self.canvas.create_text(500,608,text="NubiWorks",font=("Helvetica",11,"bold"),fill=BLUE)
-        self.canvas.create_text(500,626,text="Tecnología con impacto social",font=("Helvetica",8),fill=MUTED)
+        cx=self.width//2
+        self.canvas.create_text(cx,int(self.height*.64),text="ASISTENTE ONG",font=("Helvetica",30,"bold"),fill=DARK)
+        self.canvas.create_text(cx,int(self.height*.70),text="Triaje y Canalización",font=("Helvetica",14),fill=MUTED)
+        self.canvas.create_text(cx,int(self.height*.745),text="TECNOLOGÍA LOCAL  ·  PRIVACIDAD  ·  OFFLINE",font=("Helvetica",9,"bold"),fill=BLUE)
+        self.loading_text=self.canvas.create_text(cx,int(self.height*.805),text="Preparando entorno local...",font=("Helvetica",10),fill=MUTED)
+        self.percent_text=self.canvas.create_text(cx,int(self.height*.845),text="0%",font=("Helvetica",9,"bold"),fill=BLUE)
+        self.canvas.create_text(cx,self.height-28,text="NubiWorks · Tecnología con impacto social",font=("Helvetica",8),fill=MUTED)
+
     def _create_progress(self):
-        self.canvas.create_rectangle(190,532,810,548,fill=LIGHT,outline="")
-        self.progress_bar=self.canvas.create_rectangle(190,532,190,548,fill=BLUE,outline="")
-        self.progress_glow=self.canvas.create_rectangle(190,532,190,548,fill="#57BCE7",outline="")
+        left=self.width*.20; right=self.width*.80; y=self.height*.87
+        self._progress_left=left; self._progress_right=right; self._progress_y=y
+        self.canvas.create_rectangle(left,y,right,y+12,fill=LIGHT,outline="")
+        self.progress_bar=self.canvas.create_rectangle(left,y,left,y+12,fill=BLUE,outline="")
+        self.progress_glow=self.canvas.create_rectangle(left,y,left,y+12,fill="#57BCE7",outline="")
+
     def update_progress(self,value,text=None):
         if self._closing:return
-        width=620*max(0,min(100,value))/100; self.canvas.coords(self.progress_bar,190,532,190+width,548); glow=min(width,620); self.canvas.coords(self.progress_glow,max(190,190+width-16),532,190+glow,548); self.canvas.itemconfig(self.loading_text,text=text or f"Cargando... {value}%"); self.canvas.itemconfig(self.percent_text,text=f"{value}%"); self.root.update_idletasks()
+        width=(self._progress_right-self._progress_left)*max(0,min(100,value))/100
+        self.canvas.coords(self.progress_bar,self._progress_left,self._progress_y,self._progress_left+width,self._progress_y+12)
+        self.canvas.coords(self.progress_glow,max(self._progress_left,self._progress_left+width-14),self._progress_y,self._progress_left+width,self._progress_y+12)
+        self.canvas.itemconfig(self.loading_text,text=text or f"Cargando... {value}%")
+        self.canvas.itemconfig(self.percent_text,text=f"{value}%")
+        self.root.update_idletasks()
+
     def _schedule(self,delay,callback):
         if not self._closing:self._after_ids.append(self.root.after(delay,callback))
+
     def _animate(self):
         if self._closing:return
-        self._tick+=1; offset=4 if (self._tick//20)%2==0 else -4; self.canvas.coords(self.logo,500,self._logo_y+offset)
+        self._tick+=1; offset=3 if (self._tick//20)%2==0 else -3
+        self.canvas.coords(self.logo,self.width//2,self._logo_y+offset)
         for i,node in enumerate(self._nodes): self.canvas.itemconfig(node,fill=BLUE if (self._tick+i*4)%50<12 else LIGHT)
         for i,r in enumerate(self._rings): self.canvas.itemconfig(r,outline=BLUE if (self._tick+i*11)%70<12 else LIGHT)
         for p in self._particles:
             p["x"]+=p["dx"]
-            if p["x"]>940:p["x"]=60
-            if p["x"]<60:p["x"]=940
+            if p["x"]>self.width-55:p["x"]=55
+            if p["x"]<55:p["x"]=self.width-55
             self.canvas.coords(p["id"],p["x"]-3,p["y"]-3,p["x"]+3,p["y"]+3)
-        self._schedule(40,self._animate)
+        self._schedule(45,self._animate)
+
     def start_loading(self):
-        steps=[(3,"Iniciando Asistente ONG..."),(8,"Preparando entorno local..."),(14,"Comprobando configuración institucional..."),(21,"Verificando almacenamiento local..."),(29,"Inicializando base de datos..."),(37,"Comprobando protección de datos..."),(45,"Cargando clasificador contextual..."),(53,"Cargando reglas y categorías de triaje..."),(61,"Preparando memoria local..."),(69,"Indexando recursos de asistencia..."),(77,"Preparando informes sociales..."),(85,"Cargando dashboard y filtros..."),(92,"Verificando componentes de interfaz..."),(97,"Comprobando fuentes oficiales configuradas..."),(100,"Sistema listo")]
+        steps=[(8,"Iniciando Asistente ONG..."),(18,"Preparando entorno local..."),(30,"Inicializando base de datos local..."),(42,"Cargando reglas de triaje..."),(54,"Preparando memoria local..."),(66,"Indexando recursos locales..."),(78,"Preparando informes y seguimiento..."),(90,"Verificando interfaz..."),(100,"Sistema listo")]
         def step(i=0):
             if self._closing:return
-            if i>=len(steps): self._schedule(1500,self._finish); return
-            p,t=steps[i]; self.update_progress(p,t); self._schedule(720 if p<100 else 1100,lambda i=i:step(i+1))
+            if i>=len(steps): self._schedule(500,self._finish); return
+            p,t=steps[i]; self.update_progress(p,t); self._schedule(260 if p<100 else 450,lambda i=i:step(i+1))
         self._animate(); step()
+
     def _finish(self):
         if self._closing:return
         self._closing=True
@@ -80,6 +106,7 @@ class SplashScreen:
             except tk.TclError:pass
         self._after_ids.clear(); self.root.destroy()
         if self.on_complete:self.on_complete()
+
     def run(self): self.start_loading(); self.root.mainloop()
 
 def show_splash(on_complete=None): SplashScreen(on_complete).run()
