@@ -3,10 +3,10 @@
 La pantalla sigue las siete categorías mínimas del informe social y evita
 campos técnicos innecesarios para la persona operadora.
 """
-import tkinter as tk
 import customtkinter as ctk
 from .styles import COLORS, FONTS
 from ..config_manager import ConfigManager
+from ..reports.report_defaults import ReportDefaults
 
 SECTIONS = [
     ("1. Profesional e institución", "Datos que pueden fijarse para nuevos informes.", [
@@ -42,6 +42,7 @@ class IntegratedCasePanel(ctk.CTkFrame):
         super().__init__(parent, **kwargs)
         self.case_manager = case_manager
         self.config_manager = config_manager or ConfigManager()
+        self.defaults = ReportDefaults()
         self.current_case = None
         self.analysis = None
         self.boxes = {}
@@ -100,11 +101,10 @@ class IntegratedCasePanel(ctk.CTkFrame):
             row, col = divmod(i, 2)
             wrap.grid(row=row, column=col, sticky="ew", padx=6, pady=5)
             ctk.CTkLabel(wrap, text=label, font=FONTS["small_bold"], text_color=COLORS["text"], anchor="w").pack(fill="x", pady=(0, 3))
-            height = 78 if key in {"miembros_hogar", "genograma", "historia_familiar", "dinamica_familiar", "ingresos", "situacion_laboral", "egresos", "condiciones_vivienda", "servicios_entorno", "salud", "educacion", "diagnostico", "fortalezas", "vulnerabilidades", "propuesta", "observaciones"} else 46
+            height = 78 if key not in {"entidad_emisora", "profesional_referencia", "colegiatura", "destinatario", "fecha_emision", "documento", "domicilio", "telefono", "correo", "fecha_nacimiento", "edad", "sexo", "nacionalidad", "estado_civil"} else 46
             box = ctk.CTkTextbox(wrap, height=height, fg_color=COLORS["surface_alt"], border_width=1, border_color=COLORS["border"], text_color=COLORS["text"])
             box.pack(fill="x")
             self.boxes[key] = box
-        return card
 
     def refresh_cases(self):
         cases = self.case_manager.get_all_cases() if self.case_manager else []
@@ -129,10 +129,11 @@ class IntegratedCasePanel(ctk.CTkFrame):
         self.case_text.configure(text=case.text)
         a = case.combined_analysis or {}
         self.analysis_hint.configure(text=(f"Clasificación: {a.get('classification', '—')} · Confianza: {a.get('confidence', '—')} · Contexto: {a.get('detected_context', '—')}\n" + a.get('priority_reason', '')) if a else "Todavía no hay un análisis integral guardado.")
-        report = case.social_report or {}
+        report = {**self.defaults.load(), **(case.social_report or {})}
         for key, box in self.boxes.items():
             box.delete("1.0", "end")
             box.insert("1.0", str(report.get(key, "")))
+        self.analysis = a or None
 
     def collect_report(self):
         return {key: box.get("1.0", "end").strip() for key, box in self.boxes.items() if box.get("1.0", "end").strip()}
@@ -140,9 +141,8 @@ class IntegratedCasePanel(ctk.CTkFrame):
     def save_institution_defaults(self):
         report = self.collect_report()
         keys = ["entidad_emisora", "profesional_referencia", "colegiatura", "destinatario"]
-        if hasattr(self.config_manager, "save_report_defaults"):
-            self.config_manager.save_report_defaults({k: report.get(k, "") for k in keys})
-        self.status.configure(text="Datos institucionales fijados para nuevos informes.")
+        self.defaults.save({k: report.get(k, "") for k in keys})
+        self.status.configure(text="Datos institucionales guardados localmente para nuevos informes.")
 
     def analyze_combined(self):
         if not self.current_case:
