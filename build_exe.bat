@@ -1,49 +1,25 @@
 @echo off
-REM Script para generar AsistenteONG.exe para distribuir en pendrives
-REM Uso: Double-click o ejecutar en terminal
+setlocal
+cd /d %~dp0
 
-echo.
 echo ====================================
 echo Asistente ONG - Constructor .EXE
-echo v0.8 PROFESIONAL
 echo ====================================
-echo.
 
-REM Verificar si PyInstaller está instalado
-pip show pyinstaller >nul 2>&1
-if errorlevel 1 (
-    echo Instalando PyInstaller...
-    pip install pyinstaller
-)
+python -m pip install -r requirements.txt
+if errorlevel 1 exit /b 1
 
-echo.
-echo Compilando ejecutable (esto puede tomar 1-2 minutos)...
-echo.
+if exist build rmdir /s /q build
+if exist dist rmdir /s /q dist
 
-REM Generar .exe
-pyinstaller --onefile ^
-    --windowed ^
-    --icon=assets/logo_g.png ^
-    --name AsistenteONG ^
-    --distpath ./dist ^
-    --buildpath ./build ^
-    --specpath ./build ^
-    src/main.py
+python -m PyInstaller --noconfirm --clean --onefile --windowed --name AsistenteONG --icon=assets/logo_g.png --add-data "assets;assets" --add-data "data;data" src/main.py
 
-echo.
 if exist dist\AsistenteONG.exe (
-    echo ✅ EXITO! Archivo generado:
-    echo    dist\AsistenteONG.exe
-    echo.
-    echo Instrucciones para usar en pendrive:
-    echo 1. Copia dist\AsistenteONG.exe a tu pendrive
-    echo 2. Entrégalo a la ONG
-    echo 3. Ellos hacen doble-click para ejecutar
-    echo 4. Funciona 100% offline, sin instalar Python
-    echo.
-    pause
+  echo.
+  echo EXITO: dist\AsistenteONG.exe
+  echo Listo para pruebas y distribucion offline.
 ) else (
-    echo ❌ ERROR: No se pudo generar el .exe
-    echo Verifica los errores arriba
-    pause
+  echo ERROR: no se pudo generar el EXE.
+  exit /b 1
 )
+endlocal
