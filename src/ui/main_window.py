@@ -10,7 +10,8 @@ from .config_panel import ConfigPanel
 from .help_panel import HelpPanel
 from .social_report_panel import SocialReportPanel
 from .integrated_case_panel import IntegratedCasePanel
-from .workspace_panels import CasesPanel,FollowUpPanel,LibraryPanel,SecurityPanel,AgendaPanel
+from .cases_panel import CasesPanel
+from .workspace_panels import FollowUpPanel,LibraryPanel,SecurityPanel,AgendaPanel
 from .onboarding import show_first_run
 from .styles import COLORS,FONTS
 from ..case_manager import CaseManager
