@@ -10,6 +10,7 @@ from .config_panel import ConfigPanel
 from .help_panel import HelpPanel
 from .social_report_panel import SocialReportPanel
 from .workspace_panels import CasesPanel,FollowUpPanel,LibraryPanel,SecurityPanel,AgendaPanel
+from .onboarding import show_first_run
 from .styles import COLORS,FONTS
 from ..case_manager import CaseManager
 from ..config_manager import ConfigManager
@@ -17,13 +18,15 @@ logger=logging.getLogger(__name__)
 ctk.set_appearance_mode("system"); ctk.set_default_color_theme("blue")
 class AboutPanel(ctk.CTkFrame):
  def __init__(self,parent,**kwargs):
-  super().__init__(parent,**kwargs); scroll=ctk.CTkScrollableFrame(self,fg_color="transparent"); scroll.pack(fill="both",expand=True,padx=28,pady=22); ctk.CTkLabel(scroll,text="Acerca de Asistente ONG",font=FONTS["title"],text_color=COLORS["text"]).pack(anchor="w"); ctk.CTkLabel(scroll,text="NubiWorks · tecnología local para apoyo social",font=FONTS["subheading"],text_color=COLORS["primary"]).pack(anchor="w",pady=(4,18));
-  for title,text in [("EL PROYECTO","Suite de escritorio para organizaciones sociales: registro de casos, análisis local, revisión, derivación, seguimiento e informes."),("PRIVACIDAD","Funcionamiento completamente offline. Los relatos, casos y memoria permanecen en el equipo. No realiza búsquedas web ni envía información a servicios externos."),("FLUJO DE TRABAJO","Un caso nace en Casos con sus datos y relato. Después se analiza localmente, se revisa el resultado y, si corresponde, se deriva o se agenda seguimiento."),("QUÉ NO HACE","No diagnostica ni reemplaza profesionales. Los resultados automáticos son orientativos y deben ser revisados."),("TECNOLOGÍAS","Python · CustomTkinter · SQLite · procesamiento local · reglas explicables · informes.")]: self._section(scroll,title,text)
+  super().__init__(parent,**kwargs); scroll=ctk.CTkScrollableFrame(self,fg_color="transparent"); scroll.pack(fill="both",expand=True,padx=28,pady=22)
+  ctk.CTkLabel(scroll,text="Acerca de Asistente ONG",font=FONTS["title"],text_color=COLORS["text"]).pack(anchor="w"); ctk.CTkLabel(scroll,text="Presentación · propósito · funcionamiento · privacidad",font=FONTS["subheading"],text_color=COLORS["primary"]).pack(anchor="w",pady=(4,18))
+  sections=[("PRESENTACIÓN","Soy Sarah, creadora y desarrolladora de este proyecto. Asistente ONG nace de la necesidad de transformar una idea social en una herramienta concreta, simple de usar y respetuosa de la privacidad de las personas que buscan ayuda."),("PROPÓSITO","La aplicación está pensada como una caja de herramientas para organizaciones sociales que reciben consultas y necesitan ordenar información, detectar indicadores relevantes y decidir qué revisar o derivar."),("CÓMO SE USA","1. Casos: crear un caso y completar sus datos junto con el relato. 2. Análisis: revisar prioridad, contexto, motivo, indicadores y preguntas pendientes. 3. Seguimiento: registrar acciones y fechas. 4. Informes y recursos: producir documentación y consultar materiales internos."),("PRIVACIDAD Y OFFLINE","El procesamiento es local. Los relatos y registros permanecen en el equipo. La aplicación no necesita Internet para realizar el triaje ni para gestionar los casos."),("CRITERIO DEL SISTEMA","El análisis utiliza reglas locales explicables. Una prioridad no es un diagnóstico ni una sentencia: indica qué conviene revisar primero. El operador mantiene siempre la decisión profesional."),("TECNOLOGÍA","Python · CustomTkinter · SQLite · reglas explicables · almacenamiento local · generación de informes."),("PROYECTO","Asistente ONG · NubiWorks. Herramienta de apoyo operativo para organizaciones sociales, diseñada para priorizar claridad, privacidad y trazabilidad.")]
+  for title,text in sections:self._section(scroll,title,text)
  def _section(self,parent,title,text):
   card=ctk.CTkFrame(parent,fg_color=COLORS["surface_alt"],corner_radius=16,border_width=1,border_color=COLORS["border"]); card.pack(fill="x",pady=6); ctk.CTkLabel(card,text=title,font=FONTS["subheading"],text_color=COLORS["primary"],anchor="w").pack(fill="x",padx=20,pady=(15,6)); ctk.CTkLabel(card,text=text,font=FONTS["body"],text_color=COLORS["text"],justify="left",anchor="w",wraplength=850).pack(fill="x",padx=20,pady=(0,18))
 class MainWindow:
  def __init__(self):
-  self.root=ctk.CTk(); self.root.title("Asistente ONG | Triaje y Canalización"); self.root.geometry("1500x900"); self.root.minsize(1080,700); self.root.configure(fg_color=COLORS["background"]); self.root.grid_rowconfigure(0,weight=1); self.root.grid_columnconfigure(0,weight=1); self.case_manager=CaseManager(); self.config_manager=ConfigManager(); self.frames={}; self._setup_ui()
+  self.root=ctk.CTk(); self.root.title("Asistente ONG | Triaje y Canalización"); self.root.geometry("1500x900"); self.root.minsize(1080,700); self.root.configure(fg_color=COLORS["background"]); self.root.grid_rowconfigure(0,weight=1); self.root.grid_columnconfigure(0,weight=1); self.case_manager=CaseManager(); self.config_manager=ConfigManager(); self.frames={}; self._setup_ui(); show_first_run(self.root)
  def _setup_ui(self):
   main=ctk.CTkFrame(self.root,fg_color=COLORS["background"],corner_radius=0); main.pack(fill="both",expand=True); main.grid_columnconfigure(1,weight=1); main.grid_rowconfigure(0,weight=1)
   sidebar=ctk.CTkFrame(main,width=265,fg_color=COLORS["surface_alt"],corner_radius=0); sidebar.grid(row=0,column=0,sticky="nsew"); sidebar.grid_propagate(False)
@@ -55,7 +58,7 @@ class MainWindow:
  def open_new_case(self): self.select_tab("Casos"); self.frames["Casos"].show_new_case()
  def _on_case_submit(self,case_text,metadata):
   try:
-   analysis=self.config_manager.analyze(case_text); case=self.case_manager.create_case(text=case_text,urgency=analysis["urgency"],keywords=analysis["keywords"],metadata=metadata); casos=self.frames["Casos"]; casos.close_editor(); self.frames["Análisis"].show_analysis(case.case_number,case_text,analysis); self.select_tab("Análisis");
+   analysis=self.config_manager.analyze(case_text); case=self.case_manager.create_case(text=case_text,urgency=analysis["urgency"],keywords=analysis["keywords"],metadata=metadata); casos=self.frames["Casos"]; casos.close_editor(); self.frames["Análisis"].show_analysis(case.case_number,case_text,analysis); self.select_tab("Análisis")
    try:self.frames["Inicio"].refresh(); casos.refresh()
    except Exception:pass
   except Exception as exc: logger.error("Error procesando caso: %s",exc,exc_info=True)
