@@ -31,7 +31,11 @@ class SplashScreen:
     def _create_progress_bar(self):
         self.canvas.create_rectangle(180,360,520,370,fill=LIGHT,outline=""); self.progress_bar=self.canvas.create_rectangle(180,360,180,370,fill=BLUE,outline="")
     def update_progress(self,value,text=None):
-        self.current_progress=value; width=340*max(0,min(100,value))/100; self.canvas.coords(self.progress_bar,180,360,180+width,370); self.canvas.itemconfig(self.loading_text,text or f"Cargando... {value}%"); self.root.update_idletasks()
+        self.current_progress=value
+        width=340*max(0,min(100,value))/100
+        self.canvas.coords(self.progress_bar,180,360,180+width,370)
+        self.canvas.itemconfig(self.loading_text,text=text or f"Cargando... {value}%")
+        self.root.update_idletasks()
     def start_loading(self):
         steps=[(10,"Inicializando..."),(30,"Cargando base local..."),(50,"Preparando interfaz..."),(70,"Cargando módulos..."),(90,"Verificando componentes..."),(100,"Listo")]
         def step(i=0):
