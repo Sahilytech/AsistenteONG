@@ -1,86 +1,15 @@
-"""
-Panel de ayuda - Tutorial e instrucciones
-"""
-
+"""Ayuda y acceso al tutorial interactivo."""
 import customtkinter as ctk
 from .styles import COLORS, FONTS
-import logging
-
-logger = logging.getLogger(__name__)
-
+from .onboarding import show_tutorial
 
 class HelpPanel(ctk.CTkFrame):
-    """Panel con tutorial e instrucciones."""
-    
-    def __init__(self, parent, **kwargs):
-        super().__init__(parent, **kwargs)
-        self._setup_ui()
-    
-    def _setup_ui(self):
-        """Configura UI."""
-        
-        scroll = ctk.CTkScrollableFrame(self, fg_color="transparent")
-        scroll.pack(fill="both", expand=True, padx=15, pady=15)
-        
-        # Título
-        ctk.CTkLabel(
-            scroll,
-            text="📚 TUTORIAL Y AYUDA",
-            font=FONTS["heading"],
-            text_color=COLORS["primary"]
-        ).pack(anchor="w", pady=(0, 20))
-        
-        # Secciones
-        sections = [
-            ("🚀 INICIO RÁPIDO (3 pasos)", [
-                "1. Ingresa la DESCRIPCIÓN del caso",
-                "2. El sistema genera automático el número",
-                "3. Clic en '✅ Analizar caso'",
-                "",
-                "✨ El sistema detectará:",
-                "   • Nivel de urgencia",
-                "   • Palabras clave",
-                "   • Respuesta borrador",
-                "   • Recursos sugeridos"
-            ]),
-            ("📋 CÓMO USAR CADA TAB", [
-                "📊 DASHBOARD: Ver estadísticas",
-                "📋 ANÁLISIS: Ver respuestas automáticas",
-                "📞 RECURSOS: Buscar teléfonos",
-                "⚙️ CONFIG: Información del sistema",
-                "❓ AYUDA: Este tutorial",
-                "👩‍💻 CREADORA: Información de Sarah"
-            ]),
-            ("🚨 NIVELES DE URGENCIA", [
-                "🔴 MUY ALTA: Emergencia (vida en riesgo)",
-                "🟠 ALTA: Urgente (hoy)",
-                "🟡 MEDIA: Importante (48h)",
-                "⚪ BAJA: Normal (sin prisa)"
-            ]),
-            ("💡 TIPS IMPORTANTES", [
-                "✅ El análisis es automático pero verificalo",
-                "✅ Personaliza las respuestas",
-                "✅ Mantén los teléfonos a mano",
-                "✅ Usa como guía, no como verdad absoluta",
-                "✅ Funciona 100% offline",
-                "✅ Los datos quedan guardados localmente"
-            ]),
-        ]
-        
-        for title, items in sections:
-            ctk.CTkLabel(
-                scroll,
-                text=title,
-                font=FONTS["body"],
-                text_color=COLORS["primary"]
-            ).pack(anchor="w", pady=(15, 5))
-            
-            for item in items:
-                ctk.CTkLabel(
-                    scroll,
-                    text=item,
-                    font=FONTS["small"],
-                    text_color=COLORS["text"],
-                    justify="left",
-                    wraplength=350
-                ).pack(anchor="w", padx=20, pady=1)
+ def __init__(self,parent,**kwargs):
+  super().__init__(parent,**kwargs); self._setup_ui()
+ def _setup_ui(self):
+  scroll=ctk.CTkScrollableFrame(self,fg_color="transparent"); scroll.pack(fill="both",expand=True,padx=24,pady=22)
+  ctk.CTkLabel(scroll,text="Ayuda",font=FONTS["title"],text_color=COLORS["text"]).pack(anchor="w")
+  ctk.CTkLabel(scroll,text="Aprendé el recorrido de la plataforma sin llenar el sistema con ejemplos.",font=FONTS["small"],text_color=COLORS["text_muted"],wraplength=900).pack(anchor="w",pady=(3,16))
+  ctk.CTkButton(scroll,text="Abrir tutorial interactivo",height=46,fg_color=COLORS["primary"],hover_color=COLORS["primary_dark"],command=lambda:show_tutorial(self.winfo_toplevel())).pack(anchor="w",pady=(0,18))
+  for title,text in [("Inicio","El panel inicial muestra únicamente tus propios casos, fechas y documentos. Si está vacío, es porque todavía no cargaste información."),("Casos","Usá Nuevo caso para crear un expediente. Completá solo lo necesario y revisá el relato antes de analizarlo."),("Biblioteca","Importá PDFs desde el botón Importar PDFs o copiálos en data/library y elegí Recargar carpeta. Los PDFs digitales se procesan localmente con pypdf."),("Análisis","El sistema aplica reglas locales explicables. Si existen documentos relacionados en la biblioteca, aparecen como documentación relevante; no se incorporan automáticamente como verdad ni reemplazan la revisión profesional."),("Seguimiento y Agenda","Registrá acciones y fechas en Seguimiento. Agenda muestra las fechas guardadas."),("Privacidad","Los casos y documentos se almacenan localmente. La búsqueda por Internet es una función separada y explícita.")]:
+   card=ctk.CTkFrame(scroll,fg_color=COLORS["surface_alt"],corner_radius=14,border_width=1,border_color=COLORS["border"]); card.pack(fill="x",pady=5); ctk.CTkLabel(card,text=title,font=FONTS["heading"],text_color=COLORS["text"]).pack(anchor="w",padx=18,pady=(13,4)); ctk.CTkLabel(card,text=text,font=FONTS["body"],text_color=COLORS["text_muted"],wraplength=900,justify="left").pack(fill="x",padx=18,pady=(0,15))
