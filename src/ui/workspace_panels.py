@@ -18,18 +18,18 @@ class WorkspacePanel(ctk.CTkFrame):
 class CasesPanel(ctk.CTkFrame):
     def __init__(self,parent,case_manager=None,**kwargs):
         super().__init__(parent,**kwargs); self.case_manager=case_manager; self.all_cases=[]
-        self.grid_rowconfigure(1,weight=1); self.grid_columnconfigure(0,weight=1)
+        self.grid_rowconfigure(1,weight=0); self.grid_rowconfigure(2,weight=1); self.grid_columnconfigure(0,weight=1)
         head=ctk.CTkFrame(self,fg_color="transparent"); head.grid(row=0,column=0,sticky="ew",padx=24,pady=(22,10)); head.grid_columnconfigure(0,weight=1)
         ctk.CTkLabel(head,text="Casos",font=FONTS["title"],text_color=COLORS["text"]).grid(row=0,column=0,sticky="w")
         self.count_label=ctk.CTkLabel(head,text="0 registrados",font=FONTS["small"],text_color=COLORS["text_muted"]); self.count_label.grid(row=1,column=0,sticky="w",pady=(3,0))
         ctk.CTkButton(head,text="＋ Nuevo caso",width=125,height=36,fg_color=COLORS["primary"],hover_color=COLORS["primary_dark"],command=self._new_case).grid(row=0,column=1,rowspan=2,padx=(10,0))
-        tools=ctk.CTkFrame(self,fg_color=COLORS["surface_alt"],corner_radius=14,border_width=1,border_color=COLORS["border"]); tools.grid(row=1,column=0,sticky="new",padx=24,pady=(0,10)); tools.grid_columnconfigure(0,weight=1)
+        tools=ctk.CTkFrame(self,fg_color=COLORS["surface_alt"],corner_radius=14,border_width=1,border_color=COLORS["border"]); tools.grid(row=1,column=0,sticky="ew",padx=24,pady=(0,10)); tools.grid_columnconfigure(0,weight=1)
         row=ctk.CTkFrame(tools,fg_color="transparent"); row.grid(row=0,column=0,sticky="ew",padx=12,pady=12); row.grid_columnconfigure(0,weight=1)
         self.search=ctk.CTkEntry(row,height=38,placeholder_text="Buscar por ID, relato, palabra clave o responsable..."); self.search.grid(row=0,column=0,sticky="ew"); self.search.bind("<KeyRelease>",lambda e:self.refresh())
         self.urgency=ctk.CTkOptionMenu(row,width=125,height=38,values=["Todas","Muy Alta","Alta","Media","Baja"],command=lambda _:self.refresh(),fg_color=COLORS["surface"],button_color=COLORS["primary"],text_color=COLORS["text"]); self.urgency.grid(row=0,column=1,padx=(8,0))
         self.status=ctk.CTkOptionMenu(row,width=145,height=38,values=["Todos","nuevo","en análisis","revisado","derivado","en seguimiento","cerrado"],command=lambda _:self.refresh(),fg_color=COLORS["surface"],button_color=COLORS["primary"],text_color=COLORS["text"]); self.status.grid(row=0,column=2,padx=(8,0))
         ctk.CTkButton(row,text="Limpiar",width=72,height=38,fg_color=COLORS["surface"],hover_color=COLORS["primary_soft"],text_color=COLORS["text"],border_width=1,border_color=COLORS["border"],command=self.clear_filters).grid(row=0,column=3,padx=(8,0))
-        self.list_frame=ctk.CTkScrollableFrame(self,fg_color="transparent"); self.list_frame.grid(row=2,column=0,sticky="nsew",padx=24,pady=(0,20)); self.grid_rowconfigure(2,weight=1)
+        self.list_frame=ctk.CTkScrollableFrame(self,fg_color="transparent"); self.list_frame.grid(row=2,column=0,sticky="nsew",padx=24,pady=(0,20))
         self.refresh()
     def _new_case(self):
         root=self.winfo_toplevel()
@@ -52,12 +52,18 @@ class CasesPanel(ctk.CTkFrame):
             empty=ctk.CTkFrame(self.list_frame,fg_color=COLORS["surface_alt"],corner_radius=16,border_width=1,border_color=COLORS["border"]); empty.pack(fill="x",pady=8)
             title="No hay casos registrados." if not self.all_cases else "No se encontraron casos."
             detail="Los casos que crees aparecerán acá." if not self.all_cases else "Probá cambiar la búsqueda o los filtros."
-            ctk.CTkLabel(empty,text=title,font=FONTS["heading"],text_color=COLORS["text"]).pack(pady=(28,5)); ctk.CTkLabel(empty,text=detail,font=FONTS["small"],text_color=COLORS["text_muted"]).pack(pady=(0,28)); return
+            ctk.CTkLabel(empty,text=title,font=FONTS["heading"],text_color=COLORS["text"]).pack(pady=(28,5)); ctk.CTkLabel(empty,text=detail,font=FONTS["small"],text_color=COLORS["text_muted"],wraplength=620,justify="center").pack(padx=20,pady=(0,28)); return
         for case in filtered: self._case_card(case)
     def _case_card(self,case):
-        card=ctk.CTkFrame(self.list_frame,fg_color=COLORS["surface"],corner_radius=14,border_width=1,border_color=COLORS["border"]); card.pack(fill="x",pady=5); card.grid_columnconfigure(1,weight=1)
-        ctk.CTkLabel(card,text=case.case_number,font=FONTS["subheading"],text_color=COLORS["primary"],anchor="w").grid(row=0,column=0,sticky="w",padx=16,pady=(14,3)); ctk.CTkLabel(card,text=str(case.urgency).upper(),font=FONTS["tiny"],text_color=COLORS["primary"],fg_color=COLORS["primary_soft"],corner_radius=7).grid(row=0,column=2,sticky="e",padx=16,pady=(12,3)); ctk.CTkLabel(card,text=str(case.status).replace("_"," ").title(),font=FONTS["tiny"],text_color=COLORS["text_muted"]).grid(row=1,column=0,sticky="w",padx=16,pady=(0,10)); ctk.CTkLabel(card,text=str(case.created_at)[:16].replace("T"," "),font=FONTS["tiny"],text_color=COLORS["text_soft"]).grid(row=1,column=2,sticky="e",padx=16,pady=(0,10)); text=str(case.text).replace("\n"," ").strip(); ctk.CTkLabel(card,text=text,font=FONTS["small"],text_color=COLORS["text"],anchor="w",justify="left",wraplength=800).grid(row=0,column=1,rowspan=2,sticky="ew",padx=14,pady=12)
+        card=ctk.CTkFrame(self.list_frame,fg_color=COLORS["surface"],corner_radius=14,border_width=1,border_color=COLORS["border"]); card.pack(fill="x",pady=5); card.grid_columnconfigure(1,weight=1); card.grid_columnconfigure(2,weight=0)
+        ctk.CTkLabel(card,text=case.case_number,font=FONTS["subheading"],text_color=COLORS["primary"],anchor="w").grid(row=0,column=0,sticky="w",padx=16,pady=(14,3))
+        ctk.CTkLabel(card,text=str(case.urgency).upper(),font=FONTS["tiny"],text_color=COLORS["primary"],fg_color=COLORS["primary_soft"],corner_radius=7).grid(row=0,column=2,sticky="e",padx=16,pady=(12,3))
+        ctk.CTkLabel(card,text=str(case.status).replace("_"," ").title(),font=FONTS["tiny"],text_color=COLORS["text_muted"]).grid(row=1,column=0,sticky="w",padx=16,pady=(0,10))
+        ctk.CTkLabel(card,text=str(case.created_at)[:16].replace("T"," "),font=FONTS["tiny"],text_color=COLORS["text_soft"]).grid(row=1,column=2,sticky="e",padx=16,pady=(0,10))
+        text=str(case.text).replace("\n"," ").strip(); body=ctk.CTkLabel(card,text=text,font=FONTS["small"],text_color=COLORS["text"],anchor="w",justify="left",wraplength=650); body.grid(row=0,column=1,rowspan=2,sticky="ew",padx=14,pady=12)
         ctk.CTkButton(card,text="Abrir",width=72,height=30,fg_color=COLORS["surface_alt"],hover_color=COLORS["primary_soft"],text_color=COLORS["primary"],border_width=1,border_color=COLORS["border"],command=lambda c=case:self.open_case(c)).grid(row=0,column=3,rowspan=2,padx=(0,12))
+        card.bind("<Configure>",lambda e,b=body:b.configure(wraplength=max(280,e.width-310)))
+        for widget in (body,): widget.bind("<Button-1>",lambda e,c=case:self.open_case(c))
     def open_case(self,case):
         win=ctk.CTkToplevel(self.winfo_toplevel()); win.title(f"{case.case_number} · Asistente ONG"); win.geometry("760x680"); win.minsize(650,560); win.configure(fg_color=COLORS["background"]); win.transient(self.winfo_toplevel())
         ctk.CTkLabel(win,text=case.case_number,font=FONTS["title"],text_color=COLORS["text"]).pack(anchor="w",padx=24,pady=(22,2)); ctk.CTkLabel(win,text=f"Creado: {case.created_at[:19].replace('T',' ')}  ·  Prioridad: {case.urgency}",font=FONTS["small"],text_color=COLORS["text_muted"]).pack(anchor="w",padx=24,pady=(0,14))
