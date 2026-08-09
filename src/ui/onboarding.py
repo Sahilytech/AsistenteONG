@@ -18,9 +18,10 @@ class Onboarding(ctk.CTkToplevel):
  def _go_section(self):
   target=self.steps[self.index][2]
   if not target:return
+  controller=getattr(self.parent,"app_controller",None) or self.parent
   self.finish()
   try:
-   if hasattr(self.parent,"select_tab"): self.parent.select_tab(target)
+   if hasattr(controller,"select_tab"): controller.select_tab(target)
   except Exception: pass
  def finish(self):
   try: FLAG.write_text("completed",encoding="utf-8")
