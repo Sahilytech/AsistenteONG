@@ -1,6 +1,18 @@
-"""Punto de entrada de Asistente ONG."""
+"""Punto de entrada de Asistente ONG.
+
+Soporta tanto ``python -m src.main`` como ``python src/main.py`` en Windows.
+"""
 import logging
 import sys
+from pathlib import Path
+
+# Cuando se ejecuta ``python src/main.py``, Python agrega ``src/`` a sys.path
+# y no la raíz del proyecto. Agregamos la raíz para que los imports ``src.*``
+# funcionen igual que con ``python -m src.main``.
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 from src.ui.splash_screen import show_splash
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
