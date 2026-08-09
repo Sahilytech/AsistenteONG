@@ -1,31 +1,21 @@
-"""
-Asistente ONG v0.9 - PUNTO DE ENTRADA LIMPIO
-"""
-
-import sys
+"""Punto de entrada de Asistente ONG."""
 import logging
+import sys
+from src.ui.splash_screen import show_splash
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-try:
-    logger.info("🆘 Iniciando Asistente ONG v0.9...")
-    
-    from src.ui.main_window import MainWindow
-    logger.info("✅ UI importada correctamente")
-    
-    app = MainWindow()
-    logger.info("✅ Aplicación lista")
-    app.run()
-    
-except ImportError as e:
-    logger.error(f"❌ Error de importación: {e}")
-    print(f"\n❌ ERROR: {e}\n")
-    sys.exit(1)
-except Exception as e:
-    logger.error(f"❌ Error: {e}", exc_info=True)
-    print(f"\n❌ ERROR CRÍTICO: {e}\n")
-    sys.exit(1)
+
+def launch_app():
+    try:
+        from src.ui.main_window import MainWindow
+        MainWindow().run()
+    except Exception as exc:
+        logger.error("Error crítico: %s", exc, exc_info=True)
+        print(f"\nERROR CRITICO: {exc}\n")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    show_splash(on_complete=launch_app)
