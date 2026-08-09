@@ -1,0 +1,48 @@
+name: Windows Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  windows-build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Compile Python sources
+        run: python -m compileall -q src
+
+      - name: Validate imports
+        run: python -c "from src.ui.main_window import MainWindow; from src.ui.social_report_panel import SocialReportPanel; from src.report_generator import generate_social_report; print('Imports OK')"
+
+      - name: Build EXE
+        run: python -m PyInstaller --noconfirm --clean --onefile --windowed --name AsistenteONG --add-data "assets;assets" --add-data "data;data" src/main.py
+
+      - name: Verify EXE
+        shell: pwsh
+        run: |
+          if (!(Test-Path "dist/AsistenteONG.exe")) { throw "No se genero dist/AsistenteONG.exe" }
+          $size = (Get-Item "dist/AsistenteONG.exe").Length
+          if ($size -lt 1000000) { throw "El EXE parece invalido o demasiado pequeno: $size bytes" }
+          Write-Host "EXE generado correctamente: $size bytes"
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AsistenteONG-Windows
+          path: dist/AsistenteONG.exe
+          if-no-files-found: error
