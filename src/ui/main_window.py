@@ -1,6 +1,7 @@
 """Ventana principal del Asistente ONG: interfaz clara, accesible y offline."""
 import customtkinter as ctk
 import logging
+import inspect
 from pathlib import Path
 from PIL import Image
 from .case_input import CaseInputFrame
@@ -50,12 +51,15 @@ class MainWindow:
   tabs=[("Inicio",DashboardFrame),("Casos",CasesPanel),("Análisis",ResultsFrame),("Seguimiento",FollowUpPanel),("Informe Social",SocialReportPanel),("Recursos",ResourcesPanel),("Biblioteca",LibraryPanel),("Agenda",AgendaPanel),("Seguridad",SecurityPanel),("Configuración",ConfigPanel),("Ayuda",HelpPanel),("Acerca de",AboutPanel)]
   for name,cls in tabs:
    tab=self.tab_view.add(name)
-   try:
-    obj=cls(tab,case_manager=self.case_manager,config_manager=self.config_manager,fg_color=COLORS["background"])
-   except TypeError:
+   params=inspect.signature(cls.__init__).parameters
+   kwargs={"fg_color":COLORS["background"]}
+   if "case_manager" in params: kwargs["case_manager"]=self.case_manager
+   if "config_manager" in params: kwargs["config_manager"]=self.config_manager
+   try: obj=cls(tab,**kwargs)
+   except TypeError as exc:
+    logger.warning("Constructor de %s rechazó kwargs (%s); reintentando sin opcionales",cls.__name__,exc)
     obj=cls(tab,fg_color=COLORS["background"])
-   obj.pack(fill="both",expand=True)
-   setattr(self,name.replace(" ","_").lower(),obj)
+   obj.pack(fill="both",expand=True); setattr(self,name.replace(" ","_").lower(),obj)
  def _on_case_submit(self,case_number,case_text):
   try:
    analysis=self.config_manager.analyze(case_text); case=self.case_manager.create_case(text=case_text,urgency=analysis["urgency"],keywords=analysis["keywords"]); self.analisis.show_analysis(case.case_number,case_text,analysis); self.tab_view.set("Análisis")
