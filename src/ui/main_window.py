@@ -29,26 +29,25 @@ class AboutPanel(ctk.CTkFrame):
 
 class MainWindow:
  def __init__(self):
-  self.root=ctk.CTk(); self.root.title("Asistente ONG | Triaje y Canalización"); self.root.geometry("1500x900"); self.root.minsize(1120,720); self.root.configure(fg_color=COLORS["background"]); self.root.grid_rowconfigure(0,weight=1); self.root.grid_columnconfigure(0,weight=1); self.case_manager=CaseManager(); self.config_manager=ConfigManager(); self._setup_ui()
+  self.root=ctk.CTk(); self.root.title("Asistente ONG | Triaje y Canalización"); self.root.geometry("1500x900"); self.root.minsize(1080,700); self.root.configure(fg_color=COLORS["background"]); self.root.grid_rowconfigure(0,weight=1); self.root.grid_columnconfigure(0,weight=1); self.case_manager=CaseManager(); self.config_manager=ConfigManager(); self._setup_ui()
  def _setup_ui(self):
-  main=ctk.CTkFrame(self.root,fg_color=COLORS["background"],corner_radius=0); main.grid(row=0,column=0,sticky="nsew"); main.grid_columnconfigure(0,weight=0,minsize=255); main.grid_columnconfigure(1,weight=1); main.grid_rowconfigure(0,weight=1)
-  sidebar=ctk.CTkFrame(main,width=255,fg_color=COLORS["surface_alt"],corner_radius=0); sidebar.grid(row=0,column=0,sticky="nsew"); sidebar.grid_propagate(False)
+  main=ctk.CTkFrame(self.root,fg_color=COLORS["background"],corner_radius=0); main.grid(row=0,column=0,sticky="nsew"); main.grid_columnconfigure(0,weight=0,minsize=265); main.grid_columnconfigure(1,weight=1); main.grid_rowconfigure(0,weight=1)
+  sidebar=ctk.CTkFrame(main,width=265,fg_color=COLORS["surface_alt"],corner_radius=0); sidebar.grid(row=0,column=0,sticky="nsew"); sidebar.grid_propagate(False)
   brand=ctk.CTkFrame(sidebar,fg_color=COLORS["surface"],corner_radius=18,border_width=1,border_color=COLORS["border"]); brand.pack(fill="x",padx=12,pady=12)
   try:
    path=Path(__file__).parent.parent.parent/"assets"/"logo_g.png"
    if path.exists():
-    im=Image.open(path).convert("RGBA"); im.thumbnail((58,58)); li=ctk.CTkImage(light_image=im,size=(58,58)); lab=ctk.CTkLabel(brand,image=li,text=""); lab.image=li; lab.pack(side="left",padx=(10,8),pady=10)
+    im=Image.open(path).convert("RGBA"); im.thumbnail((62,62)); li=ctk.CTkImage(light_image=im,size=(62,62)); lab=ctk.CTkLabel(brand,image=li,text=""); lab.image=li; lab.pack(side="left",padx=(10,8),pady=10)
   except Exception: pass
   titlebox=ctk.CTkFrame(brand,fg_color="transparent"); titlebox.pack(side="left",fill="x",expand=True); ctk.CTkLabel(titlebox,text="Asistente ONG",font=FONTS["heading"],text_color=COLORS["text"]).pack(anchor="w"); ctk.CTkLabel(titlebox,text="Triaje · Casos · Informes",font=FONTS["tiny"],text_color=COLORS["text_muted"]).pack(anchor="w",pady=(2,0)); ctk.CTkLabel(titlebox,text="NubiWorks",font=FONTS["small_bold"],text_color=COLORS["primary"]).pack(anchor="w",pady=(4,0))
-  ctk.CTkButton(sidebar,text="＋  Nuevo caso",height=42,corner_radius=11,fg_color=COLORS["primary"],hover_color=COLORS["primary_dark"],font=FONTS["body_bold"],command=self.open_new_case).pack(fill="x",padx=12,pady=(2,12))
+  ctk.CTkButton(sidebar,text="＋  Nuevo caso",height=44,corner_radius=11,fg_color=COLORS["primary"],hover_color=COLORS["primary_dark"],font=FONTS["body_bold"],command=self.open_new_case).pack(fill="x",padx=12,pady=(2,12))
   nav=ctk.CTkScrollableFrame(sidebar,fg_color="transparent"); nav.pack(fill="both",expand=True,padx=6); self.nav_buttons=[]
   tabs=[("Inicio","Inicio"),("Casos","Casos"),("Análisis","Análisis"),("Seguimiento","Seguimiento"),("Informe Social","Informe Social"),("Recursos","Recursos"),("Biblioteca","Biblioteca"),("Agenda","Agenda"),("Seguridad","Seguridad"),("Configuración","Configuración"),("Ayuda","Ayuda"),("Acerca de","Acerca de")]
   for label,target in tabs:
    b=ctk.CTkButton(nav,text=label,height=36,anchor="w",corner_radius=9,fg_color="transparent",hover_color=COLORS["primary_soft"],text_color=COLORS["text"],font=FONTS["body"],command=lambda t=target:self.select_tab(t)); b.pack(fill="x",padx=4,pady=2); self.nav_buttons.append((target,b))
   status=ctk.CTkFrame(sidebar,fg_color=COLORS["primary_soft"],corner_radius=13); status.pack(fill="x",padx=12,pady=12); ctk.CTkLabel(status,text="●  OFFLINE-FIRST",font=FONTS["small_bold"],text_color=COLORS["primary"]).pack(anchor="w",padx=12,pady=(9,2)); ctk.CTkLabel(status,text="Datos y memoria en este equipo",font=FONTS["tiny"],text_color=COLORS["text_muted"]).pack(anchor="w",padx=12,pady=(0,9))
   center=ctk.CTkFrame(main,fg_color=COLORS["surface"],corner_radius=20,border_width=1,border_color=COLORS["border"]); center.grid(row=0,column=1,sticky="nsew",padx=(8,16),pady=14)
-  top=ctk.CTkFrame(center,fg_color="transparent"); top.pack(fill="x",padx=24,pady=(18,4)); left=ctk.CTkFrame(top,fg_color="transparent"); left.pack(side="left"); ctk.CTkLabel(left,text="Centro de asistencia",font=FONTS["title"],text_color=COLORS["text"]).pack(anchor="w"); ctk.CTkLabel(left,text="Gestión local de casos, triaje, recursos y documentación",font=FONTS["small"],text_color=COLORS["text_muted"]).pack(anchor="w",pady=(3,0)); self.status_badge=ctk.CTkLabel(top,text="●  COMPROBANDO...",font=FONTS["small_bold"],text_color=COLORS["primary"],fg_color=COLORS["primary_soft"],corner_radius=10); self.status_badge.pack(side="right",padx=4,pady=2)
-  self.tab_view=ctk.CTkTabview(center,fg_color=COLORS["surface"],corner_radius=14,segmented_button_fg_color=COLORS["surface_alt"],segmented_button_selected_color=COLORS["primary"],segmented_button_selected_hover_color=COLORS["primary_dark"],segmented_button_unselected_color=COLORS["surface_alt"],segmented_button_unselected_hover_color=COLORS["primary_soft"],text_color=COLORS["text"],anchor="w"); self.tab_view.pack(fill="both",expand=True,padx=14,pady=(8,14)); self.tab_view._segmented_button.grid_remove()
+  self.tab_view=ctk.CTkTabview(center,fg_color=COLORS["surface"],corner_radius=14,segmented_button_fg_color=COLORS["surface"],segmented_button_selected_color=COLORS["surface"],segmented_button_selected_hover_color=COLORS["surface"],segmented_button_unselected_color=COLORS["surface"],segmented_button_unselected_hover_color=COLORS["surface"],text_color=COLORS["text"],anchor="w"); self.tab_view.pack(fill="both",expand=True,padx=0,pady=0); self.tab_view._segmented_button.grid_remove()
   for name,cls in [("Inicio",DashboardFrame),("Casos",CasesPanel),("Análisis",ResultsFrame),("Seguimiento",FollowUpPanel),("Informe Social",SocialReportPanel),("Recursos",ResourcesPanel),("Biblioteca",LibraryPanel),("Agenda",AgendaPanel),("Seguridad",SecurityPanel),("Configuración",ConfigPanel),("Ayuda",HelpPanel),("Acerca de",AboutPanel)]:
    tab=self.tab_view.add(name); params=inspect.signature(cls.__init__).parameters; kwargs={"fg_color":COLORS["background"]};
    if "case_manager" in params: kwargs["case_manager"]=self.case_manager
@@ -56,7 +55,7 @@ class MainWindow:
    try: obj=cls(tab,**kwargs)
    except TypeError as exc: logger.warning("Constructor %s rechazó opcionales: %s",cls.__name__,exc); obj=cls(tab,fg_color=COLORS["background"])
    obj.pack(fill="both",expand=True); setattr(self,name.replace(" ","_").lower(),obj)
-  self.root.select_tab=self.select_tab; self.root.open_new_case=self.open_new_case; self.select_tab("Inicio"); self.root.after(250,self._update_connection_badge)
+  self.root.select_tab=self.select_tab; self.root.open_new_case=self.open_new_case; self.select_tab("Inicio")
  def select_tab(self,target):
   self.tab_view.set(target)
   for name,b in self.nav_buttons:
@@ -65,15 +64,10 @@ class MainWindow:
   win=ctk.CTkToplevel(self.root); win.title("Nuevo caso · Asistente ONG"); win.geometry("620x650"); win.minsize(560,560); win.configure(fg_color=COLORS["background"]); win.transient(self.root); win.grab_set(); ctk.CTkLabel(win,text="Nuevo caso",font=FONTS["title"],text_color=COLORS["text"]).pack(anchor="w",padx=24,pady=(22,3)); ctk.CTkLabel(win,text="Ingresá el relato tal como fue recibido por la organización.",font=FONTS["small"],text_color=COLORS["text_muted"]).pack(anchor="w",padx=24,pady=(0,12))
   def submit(case_number,case_text): self._on_case_submit(case_number,case_text); win.destroy()
   frame=CaseInputFrame(win,on_submit=submit,fg_color=COLORS["background"]); frame.pack(fill="both",expand=True,padx=16,pady=4)
- def _update_connection_badge(self):
-  try:
-   from ..knowledge.official_web import internet_available
-   online=internet_available(); self.status_badge.configure(text="●  INTERNET DISPONIBLE" if online else "●  MODO OFFLINE",text_color=COLORS["success"] if online else COLORS["warning"],fg_color=COLORS["success_soft"] if online else COLORS["warning_soft"])
-  except Exception: pass
  def _on_case_submit(self,case_number,case_text):
   try:
-   analysis=self.config_manager.analyze(case_text); case=self.case_manager.create_case(text=case_text,urgency=analysis["urgency"],keywords=analysis["keywords"]); self.analisis.show_analysis(case.case_number,case_text,analysis); self.select_tab("Análisis");
-   try:self.inicio.update_stats(analysis["urgency"],"general",case.case_number)
+   analysis=self.config_manager.analyze(case_text); case=self.case_manager.create_case(text=case_text,urgency=analysis["urgency"],keywords=analysis["keywords"]); self.analisis.show_analysis(case.case_number,case_text,analysis); self.select_tab("Análisis")
+   try:self.inicio.refresh()
    except Exception:pass
   except Exception as exc: logger.error("Error procesando caso: %s",exc,exc_info=True)
  def run(self): self.root.mainloop()
