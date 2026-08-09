@@ -18,6 +18,7 @@ class ResultsFrame(ctk.CTkFrame):
   self._make_section(scroll,"LECTURA DEL CASO", "classification_label")
   self._make_section(scroll,"SEÑALES DETECTADAS", "signals_label")
   self._make_section(scroll,"ANÁLISIS", "analysis_label")
+  self._make_section(scroll,"DOCUMENTACIÓN RELEVANTE DE LA BIBLIOTECA", "knowledge_label")
   self._make_section(scroll,"PREGUNTAS PARA COMPLETAR", "questions_label")
   self._make_section(scroll,"RECURSOS / DERIVACIONES A CONSIDERAR", "resources_label")
   note=self._card(scroll,"CRITERIO PROFESIONAL",None)
@@ -30,7 +31,7 @@ class ResultsFrame(ctk.CTkFrame):
   card=self._card(parent,title,None); label=ctk.CTkLabel(card,text="—",font=FONTS["body"],text_color=COLORS["text"],wraplength=980,justify="left",anchor="w"); label.pack(fill="x",padx=18,pady=(0,14)); setattr(self,attr,label)
  def show_analysis(self,case_number,case_text,analysis):
   self.current_case={"number":case_number,"text":case_text,"analysis":analysis}
-  u=analysis.get("urgency","Baja"); k=analysis.get("keywords",[]); risk=analysis.get("risk_keywords",[]); ctx=analysis.get("context_keywords",[]); cls=analysis.get("classification","Consulta social"); conf=analysis.get("confidence","Media"); detected=analysis.get("detected_context","Consulta general"); questions=analysis.get("next_questions",[]); resources=analysis.get("suggested_resources",[])
+  u=analysis.get("urgency","Baja"); risk=analysis.get("risk_keywords",[]); ctx=analysis.get("context_keywords",[]); cls=analysis.get("classification","Consulta social"); conf=analysis.get("confidence","Media"); detected=analysis.get("detected_context","Consulta general"); questions=analysis.get("next_questions",[]); resources=analysis.get("suggested_resources",[]); docs=analysis.get("knowledge_matches",[])
   self.case_label.configure(text=f"{case_number} · {cls}")
   social=" · Informe social integrado" if analysis.get("combined_with_social_report") else ""
   self.meta.configure(text=f"Prioridad: {u} · Confianza orientativa: {conf} · Contexto: {detected}{social}")
@@ -42,15 +43,20 @@ class ResultsFrame(ctk.CTkFrame):
   if not signals: signals=["No se detectaron señales específicas con las reglas actuales."]
   self.signals_label.configure(text="\n".join(signals))
   self.analysis_label.configure(text=analysis.get("response","Sin análisis disponible."))
+  if docs:
+   self.knowledge_label.configure(text="\n\n".join(f"• {d.get('title','Fuente')}\n  {d.get('snippet','')[:500]}" for d in docs))
+  else:
+   self.knowledge_label.configure(text="No hay documentación local relacionada. Podés cargar PDFs desde Biblioteca; se buscarán coincidencias en futuros análisis.")
   self.questions_label.configure(text="\n".join(f"• {x}" for x in questions) if questions else "No hay preguntas automáticas adicionales.")
   self.resources_label.configure(text="\n".join(f"• {x}" for x in resources) if resources else "No se sugirieron recursos automáticamente. Revisar directorio local de recursos.")
   self.note_label.configure(text=analysis.get("context_note","Revisar manualmente el resultado antes de intervenir."))
   self._summary=self._build_summary(case_number,analysis)
  def _build_summary(self,case_number,a):
   def bullets(items):return "\n".join("• "+str(x) for x in items) if items else "• Ninguno"
-  return f"CASO: {case_number}\nPRIORIDAD: {a.get('urgency','Baja')}\nCLASIFICACIÓN: {a.get('classification','Consulta social')}\nCONTEXTO: {a.get('detected_context','Consulta general')}\nCONFIANZA: {a.get('confidence','Baja')}\n\nINDICADORES\n{bullets(a.get('risk_keywords',[]))}\n\nCONTEXTO DETECTADO\n{bullets(a.get('context_keywords',[]))}\n\nCRITERIO\n{a.get('priority_reason','')}\n\nANÁLISIS\n{a.get('response','')}\n\nPREGUNTAS\n{bullets(a.get('next_questions',[]))}\n\nRECURSOS\n{bullets(a.get('suggested_resources',[]))}\n"
+  docs=a.get("knowledge_matches",[])
+  doc_text="\n".join("• "+str(x.get("title","Fuente")) for x in docs) if docs else "• Ninguna"
+  return f"CASO: {case_number}\nPRIORIDAD: {a.get('urgency','Baja')}\nCLASIFICACIÓN: {a.get('classification','Consulta social')}\nCONTEXTO: {a.get('detected_context','Consulta general')}\nCONFIANZA: {a.get('confidence','Baja')}\n\nINDICADORES\n{bullets(a.get('risk_keywords',[]))}\n\nCONTEXTO DETECTADO\n{bullets(a.get('context_keywords',[]))}\n\nDOCUMENTACIÓN LOCAL\n{doc_text}\n\nCRITERIO\n{a.get('priority_reason','')}\n\nANÁLISIS\n{a.get('response','')}\n\nPREGUNTAS\n{bullets(a.get('next_questions',[]))}\n\nRECURSOS\n{bullets(a.get('suggested_resources',[]))}\n"
  def _copy_text(self):
   self.winfo_toplevel().clipboard_clear(); self.winfo_toplevel().clipboard_append(self._summary)
  def _edit_text(self):
-  # Mantener el resultado visible y permitir edición mediante una ventana separada en una futura iteración.
   self._summary=self._summary
