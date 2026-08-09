@@ -20,18 +20,16 @@ logger=logging.getLogger(__name__)
 ctk.set_appearance_mode("light"); ctk.set_default_color_theme("blue")
 class AboutPanel(ctk.CTkFrame):
  def __init__(self,parent,**kwargs):
-  super().__init__(parent,**kwargs); scroll=ctk.CTkScrollableFrame(self,fg_color="transparent"); scroll.pack(fill="both",expand=True,padx=28,pady=22)
-  ctk.CTkLabel(scroll,text="Acerca de Asistente ONG",font=FONTS["title"],text_color=COLORS["text"]).pack(anchor="w"); ctk.CTkLabel(scroll,text="Proyecto · propósito · funcionamiento · privacidad · NubiWorks",font=FONTS["subheading"],text_color=COLORS["primary"]).pack(anchor="w",pady=(4,18))
+  super().__init__(parent,**kwargs); scroll=ctk.CTkScrollableFrame(self,fg_color="transparent"); scroll.pack(fill="both",expand=True,padx=28,pady=22); ctk.CTkLabel(scroll,text="Acerca de Asistente ONG",font=FONTS["title"],text_color=COLORS["text"]).pack(anchor="w"); ctk.CTkLabel(scroll,text="Proyecto · propósito · funcionamiento · privacidad",font=FONTS["subheading"],text_color=COLORS["primary"]).pack(anchor="w",pady=(4,18))
   sections=[("PRESENTACIÓN","Asistente ONG es una herramienta de escritorio para equipos de asistencia y organizaciones sociales."),("EL PROYECTO","Integra gestión de casos, triaje contextual, informes sociales, seguimiento, recursos, biblioteca documental y búsqueda controlada de fuentes oficiales cuando existe conexión."),("PRIVACIDAD","La aplicación prioriza procesamiento y almacenamiento local. Internet se utiliza únicamente en funciones explícitas que lo requieren. Los documentos PDF importados quedan en la memoria local del equipo."),("CRITERIO Y LÍMITES","El análisis es una herramienta de apoyo. No diagnostica, no reemplaza profesionales y no determina por sí solo decisiones legales, sanitarias o de protección. Todo resultado requiere revisión humana."),("TECNOLOGÍA","Python · CustomTkinter · SQLite · reglas locales explicables · extracción de texto PDF · memoria local · búsqueda de fuentes oficiales · preparación para Windows."),("BIEN COMÚN","El objetivo es facilitar tareas repetitivas, conservar trazabilidad y proteger la confidencialidad sin reemplazar la atención humana.")]
   for title,text in sections:self._section(scroll,title,text)
  def _section(self,parent,title,text):
   card=ctk.CTkFrame(parent,fg_color=COLORS["surface_alt"],corner_radius=16,border_width=1,border_color=COLORS["border"]); card.pack(fill="x",pady=6); ctk.CTkLabel(card,text=title,font=FONTS["subheading"],text_color=COLORS["primary"],anchor="w").pack(fill="x",padx=20,pady=(15,6)); ctk.CTkLabel(card,text=text,font=FONTS["body"],text_color=COLORS["text"],justify="left",anchor="w",wraplength=950).pack(fill="x",padx=20,pady=(0,18))
 class MainWindow:
  def __init__(self):
-  self.root=ctk.CTk(); self.root.title("Asistente ONG | Triaje y Canalización"); self.root.geometry("1500x900"); self.root.minsize(1080,700); self.root.configure(fg_color=COLORS["background"]); self.root.grid_rowconfigure(0,weight=1); self.root.grid_columnconfigure(0,weight=1); self.case_manager=CaseManager(); self.config_manager=ConfigManager(); self.memory=LocalMemory(); self.frames={}; self._setup_ui(); show_first_run(self.root)
+  self.root=ctk.CTk(); self.root.title("Asistente ONG | Triaje y Canalización"); self.root.geometry("1500x900"); self.root.minsize(1080,700); self.root.configure(fg_color=COLORS["background"]); self.root.grid_rowconfigure(0,weight=1); self.root.grid_columnconfigure(0,weight=1); self.case_manager=CaseManager(); self.config_manager=ConfigManager(); self.memory=LocalMemory(); self.frames={}; self._setup_ui(); self.root.app_controller=self; show_first_run(self.root)
  def _setup_ui(self):
-  main=ctk.CTkFrame(self.root,fg_color=COLORS["background"],corner_radius=0); main.pack(fill="both",expand=True); main.grid_columnconfigure(1,weight=1); main.grid_rowconfigure(0,weight=1)
-  sidebar=ctk.CTkFrame(main,width=265,fg_color=COLORS["surface_alt"],corner_radius=0); sidebar.grid(row=0,column=0,sticky="nsew"); sidebar.grid_propagate(False)
+  main=ctk.CTkFrame(self.root,fg_color=COLORS["background"],corner_radius=0); main.pack(fill="both",expand=True); main.grid_columnconfigure(1,weight=1); main.grid_rowconfigure(0,weight=1); sidebar=ctk.CTkFrame(main,width=265,fg_color=COLORS["surface_alt"],corner_radius=0); sidebar.grid(row=0,column=0,sticky="nsew"); sidebar.grid_propagate(False)
   brand=ctk.CTkFrame(sidebar,fg_color=COLORS["surface"],corner_radius=18,border_width=1,border_color=COLORS["border"]); brand.pack(fill="x",padx=12,pady=12)
   try:
    path=Path(__file__).parent.parent.parent/"assets"/"logo_g.png"
@@ -42,10 +40,9 @@ class MainWindow:
   for target in ["Inicio","Casos","Caso + Informe","Análisis","Seguimiento","Recursos","Biblioteca","Agenda","Seguridad","Configuración","Ayuda","Acerca de"]:
    b=ctk.CTkButton(nav,text=target,height=36,anchor="w",corner_radius=9,fg_color="transparent",hover_color=COLORS["primary_soft"],text_color=COLORS["text"],font=FONTS["body"],command=lambda t=target:self.select_tab(t)); b.pack(fill="x",padx=4,pady=2); self.nav_buttons.append((target,b))
   status=ctk.CTkFrame(sidebar,fg_color=COLORS["success_soft"],corner_radius=13); status.pack(fill="x",padx=12,pady=12); ctk.CTkLabel(status,text="●  LOCAL FIRST",font=FONTS["small_bold"],text_color=COLORS["success"]).pack(anchor="w",padx=12,pady=(9,2)); ctk.CTkLabel(status,text="Casos y análisis en este equipo",font=FONTS["tiny"],text_color=COLORS["text_muted"]).pack(anchor="w",padx=12,pady=(0,9))
-  workspace=ctk.CTkFrame(main,fg_color=COLORS["background"],corner_radius=0); workspace.grid(row=0,column=1,sticky="nsew",padx=(8,16),pady=14); workspace.grid_rowconfigure(0,weight=1); workspace.grid_columnconfigure(0,weight=1)
-  specs=[("Inicio",DashboardFrame),("Casos",CasesPanel),("Caso + Informe",IntegratedCasePanel),("Análisis",ResultsFrame),("Seguimiento",FollowUpPanel),("Recursos",ResourcesPanel),("Biblioteca",LibraryPanel),("Agenda",AgendaPanel),("Seguridad",SecurityPanel),("Configuración",ConfigPanel),("Ayuda",HelpPanel),("Acerca de",AboutPanel)]
+  workspace=ctk.CTkFrame(main,fg_color=COLORS["background"],corner_radius=0); workspace.grid(row=0,column=1,sticky="nsew",padx=(8,16),pady=14); workspace.grid_rowconfigure(0,weight=1); workspace.grid_columnconfigure(0,weight=1); specs=[("Inicio",DashboardFrame),("Casos",CasesPanel),("Caso + Informe",IntegratedCasePanel),("Análisis",ResultsFrame),("Seguimiento",FollowUpPanel),("Recursos",ResourcesPanel),("Biblioteca",LibraryPanel),("Agenda",AgendaPanel),("Seguridad",SecurityPanel),("Configuración",ConfigPanel),("Ayuda",HelpPanel),("Acerca de",AboutPanel)]
   for name,cls in specs:
-   params=inspect.signature(cls.__init__).parameters; kwargs={"fg_color":COLORS["background"]}
+   params=inspect.signature(cls.__init__).parameters; kwargs={"fg_color":COLORS["background"]};
    if "case_manager" in params: kwargs["case_manager"]=self.case_manager
    if "config_manager" in params: kwargs["config_manager"]=self.config_manager
    if name=="Casos": kwargs["on_analyze"]=self._on_case_submit
@@ -62,8 +59,7 @@ class MainWindow:
   try:
    analysis=self.config_manager.analyze(case_text)
    try:
-    matches=self.memory.search(case_text, limit=5)
-    analysis["knowledge_matches"]=[{"title":m.get("title","Fuente"),"snippet":m.get("snippet","")} for m in matches]
+    matches=self.memory.search(case_text,limit=5); analysis["knowledge_matches"]=[{"title":m.get("title","Fuente"),"snippet":m.get("snippet","")} for m in matches]
    except Exception: analysis["knowledge_matches"]=[]
    case=self.case_manager.create_case(text=case_text,urgency=analysis["urgency"],keywords=analysis["keywords"],metadata=metadata,analysis=analysis); casos=self.frames["Casos"]; casos.close_editor(); self.frames["Análisis"].show_analysis(case.case_number,case_text,analysis); self.frames["Caso + Informe"].refresh_cases(); self.select_tab("Análisis")
    try:self.frames["Inicio"].refresh(); casos.refresh()
