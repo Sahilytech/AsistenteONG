@@ -8,7 +8,6 @@ from .resources_panel import ResourcesPanel
 from .dashboard import DashboardFrame
 from .config_panel import ConfigPanel
 from .help_panel import HelpPanel
-from .social_report_panel import SocialReportPanel
 from .integrated_case_panel import IntegratedCasePanel
 from .cases_panel import CasesPanel
 from .workspace_panels import FollowUpPanel,LibraryPanel,SecurityPanel,AgendaPanel
@@ -16,19 +15,20 @@ from .onboarding import show_first_run
 from .styles import COLORS,FONTS
 from ..case_manager import CaseManager
 from ..config_manager import ConfigManager
+from ..knowledge.memory import LocalMemory
 logger=logging.getLogger(__name__)
 ctk.set_appearance_mode("light"); ctk.set_default_color_theme("blue")
 class AboutPanel(ctk.CTkFrame):
  def __init__(self,parent,**kwargs):
   super().__init__(parent,**kwargs); scroll=ctk.CTkScrollableFrame(self,fg_color="transparent"); scroll.pack(fill="both",expand=True,padx=28,pady=22)
   ctk.CTkLabel(scroll,text="Acerca de Asistente ONG",font=FONTS["title"],text_color=COLORS["text"]).pack(anchor="w"); ctk.CTkLabel(scroll,text="Proyecto · propósito · funcionamiento · privacidad · NubiWorks",font=FONTS["subheading"],text_color=COLORS["primary"]).pack(anchor="w",pady=(4,18))
-  sections=[("PRESENTACIÓN","Mi nombre es Sarah Lee Olivera y soy una estudiante y desarrolladora de software de Argentina apasionada por crear tecnología con impacto social."),("EL PROYECTO","Asistente ONG es una caja de herramientas de escritorio para organizaciones sociales, fundaciones y equipos de asistencia. Integra gestión de casos, triaje contextual, informes sociales, seguimiento, recursos, memoria local y búsqueda controlada de fuentes oficiales cuando existe conexión."),("CÓMO TRABAJA EL SISTEMA","El relato del caso y, cuando corresponde, el informe social se analizan como un conjunto. El sistema identifica contexto, indicadores, información faltante, prioridad orientativa y recursos posibles. Las palabras de contexto no elevan por sí solas la urgencia: el motor busca señales concretas y relaciones entre conceptos."),("PRIVACIDAD Y OFFLINE","La aplicación prioriza procesamiento y almacenamiento local. Internet se utiliza únicamente para las funciones que lo requieren y las fuentes externas deben estar dentro de los dominios oficiales configurados. Los resultados consultados pueden guardarse en la memoria local para futuras consultas offline."),("CRITERIO Y LÍMITES","El análisis es una herramienta de apoyo. No diagnostica, no reemplaza profesionales, no confirma por sí solo una emergencia ni determina decisiones legales o sanitarias. Los resultados deben ser revisados y contextualizados por la persona responsable del caso."),("NUBIWORKS","NubiWorks es mi proyecto y marca tecnológica, actualmente en proceso de formación. El objetivo es crear herramientas accesibles, privadas y útiles, especialmente tecnología que pueda funcionar con recursos limitados."),("TECNOLOGÍA","Python · CustomTkinter · SQLite · reglas locales explicables · análisis contextual · informes sociales · memoria local · búsqueda de fuentes oficiales · preparación para Windows."),("CÓDIGO ABIERTO Y BIEN COMÚN","Este software está orientado al bien común. Busca apoyar a profesionales y voluntarios, facilitar tareas repetitivas y proteger la confidencialidad de la información, sin reemplazar la atención humana."),("CREADORA","Sarah Lee Olivera\nDesarrolladora del proyecto · NubiWorks")]
+  sections=[("PRESENTACIÓN","Asistente ONG es una herramienta de escritorio para equipos de asistencia y organizaciones sociales."),("EL PROYECTO","Integra gestión de casos, triaje contextual, informes sociales, seguimiento, recursos, biblioteca documental y búsqueda controlada de fuentes oficiales cuando existe conexión."),("PRIVACIDAD","La aplicación prioriza procesamiento y almacenamiento local. Internet se utiliza únicamente en funciones explícitas que lo requieren. Los documentos PDF importados quedan en la memoria local del equipo."),("CRITERIO Y LÍMITES","El análisis es una herramienta de apoyo. No diagnostica, no reemplaza profesionales y no determina por sí solo decisiones legales, sanitarias o de protección. Todo resultado requiere revisión humana."),("TECNOLOGÍA","Python · CustomTkinter · SQLite · reglas locales explicables · extracción de texto PDF · memoria local · búsqueda de fuentes oficiales · preparación para Windows."),("BIEN COMÚN","El objetivo es facilitar tareas repetitivas, conservar trazabilidad y proteger la confidencialidad sin reemplazar la atención humana.")]
   for title,text in sections:self._section(scroll,title,text)
  def _section(self,parent,title,text):
   card=ctk.CTkFrame(parent,fg_color=COLORS["surface_alt"],corner_radius=16,border_width=1,border_color=COLORS["border"]); card.pack(fill="x",pady=6); ctk.CTkLabel(card,text=title,font=FONTS["subheading"],text_color=COLORS["primary"],anchor="w").pack(fill="x",padx=20,pady=(15,6)); ctk.CTkLabel(card,text=text,font=FONTS["body"],text_color=COLORS["text"],justify="left",anchor="w",wraplength=950).pack(fill="x",padx=20,pady=(0,18))
 class MainWindow:
  def __init__(self):
-  self.root=ctk.CTk(); self.root.title("Asistente ONG | Triaje y Canalización"); self.root.geometry("1500x900"); self.root.minsize(1080,700); self.root.configure(fg_color=COLORS["background"]); self.root.grid_rowconfigure(0,weight=1); self.root.grid_columnconfigure(0,weight=1); self.case_manager=CaseManager(); self.config_manager=ConfigManager(); self.frames={}; self._setup_ui(); show_first_run(self.root)
+  self.root=ctk.CTk(); self.root.title("Asistente ONG | Triaje y Canalización"); self.root.geometry("1500x900"); self.root.minsize(1080,700); self.root.configure(fg_color=COLORS["background"]); self.root.grid_rowconfigure(0,weight=1); self.root.grid_columnconfigure(0,weight=1); self.case_manager=CaseManager(); self.config_manager=ConfigManager(); self.memory=LocalMemory(); self.frames={}; self._setup_ui(); show_first_run(self.root)
  def _setup_ui(self):
   main=ctk.CTkFrame(self.root,fg_color=COLORS["background"],corner_radius=0); main.pack(fill="both",expand=True); main.grid_columnconfigure(1,weight=1); main.grid_rowconfigure(0,weight=1)
   sidebar=ctk.CTkFrame(main,width=265,fg_color=COLORS["surface_alt"],corner_radius=0); sidebar.grid(row=0,column=0,sticky="nsew"); sidebar.grid_propagate(False)
@@ -60,7 +60,12 @@ class MainWindow:
  def open_new_case(self): self.select_tab("Casos"); self.frames["Casos"].show_new_case()
  def _on_case_submit(self,case_text,metadata):
   try:
-   analysis=self.config_manager.analyze(case_text); case=self.case_manager.create_case(text=case_text,urgency=analysis["urgency"],keywords=analysis["keywords"],metadata=metadata,analysis=analysis); casos=self.frames["Casos"]; casos.close_editor(); self.frames["Análisis"].show_analysis(case.case_number,case_text,analysis); self.frames["Caso + Informe"].refresh_cases(); self.select_tab("Análisis")
+   analysis=self.config_manager.analyze(case_text)
+   try:
+    matches=self.memory.search(case_text, limit=5)
+    analysis["knowledge_matches"]=[{"title":m.get("title","Fuente"),"snippet":m.get("snippet","")} for m in matches]
+   except Exception: analysis["knowledge_matches"]=[]
+   case=self.case_manager.create_case(text=case_text,urgency=analysis["urgency"],keywords=analysis["keywords"],metadata=metadata,analysis=analysis); casos=self.frames["Casos"]; casos.close_editor(); self.frames["Análisis"].show_analysis(case.case_number,case_text,analysis); self.frames["Caso + Informe"].refresh_cases(); self.select_tab("Análisis")
    try:self.frames["Inicio"].refresh(); casos.refresh()
    except Exception:pass
   except Exception as exc: logger.error("Error procesando caso: %s",exc,exc_info=True)
