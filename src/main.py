@@ -1,14 +1,8 @@
-"""Punto de entrada de Asistente ONG.
-
-Soporta tanto ``python -m src.main`` como ``python src/main.py`` en Windows.
-"""
+"""Punto de entrada de Asistente ONG."""
 import logging
 import sys
 from pathlib import Path
 
-# Cuando se ejecuta ``python src/main.py``, Python agrega ``src/`` a sys.path
-# y no la raíz del proyecto. Agregamos la raíz para que los imports ``src.*``
-# funcionen igual que con ``python -m src.main``.
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
@@ -22,7 +16,15 @@ logger = logging.getLogger(__name__)
 def launch_app():
     try:
         from src.ui.main_window import MainWindow
-        MainWindow().run()
+        app = MainWindow()
+        # Maximizar antes de mostrar el primer frame evita el salto visual de 1500x900 a pantalla completa.
+        app.root.update_idletasks()
+        try:
+            app.root.state("zoomed")
+        except Exception:
+            app.root.attributes("-zoomed", True)
+        app.root.update_idletasks()
+        app.run()
     except Exception as exc:
         logger.error("Error crítico: %s", exc, exc_info=True)
         print(f"\nERROR CRITICO: {exc}\n")
