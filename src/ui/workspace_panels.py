@@ -1,52 +1,112 @@
+"""Paneles de trabajo secundarios con funciones reales y datos locales."""
+import datetime
 import customtkinter as ctk
-from .styles import COLORS,FONTS
-from .case_input import CaseInputFrame
+from .styles import COLORS, FONTS
+from ..knowledge.memory import LocalMemory
+
 class WorkspacePanel(ctk.CTkFrame):
-    def __init__(self,parent,title,subtitle,**kwargs):
-        super().__init__(parent,**kwargs); self.grid_rowconfigure(0,weight=1); self.grid_columnconfigure(0,weight=1); scroll=ctk.CTkScrollableFrame(self,fg_color="transparent"); scroll.grid(row=0,column=0,sticky="nsew",padx=24,pady=22); ctk.CTkLabel(scroll,text=title,font=FONTS["title"],text_color=COLORS["text"]).pack(anchor="w"); ctk.CTkLabel(scroll,text=subtitle,font=FONTS["small"],text_color=COLORS["text_muted"],wraplength=950,justify="left").pack(anchor="w",pady=(3,18)); self.body=scroll
-    def card(self,title,text,action=None):
-        card=ctk.CTkFrame(self.body,fg_color=COLORS["surface_alt"],corner_radius=14,border_width=1,border_color=COLORS["border"]); card.pack(fill="x",pady=6); ctk.CTkLabel(card,text=title,font=FONTS["subheading"],text_color=COLORS["text"],anchor="w").pack(fill="x",padx=18,pady=(14,4)); ctk.CTkLabel(card,text=text,font=FONTS["small"],text_color=COLORS["text_muted"],wraplength=900,justify="left",anchor="w").pack(fill="x",padx=18,pady=(0,12));
-        if action: ctk.CTkButton(card,text=action,height=32,fg_color=COLORS["primary"],hover_color=COLORS["primary_dark"]).pack(anchor="e",padx=18,pady=(0,14))
-class CasesPanel(ctk.CTkFrame):
-    def __init__(self,parent,case_manager=None,on_analyze=None,**kwargs):
-        super().__init__(parent,**kwargs); self.case_manager=case_manager; self.on_analyze=on_analyze; self.all_cases=[]; self.grid_rowconfigure(2,weight=1); self.grid_columnconfigure(0,weight=1)
-        head=ctk.CTkFrame(self,fg_color="transparent"); head.grid(row=0,column=0,sticky="ew",padx=24,pady=(22,10)); head.grid_columnconfigure(0,weight=1); ctk.CTkLabel(head,text="Casos",font=FONTS["title"],text_color=COLORS["text"]).grid(row=0,column=0,sticky="w"); self.count_label=ctk.CTkLabel(head,text="0 registrados",font=FONTS["small"],text_color=COLORS["text_muted"]); self.count_label.grid(row=1,column=0,sticky="w",pady=(3,0)); ctk.CTkButton(head,text="＋ Nuevo caso",width=125,height=36,fg_color=COLORS["primary"],hover_color=COLORS["primary_dark"],command=self.show_new_case).grid(row=0,column=1,rowspan=2,padx=(10,0))
-        tools=ctk.CTkFrame(self,fg_color=COLORS["surface_alt"],corner_radius=14,border_width=1,border_color=COLORS["border"]); tools.grid(row=1,column=0,sticky="ew",padx=24,pady=(0,10)); tools.grid_columnconfigure(0,weight=1); row=ctk.CTkFrame(tools,fg_color="transparent"); row.grid(row=0,column=0,sticky="ew",padx=12,pady=12); row.grid_columnconfigure(0,weight=1); self.search=ctk.CTkEntry(row,height=38,placeholder_text="Buscar por ID, relato, palabra clave o responsable..."); self.search.grid(row=0,column=0,sticky="ew"); self.search.bind("<KeyRelease>",lambda e:self.refresh()); self.urgency=ctk.CTkOptionMenu(row,width=125,height=38,values=["Todas","Muy Alta","Alta","Media","Baja"],command=lambda _:self.refresh()); self.urgency.grid(row=0,column=1,padx=(8,0)); self.status=ctk.CTkOptionMenu(row,width=145,height=38,values=["Todos","nuevo","en análisis","revisado","derivado","en seguimiento","cerrado"],command=lambda _:self.refresh()); self.status.grid(row=0,column=2,padx=(8,0)); ctk.CTkButton(row,text="Limpiar",width=72,height=38,fg_color=COLORS["surface"],hover_color=COLORS["primary_soft"],text_color=COLORS["text"],border_width=1,border_color=COLORS["border"],command=self.clear_filters).grid(row=0,column=3,padx=(8,0)); self.list_frame=ctk.CTkScrollableFrame(self,fg_color="transparent"); self.list_frame.grid(row=2,column=0,sticky="nsew",padx=24,pady=(0,20)); self.refresh()
-    def show_new_case(self):
-        if hasattr(self,"editor") and self.editor.winfo_exists(): self.editor.destroy()
-        self.editor=ctk.CTkFrame(self,fg_color=COLORS["background"]); self.editor.place(relx=0,rely=0,relwidth=1,relheight=1); self.editor.lift(); ctk.CTkButton(self.editor,text="← Volver a casos",width=125,height=34,fg_color="transparent",hover_color=COLORS["primary_soft"],text_color=COLORS["primary"],command=self.close_editor).pack(anchor="w",padx=24,pady=(18,0)); CaseInputFrame(self.editor,on_submit=self._submit_new_case,fg_color=COLORS["background"]).pack(fill="both",expand=True,padx=10,pady=2)
-    def close_editor(self):
-        if hasattr(self,"editor") and self.editor.winfo_exists(): self.editor.destroy()
-        self.refresh()
-    def _submit_new_case(self,text,metadata):
-        if self.on_analyze: self.on_analyze(text,metadata)
-    def clear_filters(self): self.search.delete(0,"end"); self.urgency.set("Todas"); self.status.set("Todos"); self.refresh()
-    def refresh(self):
-        self.all_cases=self.case_manager.get_all_cases() if self.case_manager else []; query=self.search.get().strip().lower(); urgency=self.urgency.get().lower(); status=self.status.get().lower(); filtered=[]
-        for case in self.all_cases:
-            hay=" ".join([case.case_number,case.text,case.assigned_to,case.person_name,case.contact,case.case_type,case.location," ".join(case.keywords)]).lower()
-            if query and query not in hay: continue
-            if urgency!="todas" and str(case.urgency).lower()!=urgency: continue
-            if status!="todos" and str(case.status).lower()!=status: continue
-            filtered.append(case)
-        for child in self.list_frame.winfo_children(): child.destroy()
-        self.count_label.configure(text=f"{len(filtered)} de {len(self.all_cases)} registrados")
-        if not filtered:
-            empty=ctk.CTkFrame(self.list_frame,fg_color=COLORS["surface_alt"],corner_radius=16,border_width=1,border_color=COLORS["border"]); empty.pack(fill="x",pady=8); ctk.CTkLabel(empty,text="No hay casos registrados." if not self.all_cases else "No se encontraron casos.",font=FONTS["heading"],text_color=COLORS["text"]).pack(pady=(28,5)); ctk.CTkLabel(empty,text="Los casos que crees aparecerán acá." if not self.all_cases else "Probá cambiar la búsqueda o los filtros.",font=FONTS["small"],text_color=COLORS["text_muted"]).pack(pady=(0,28)); return
-        for case in filtered: self._case_card(case)
-    def _case_card(self,case):
-        card=ctk.CTkFrame(self.list_frame,fg_color=COLORS["surface"],corner_radius=14,border_width=1,border_color=COLORS["border"]); card.pack(fill="x",pady=5); card.grid_columnconfigure(1,weight=1); ctk.CTkLabel(card,text=case.case_number,font=FONTS["subheading"],text_color=COLORS["primary"],anchor="w").grid(row=0,column=0,sticky="w",padx=16,pady=(14,3)); ctk.CTkLabel(card,text=str(case.urgency).upper(),font=FONTS["tiny"],text_color=COLORS["primary"],fg_color=COLORS["primary_soft"],corner_radius=7).grid(row=0,column=2,sticky="e",padx=16,pady=(12,3)); ctk.CTkLabel(card,text=str(case.status).replace("_"," ").title(),font=FONTS["tiny"],text_color=COLORS["text_muted"]).grid(row=1,column=0,sticky="w",padx=16,pady=(0,10)); summary=" · ".join(x for x in [case.person_name,case.case_type,case.location] if x); text=(summary+"\n" if summary else "")+str(case.text).replace("\n"," ").strip(); ctk.CTkLabel(card,text=text,font=FONTS["small"],text_color=COLORS["text"],anchor="w",justify="left",wraplength=760).grid(row=0,column=1,rowspan=2,sticky="ew",padx=14,pady=12); ctk.CTkButton(card,text="Abrir",width=72,height=30,fg_color=COLORS["surface_alt"],hover_color=COLORS["primary_soft"],text_color=COLORS["primary"],border_width=1,border_color=COLORS["border"],command=lambda c=case:self.open_case(c)).grid(row=0,column=3,rowspan=2,padx=(0,12))
-    def open_case(self,case):
-        if hasattr(self,"editor") and self.editor.winfo_exists(): self.editor.destroy()
-        self.editor=ctk.CTkFrame(self,fg_color=COLORS["background"]); self.editor.place(relx=0,rely=0,relwidth=1,relheight=1); self.editor.lift(); ctk.CTkButton(self.editor,text="← Volver a casos",width=125,height=34,fg_color="transparent",hover_color=COLORS["primary_soft"],text_color=COLORS["primary"],command=self.close_editor).pack(anchor="w",padx=24,pady=(18,0)); box=ctk.CTkScrollableFrame(self.editor,fg_color="transparent"); box.pack(fill="both",expand=True,padx=24,pady=8); ctk.CTkLabel(box,text=case.case_number,font=FONTS["title"],text_color=COLORS["text"]).pack(anchor="w"); ctk.CTkLabel(box,text=f"Prioridad: {case.urgency} · Estado: {str(case.status).replace('_',' ').title()}",font=FONTS["small"],text_color=COLORS["text_muted"]).pack(anchor="w",pady=(3,14)); self._detail(box,"Datos",f"Nombre / alias: {case.person_name or 'No indicado'}\nContacto: {case.contact or 'No indicado'}\nTipo: {case.case_type or 'No indicado'}\nZona: {case.location or 'No indicada'}"); self._detail(box,"Relato",case.text); self._detail(box,"Palabras clave",", ".join(case.keywords) if case.keywords else "Sin palabras clave"); self._detail(box,"Seguimiento",case.follow_up_date or "Sin fecha"); self._detail(box,"Notas",case.notes or "Sin notas")
-    def _detail(self,parent,title,text):
-        card=ctk.CTkFrame(parent,fg_color=COLORS["surface_alt"],corner_radius=12,border_width=1,border_color=COLORS["border"]); card.pack(fill="x",pady=5); ctk.CTkLabel(card,text=title.upper(),font=FONTS["tiny"],text_color=COLORS["primary"]).pack(anchor="w",padx=16,pady=(12,4)); ctk.CTkLabel(card,text=text,font=FONTS["body"],text_color=COLORS["text"],justify="left",anchor="w",wraplength=800).pack(fill="x",padx=16,pady=(0,14))
+    def __init__(self, parent, title, subtitle, **kwargs):
+        super().__init__(parent, **kwargs)
+        scroll = ctk.CTkScrollableFrame(self, fg_color="transparent"); scroll.pack(fill="both", expand=True, padx=24, pady=22)
+        ctk.CTkLabel(scroll, text=title, font=FONTS["title"], text_color=COLORS["text"]).pack(anchor="w")
+        ctk.CTkLabel(scroll, text=subtitle, font=FONTS["small"], text_color=COLORS["text_muted"], wraplength=980, justify="left").pack(anchor="w", pady=(3, 18))
+        self.body = scroll
+
 class FollowUpPanel(WorkspacePanel):
-    def __init__(self,parent,case_manager=None,**kwargs):
-        super().__init__(parent,"Seguimiento","Revisá acciones pendientes y fechas de seguimiento.",**kwargs); cases=case_manager.get_all_cases() if case_manager else []; pending=[c for c in cases if c.status.lower() not in {"cerrado","cerrada"}]; self.card("Pendientes",f"{len(pending)} casos abiertos que requieren revisión."); self.card("Sin fecha",f"{sum(1 for c in pending if not c.follow_up_date)} casos todavía no tienen seguimiento asignado.")
+    def __init__(self, parent, case_manager=None, **kwargs):
+        self.case_manager = case_manager
+        super().__init__(parent, "Seguimiento", "Convertí la valoración en acciones concretas: qué hacer, quién lo hace, para cuándo y qué ocurrió.", **kwargs)
+        cases = case_manager.get_all_cases() if case_manager else []
+        self.case_map = {c.case_number: c for c in cases}
+        selector = ctk.CTkFrame(self.body, fg_color=COLORS["surface_alt"], corner_radius=14, border_width=1, border_color=COLORS["border"]); selector.pack(fill="x", pady=6); selector.grid_columnconfigure(1, weight=1)
+        ctk.CTkLabel(selector, text="Caso", font=FONTS["small_bold"]).grid(row=0, column=0, padx=12, pady=10)
+        self.case_menu = ctk.CTkComboBox(selector, values=list(self.case_map) or ["Sin casos"], command=self._load_case); self.case_menu.grid(row=0, column=1, sticky="ew", padx=8, pady=10)
+        self.status = ctk.CTkLabel(selector, text="", font=FONTS["tiny"], text_color=COLORS["text_muted"]); self.status.grid(row=0, column=2, padx=12)
+        self._build_editor()
+        self._load_case(self.case_menu.get())
+
+    def _build_editor(self):
+        card = ctk.CTkFrame(self.body, fg_color=COLORS["surface"], corner_radius=14, border_width=1, border_color=COLORS["border"]); card.pack(fill="x", pady=6)
+        ctk.CTkLabel(card, text="Nueva acción de seguimiento", font=FONTS["heading"], text_color=COLORS["text"]).pack(anchor="w", padx=16, pady=(14, 3))
+        ctk.CTkLabel(card, text="Registrá una acción concreta. No reemplaza el criterio ni la responsabilidad profesional.", font=FONTS["tiny"], text_color=COLORS["text_muted"]).pack(anchor="w", padx=16, pady=(0, 8))
+        self.task = ctk.CTkEntry(card, placeholder_text="Acción a realizar"); self.task.pack(fill="x", padx=16, pady=5)
+        self.when = ctk.CTkEntry(card, placeholder_text="Fecha (AAAA-MM-DD)"); self.when.pack(fill="x", padx=16, pady=5); self.when.insert(0, datetime.date.today().isoformat())
+        self.actor = ctk.CTkEntry(card, placeholder_text="Responsable"); self.actor.pack(fill="x", padx=16, pady=5)
+        self.notes = ctk.CTkTextbox(card, height=80); self.notes.pack(fill="x", padx=16, pady=5)
+        ctk.CTkButton(card, text="Guardar seguimiento", command=self._save, fg_color=COLORS["primary"], hover_color=COLORS["primary_dark"]).pack(anchor="e", padx=16, pady=12)
+        self.timeline = ctk.CTkScrollableFrame(self.body, fg_color=COLORS["surface_alt"], height=230); self.timeline.pack(fill="x", pady=6)
+
+    def _load_case(self, number):
+        case = self.case_map.get(number)
+        if not case: self.status.configure(text="Sin casos"); return
+        self.status.configure(text=f"{case.status} · {len(case.timeline)} eventos"); self._render_timeline(case)
+
+    def _render_timeline(self, case):
+        for w in self.timeline.winfo_children(): w.destroy()
+        for event in reversed(case.timeline):
+            ctk.CTkLabel(self.timeline, text=f"{event.get('created_at','')} · {event.get('title','Evento')}", font=FONTS["small_bold"], text_color=COLORS["primary"], anchor="w").pack(fill="x", padx=12, pady=(8, 1))
+            ctk.CTkLabel(self.timeline, text=event.get("description", ""), font=FONTS["tiny"], text_color=COLORS["text_muted"], anchor="w", justify="left", wraplength=900).pack(fill="x", padx=12, pady=(0, 6))
+
+    def _save(self):
+        case = self.case_map.get(self.case_menu.get())
+        task = self.task.get().strip()
+        if not case or not task: self.status.configure(text="Seleccioná un caso y escribí una acción."); return
+        date = self.when.get().strip(); actor = self.actor.get().strip(); notes = self.notes.get("1.0", "end").strip()
+        case.follow_up_date = date
+        self.case_manager.add_timeline_event(case.case_number, "seguimiento", task, f"Fecha: {date}. {notes}", actor)
+        self.case_manager.save_case(case)
+        self.status.configure(text="Seguimiento guardado localmente."); self.task.delete(0, "end"); self.notes.delete("1.0", "end"); self.case_map[case.case_number] = self.case_manager.get_case(case.case_number); self._load_case(case.case_number)
+
 class LibraryPanel(WorkspacePanel):
-    def __init__(self,parent,**kwargs): super().__init__(parent,"Biblioteca","Documentos y materiales internos disponibles sin conexión.",**kwargs); self.card("Protocolos","Consultá guías, procedimientos y documentos internos."); self.card("Plantillas","Centralizá plantillas para informes y comunicaciones.")
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, "Biblioteca", "Memoria documental del equipo: fuentes oficiales guardadas, protocolos y materiales que la organización decide conservar.", **kwargs)
+        self.memory = LocalMemory()
+        row = ctk.CTkFrame(self.body, fg_color=COLORS["surface_alt"], corner_radius=14, border_width=1, border_color=COLORS["border"]); row.pack(fill="x", pady=6)
+        self.search = ctk.CTkEntry(row, placeholder_text="Buscar en la memoria local..."); self.search.pack(side="left", fill="x", expand=True, padx=10, pady=10); self.search.bind("<Return>", lambda _: self._search())
+        ctk.CTkButton(row, text="Buscar", command=self._search, fg_color=COLORS["primary"], hover_color=COLORS["primary_dark"]).pack(side="left", padx=(0, 10))
+        self.status = ctk.CTkLabel(self.body, text=f"{self.memory.count()} fuentes guardadas", font=FONTS["small"], text_color=COLORS["text_muted"]); self.status.pack(anchor="w", pady=(4, 4))
+        self.results = ctk.CTkScrollableFrame(self.body, fg_color="transparent"); self.results.pack(fill="both", expand=True)
+        self._search()
+
+    def _search(self):
+        for w in self.results.winfo_children(): w.destroy()
+        q = self.search.get().strip()
+        items = self.memory.search(q, 50) if q else []
+        if not q:
+            ctk.CTkLabel(self.results, text="Escribí una búsqueda para consultar la memoria. Las fuentes guardadas conservan su dominio y fecha.", font=FONTS["body"], text_color=COLORS["text_muted"], wraplength=900, justify="left").pack(anchor="w", padx=10, pady=18); return
+        self.status.configure(text=f"{len(items)} coincidencias · memoria local")
+        for item in items:
+            card = ctk.CTkFrame(self.results, fg_color=COLORS["surface"], corner_radius=12, border_width=1, border_color=COLORS["border"]); card.pack(fill="x", pady=5)
+            ctk.CTkLabel(card, text=item.get("title", "Fuente"), font=FONTS["subheading"], text_color=COLORS["text"], anchor="w", wraplength=900).pack(fill="x", padx=14, pady=(10, 3))
+            ctk.CTkLabel(card, text=f"{item.get('domain','')} · guardado {item.get('saved_at','')}", font=FONTS["tiny"], text_color=COLORS["primary"]).pack(anchor="w", padx=14)
+            ctk.CTkLabel(card, text=item.get("snippet", ""), font=FONTS["small"], text_color=COLORS["text_muted"], anchor="w", justify="left", wraplength=900).pack(fill="x", padx=14, pady=(4, 10))
+
 class SecurityPanel(WorkspacePanel):
-    def __init__(self,parent,**kwargs): super().__init__(parent,"Privacidad y seguridad","Controles locales para proteger la información.",**kwargs); self.card("Estado","Modo offline · almacenamiento local · sin envío automático de casos."); self.card("Copias de seguridad","Gestioná copias locales según la política de la organización.")
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, "Privacidad y seguridad", "Controles para entender qué se guarda, qué se consulta y qué información debe quedar protegida.", **kwargs)
+        self._card("Datos del caso", "Se guardan localmente en SQLite: relato, metadatos, informe social, análisis, timeline y derivaciones. No se incluyen imágenes por defecto.")
+        self._card("Fuentes", "Las fuentes guardadas en memoria incluyen dominio, título, URL y fecha de guardado para mantener trazabilidad.")
+        self._card("Principio de minimización", "Ingresá solo la información necesaria para el objetivo profesional. Evitá copiar datos sensibles que no aporten a la valoración.")
+        self._card("Revisión", "El análisis automático es orientativo. La decisión profesional, la derivación y cualquier documento emitido requieren revisión humana.")
+
+    def _card(self, title, text):
+        card = ctk.CTkFrame(self.body, fg_color=COLORS["surface"], corner_radius=14, border_width=1, border_color=COLORS["border"]); card.pack(fill="x", pady=6)
+        ctk.CTkLabel(card, text=title, font=FONTS["heading"], text_color=COLORS["text"]).pack(anchor="w", padx=18, pady=(14, 4))
+        ctk.CTkLabel(card, text=text, font=FONTS["body"], text_color=COLORS["text_muted"], wraplength=900, justify="left").pack(fill="x", padx=18, pady=(0, 15))
+
 class AgendaPanel(WorkspacePanel):
-    def __init__(self,parent,**kwargs): super().__init__(parent,"Agenda","Tareas y fechas relacionadas con los casos.",**kwargs); self.card("Hoy","Revisá los seguimientos que correspondan a la fecha actual."); self.card("Próximas fechas","Organizá revisiones y tareas pendientes.")
+    def __init__(self, parent, case_manager=None, **kwargs):
+        super().__init__(parent, "Agenda", "Vista operativa de fechas de seguimiento registradas en los expedientes.", **kwargs)
+        self.case_manager = case_manager
+        self.list = ctk.CTkScrollableFrame(self.body, fg_color="transparent"); self.list.pack(fill="both", expand=True)
+        self.refresh()
+    def refresh(self):
+        for w in self.list.winfo_children(): w.destroy()
+        cases = self.case_manager.get_all_cases() if self.case_manager else []
+        dated = sorted([c for c in cases if c.follow_up_date], key=lambda c: c.follow_up_date or "")
+        if not dated:
+            ctk.CTkLabel(self.list, text="No hay fechas de seguimiento registradas.", font=FONTS["body"], text_color=COLORS["text_muted"]).pack(anchor="w", padx=10, pady=18); return
+        for case in dated:
+            card = ctk.CTkFrame(self.list, fg_color=COLORS["surface"], corner_radius=12, border_width=1, border_color=COLORS["border"]); card.pack(fill="x", pady=5)
+            ctk.CTkLabel(card, text=case.follow_up_date, font=FONTS["heading"], text_color=COLORS["primary"], width=120).pack(side="left", padx=14, pady=14)
+            ctk.CTkLabel(card, text=f"{case.case_number} · {case.status}", font=FONTS["small_bold"], text_color=COLORS["text"]).pack(side="left", padx=5)
