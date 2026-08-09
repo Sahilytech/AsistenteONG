@@ -1,27 +1,23 @@
-"""Estilos de la interfaz: modo claro único."""
+"""Sistema visual de Asistente ONG: claro, limpio y centrado en accesibilidad."""
 
 COLORS = {
-    "background": "#FFFFFF",
-    "surface": "#FFFFFF",
-    "primary": "#0e98d6",
-    "text": "#000000",
-    "text_muted": "#666666",
-    "border": "#D9D9D9",
-    "success": "#16a34a",
-    "warning": "#d97706",
-    "danger": "#dc2626",
+    "background": "#FFFFFF", "surface": "#FFFFFF", "surface_alt": "#F7FBFD",
+    "primary": "#0e98d6", "primary_dark": "#0879ad", "primary_soft": "#EAF6FC",
+    "text": "#111111", "text_muted": "#66717A", "border": "#DCE5EA",
+    "success": "#168A4A", "warning": "#B86A00", "danger": "#C62828",
 }
 
 FONTS = {
-    "title": ("Helvetica", 18, "bold"),
-    "heading": ("Helvetica", 14, "bold"),
-    "body": ("Helvetica", 11),
-    "small": ("Helvetica", 9),
+    "display": ("Helvetica", 25, "bold"), "title": ("Helvetica", 20, "bold"),
+    "heading": ("Helvetica", 14, "bold"), "subheading": ("Helvetica", 12, "bold"),
+    "body": ("Helvetica", 11), "small": ("Helvetica", 9), "tiny": ("Helvetica", 8),
 }
 
 SPACING = {"xs": 5, "sm": 10, "md": 15, "lg": 20, "xl": 30}
 
+CARD_RADIUS = 12
+
 
 def switch_theme(theme: str):
-    """Compatibilidad con módulos antiguos; la aplicación permanece en modo claro."""
+    """Compatibilidad: el producto utiliza exclusivamente modo claro."""
     return COLORS
