@@ -10,7 +10,8 @@ from .help_panel import HelpPanel
 from .integrated_case_panel import IntegratedCasePanel
 from .cases_panel import CasesPanel
 from .people_panel import PeoplePanel
-from .workspace_panels import FollowUpPanel,LibraryPanel,SecurityPanel,AgendaPanel
+from .pdf_library_panel import PDFLibraryPanel
+from .workspace_panels import FollowUpPanel,AgendaPanel,SecurityPanel
 from .onboarding import show_first_run
 from .styles import COLORS,FONTS
 from ..case_manager import CaseManager
@@ -21,7 +22,7 @@ from ..knowledge.case_document_matcher import build_case_context
 logger=logging.getLogger(__name__);ctk.set_appearance_mode("light");ctk.set_default_color_theme("blue")
 class AboutPanel(ctk.CTkFrame):
  def __init__(self,parent,**kwargs):
-  super().__init__(parent,**kwargs);scroll=ctk.CTkScrollableFrame(self,fg_color="transparent");scroll.pack(fill="both",expand=True,padx=28,pady=22);ctk.CTkLabel(scroll,text="Acerca de Asistente ONG",font=FONTS["title"],text_color=COLORS["text"]).pack(anchor="w");ctk.CTkLabel(scroll,text="Gestión de personas · casos · documentación · seguimiento",font=FONTS["subheading"],text_color=COLORS["primary"]).pack(anchor="w",pady=(4,18))
+  super().__init__(parent,**kwargs);scroll=ctk.CTkScrollableFrame(self,fg_color="transparent");scroll.pack(fill="both",expand=True,padx=28,pady=22);ctk.CTkLabel(scroll,text="Acerca de Asistente ONG",font=FONTS["title"],text_color=COLORS["text"]).pack(anchor="w");ctk.CTkLabel(scroll,text="Personas · casos · documentación · seguimiento",font=FONTS["subheading"],text_color=COLORS["primary"]).pack(anchor="w",pady=(4,18))
   for title,text in [("PROPÓSITO","Herramienta de apoyo para equipos de asistencia. Organiza información y tareas repetitivas sin reemplazar la revisión profesional."),("PERSONAS Y CASOS","Una persona puede tener múltiples casos. El registro de persona se reutiliza y cada atención queda como un caso separado dentro de su historial."),("DOCUMENTACIÓN","Los PDFs se procesan localmente y sus fragmentos relevantes pueden recuperarse al analizar un caso. Las coincidencias se muestran como apoyo documental, no como conclusiones."),("PRIVACIDAD","El almacenamiento prioriza este equipo. Los campos personales sensibles son opcionales y la organización debe cargar únicamente lo necesario."),("LÍMITES","El análisis no diagnostica ni decide por sí solo cuestiones legales, sanitarias o de protección. Requiere revisión humana.")]:
    card=ctk.CTkFrame(scroll,fg_color=COLORS["surface_alt"],corner_radius=16,border_width=1,border_color=COLORS["border"]);card.pack(fill="x",pady=6);ctk.CTkLabel(card,text=title,font=FONTS["subheading"],text_color=COLORS["primary"]).pack(anchor="w",padx=20,pady=(15,6));ctk.CTkLabel(card,text=text,font=FONTS["body"],text_color=COLORS["text"],justify="left",anchor="w",wraplength=950).pack(fill="x",padx=20,pady=(0,18))
 class MainWindow:
@@ -39,8 +40,7 @@ class MainWindow:
   for target in ["Inicio","Personas","Casos","Caso + Informe","Análisis","Seguimiento","Recursos","Biblioteca","Agenda","Seguridad","Configuración","Ayuda","Acerca de"]:
    b=ctk.CTkButton(nav,text=target,height=36,anchor="w",corner_radius=9,fg_color="transparent",hover_color=COLORS["primary_soft"],text_color=COLORS["text"],font=FONTS["body"],command=lambda t=target:self.select_tab(t));b.pack(fill="x",padx=4,pady=2);self.nav_buttons.append((target,b))
   status=ctk.CTkFrame(sidebar,fg_color=COLORS["success_soft"],corner_radius=13);status.pack(fill="x",padx=12,pady=12);ctk.CTkLabel(status,text="●  LOCAL FIRST",font=FONTS["small_bold"],text_color=COLORS["success"]).pack(anchor="w",padx=12,pady=(9,2));ctk.CTkLabel(status,text="Personas, casos y documentos en este equipo",font=FONTS["tiny"],text_color=COLORS["text_muted"]).pack(anchor="w",padx=12,pady=(0,9))
-  workspace=ctk.CTkFrame(main,fg_color=COLORS["background"],corner_radius=0);workspace.grid(row=0,column=1,sticky="nsew",padx=(8,16),pady=14);workspace.grid_rowconfigure(0,weight=1);workspace.grid_columnconfigure(0,weight=1)
-  specs=[("Inicio",DashboardFrame),("Personas",PeoplePanel),("Casos",CasesPanel),("Caso + Informe",IntegratedCasePanel),("Análisis",ResultsFrame),("Seguimiento",FollowUpPanel),("Recursos",ResourcesPanel),("Biblioteca",LibraryPanel),("Agenda",AgendaPanel),("Seguridad",SecurityPanel),("Configuración",ConfigPanel),("Ayuda",HelpPanel),("Acerca de",AboutPanel)]
+  workspace=ctk.CTkFrame(main,fg_color=COLORS["background"],corner_radius=0);workspace.grid(row=0,column=1,sticky="nsew",padx=(8,16),pady=14);workspace.grid_rowconfigure(0,weight=1);workspace.grid_columnconfigure(0,weight=1);specs=[("Inicio",DashboardFrame),("Personas",PeoplePanel),("Casos",CasesPanel),("Caso + Informe",IntegratedCasePanel),("Análisis",ResultsFrame),("Seguimiento",FollowUpPanel),("Recursos",ResourcesPanel),("Biblioteca",PDFLibraryPanel),("Agenda",AgendaPanel),("Seguridad",SecurityPanel),("Configuración",ConfigPanel),("Ayuda",HelpPanel),("Acerca de",AboutPanel)]
   for name,cls in specs:
    params=inspect.signature(cls.__init__).parameters;kwargs={"fg_color":COLORS["background"]}
    if "case_manager" in params:kwargs["case_manager"]=self.case_manager
