@@ -17,9 +17,11 @@ La plataforma evoluciona por fases. El sistema debe ser offline-first, explicabl
 - [x] Esquema estructurado del informe social.
 - [x] Estructura base de timeline.
 - [x] Derivaciones con estado persistidas.
-- [ ] Genograma visual.
-- [ ] Plan de intervención.
-- [ ] Próxima acción y vencimientos.
+- [x] Modelo de genograma.
+- [x] Núcleo de plan de intervención.
+- [ ] Genograma visual en UI.
+- [ ] Integrar plan de intervención al flujo visual.
+- [ ] Próxima acción y vencimientos en UI.
 - [ ] Historial completo de cambios.
 
 ## Fase 3 — Cobertura Argentina — EN PROGRESO
@@ -48,11 +50,12 @@ La plataforma evoluciona por fases. El sistema debe ser offline-first, explicabl
 - [ ] Modo privacidad/anónimo para capacitación.
 - [ ] Exportaciones protegidas.
 
-## Fase 6 — Documentos y trabajo profesional — PLANIFICADA
+## Fase 6 — Documentos y trabajo profesional — EN PROGRESO
 - [x] Esquema base de informe social.
 - [ ] Informe social profesional.
 - [ ] Nota de derivación.
-- [ ] Plan de intervención.
+- [x] Núcleo de plan de intervención.
+- [ ] Integración visual del plan.
 - [ ] Resumen de caso.
 - [ ] Seguimiento.
 - [ ] PDF/DOCX.
