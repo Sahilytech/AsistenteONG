@@ -1,224 +1,207 @@
-"""
-Gestor de configuración - Análisis inteligente de casos
-"""
+"""Gestor de configuración y triaje local basado en reglas explicables."""
 
 import logging
+import re
 from typing import Dict, List
 
 logger = logging.getLogger(__name__)
 
 
 class ConfigManager:
-    """Motor de análisis inteligente."""
-    
-    # Palabras clave por categoría
+    """Motor de análisis local. Las reglas priorizan contexto sobre palabras aisladas."""
+
     KEYWORDS = {
         "Riesgo de Vida": [
-            "suicidio", "matar", "muerte", "arma", "veneno", "sobredosis",
-            "cuerda", "precipicio", "tóxico", "intoxicación", "asfixia",
-            "apuñalar", "disparar", "explosivo", "ácido", "quemadura"
+            "suicidio", "suicida", "matar", "matarme", "matarse", "muerte", "arma",
+            "veneno", "sobredosis", "asfixia", "apuñalar", "disparar", "explosivo",
+            "inconsciente", "no respira", "no responde", "paro cardíaco", "paro cardiaco",
         ],
         "Violencia Severa": [
-            "golpeado", "fractura", "sangre", "trauma", "hospitalizac",
-            "urgencia", "grave", "crítico", "inconsciente", "coma",
-            "lesión", "herida", "apaleado", "molido"
+            "golpeado", "fractura", "sangre", "trauma", "hospitalización", "hospitalizacion",
+            "urgencia", "grave", "crítico", "critico", "coma", "lesión", "lesion", "herida",
+            "apaleado", "molido", "quemadura grave", "quemaduras graves",
         ],
         "Menores": [
-            "niño", "niña", "hijo", "hija", "bebé", "infante", "menor",
-            "abuso infantil", "pedofilia", "maltrato niño", "explotación"
+            "niño", "niña", "hijo", "hija", "bebé", "bebe", "infante", "menor",
+            "abuso infantil", "maltrato infantil", "explotación infantil",
         ],
         "Violencia Sexual": [
-            "violación", "abuso sexual", "tocamientos", "forzado",
+            "violación", "violacion", "abuso sexual", "tocamientos", "forzado",
             "sin consentimiento", "violada", "violado", "acoso sexual",
-            "exhibicionismo", "pornografía"
         ],
         "Violencia Doméstica": [
-            "pareja", "marido", "esposo", "novia", "novio", "ex",
-            "golpeó", "amenaza", "controla", "aislada", "control",
-            "dependencia", "dominio"
+            "pareja", "marido", "esposo", "novia", "novio", "ex", "golpeó", "golpeo",
+            "amenaza", "controla", "aislada", "control", "dependencia", "dominio",
         ],
         "Salud Mental": [
-            "depresión", "ansiedad", "pánico", "autolesión", "adicción",
-            "droga", "alcohol", "consumo", "trastorno", "psicosis",
-            "bipolar", "esquizofrenia"
+            "depresión", "depresion", "ansiedad", "pánico", "panico", "autolesión", "autolesion",
+            "adicción", "adiccion", "droga", "alcohol", "consumo", "trastorno", "psicosis",
         ],
         "Necesidad Inmediata": [
-            "ahora", "urgente", "emergencia", "ayuda", "SOS", "rápido",
-            "inmediato", "prisa", "ya", "ahorita"
+            "ahora", "urgente", "emergencia", "ayuda", "sos", "rápido", "rapido",
+            "inmediato", "prisa", "ya", "ahorita",
         ],
         "Asesoría Legal": [
-            "abogado", "demanda", "custodia", "divorcio", "derechos",
-            "juicio", "proceso", "legal", "ley", "justicia", "tribunal"
+            "abogado", "demanda", "custodia", "divorcio", "derechos", "juicio", "proceso",
+            "legal", "ley", "justicia", "tribunal",
         ],
         "Recursos": [
-            "refugio", "dinero", "trabajo", "comida", "vivienda",
-            "medicinas", "alojamiento", "asistencia", "auxilio",
-            "alimento", "hospedaje"
+            "refugio", "dinero", "trabajo", "comida", "vivienda", "medicinas", "alojamiento",
+            "asistencia", "auxilio", "alimento", "hospedaje",
+        ],
+        "Accidente / Salud Física": [
+            "me quemé", "se quemó", "me queme", "se quemo", "quemé", "queme", "quemadura",
+            "quemado", "quemada", "me lastimé", "se lastimó", "accidente", "caída", "caida",
+            "me corté", "se cortó", "me corte", "se corto", "corte accidental",
         ],
     }
-    
-    # Plantillas de respuesta por urgencia
+
     RESPONSES = {
         "Muy Alta": """
-🆘 SITUACIÓN DE EMERGENCIA - ACCIÓN INMEDIATA
+SITUACIÓN DE POSIBLE EMERGENCIA
 
-Esta situación requiere intervención profesional inmediata.
+El análisis automático detecta indicadores que pueden requerir atención inmediata.
 
-ACCIONES A TOMAR AHORA:
-1. Llamar 911 o emergencia local
-2. Informar que hay riesgo de vida
-3. Dar ubicación exacta
-4. Seguir instrucciones del operador
+ACCIONES:
+1. Verificar con un profesional qué ocurrió y si existe peligro actual.
+2. Si hay riesgo inmediato para la vida o una persona no responde, contactar al servicio de emergencias local.
+3. Registrar datos relevantes sin reemplazar la valoración profesional.
 
-LÍNEAS DIRECTAS 24/7:
-• Crisis Nacional: 0800-666-7777
-• Línea Suicida: 0800-110-1010
-• Violencia: 0800-345-1999
-
-⚠️ IMPORTANTE: Este es un análisis automático. Confirma la emergencia con un profesional.
+IMPORTANTE: El sistema no diagnostica ni confirma una emergencia. La decisión final corresponde al profesional responsable.
         """,
-        
         "Alta": """
-🟠 SITUACIÓN URGENTE - ATENCIÓN HOY
+SITUACIÓN URGENTE
 
-Esta situación requiere atención profesional hoy.
-
-RECURSOS RECOMENDADOS:
-• Defensora Pública: 4321-0987
-• Centro de Asistencia Legal: 0800-333-4444
-• Línea de Violencia: 0800-345-1999
-• Refugios de emergencia: Disponibles 24/7
+El caso presenta indicadores que justifican valoración profesional prioritaria.
 
 PRÓXIMOS PASOS:
-1. Contacta a recursos de inmediato
-2. Documenta la situación
-3. Busca apoyo profesional
-4. Mantente en lugar seguro
+1. Confirmar la situación y su gravedad con la persona involucrada.
+2. Valorar si necesita atención médica, protección u otra intervención inmediata.
+3. Registrar la información relevante y derivar al recurso correspondiente.
 
-⚠️ Este análisis es orientativo. Consulta con profesionales.
+IMPORTANTE: Este resultado es orientativo y debe ser revisado por un profesional.
         """,
-        
         "Media": """
-🟡 SITUACIÓN IMPORTANTE - GESTIONAR PRONTO
+SITUACIÓN PARA SEGUIMIENTO
 
-Esta situación requiere seguimiento y recursos.
+El caso presenta indicadores que justifican seguimiento o asesoramiento profesional.
 
-RECURSOS DISPONIBLES:
-• Asesoría Legal Gratuita: 0800-333-4444
-• Psicología: Centro Salud Mental
-• Derechos: Centro de Derechos Humanos
-• Información general disponible
+PRÓXIMOS PASOS:
+1. Ampliar la información disponible.
+2. Identificar necesidades concretas.
+3. Derivar a los recursos adecuados.
 
-RECOMENDACIONES:
-1. Busca asesoría profesional
-2. Documenta todo
-3. Conoce tus derechos
-4. Mantén contacto con recursos
-
-💡 Este análisis es una guía. Consulta especialistas.
+Este análisis es orientativo y no reemplaza la valoración profesional.
         """,
-        
         "Baja": """
-⚪ INFORMACIÓN Y ORIENTACIÓN
+INFORMACIÓN Y ORIENTACIÓN
 
-Esta consulta puede ser resuelta con asesoría.
+No se detectaron indicadores suficientes para clasificar el caso como urgente mediante las reglas actuales.
 
-RECURSOS DE INFORMACIÓN:
-• Centro de Información Legal
-• Líneas de orientación
-• Recursos comunitarios
-• Guías y materiales educativos
+PRÓXIMOS PASOS:
+1. Revisar el relato completo.
+2. Identificar necesidades y recursos.
+3. Consultar con un profesional cuando corresponda.
 
-PASOS:
-1. Busca información completa
-2. Consulta con profesionales
-3. Explora opciones disponibles
-4. Toma decisiones informada
+El resultado automático no descarta riesgos que no hayan sido expresados en el texto.
+        """,
+        "Accidente": """
+ACCIDENTE / SITUACIÓN DE SALUD FÍSICA
 
-📌 Para más información, contacta recursos especializados.
-        """
+El relato parece describir un accidente o una lesión física, no una situación de violencia o riesgo autoinfligido por sí sola.
+
+PRIORIDAD:
+1. Confirmar qué ocurrió, cuándo y qué síntomas presenta la persona.
+2. Si la lesión parece importante, empeora, afecta una zona sensible o genera preocupación, buscar valoración médica.
+3. Si existe una emergencia médica, contactar al servicio de emergencias local.
+4. No asumir gravedad únicamente por una palabra clave.
+
+IMPORTANTE: El sistema no diagnostica. La valoración de la lesión corresponde a personal sanitario.
+        """,
     }
-    
+
     def __init__(self):
-        """Inicializa."""
-        logger.info("✅ ConfigManager inicializado")
-    
+        logger.info("ConfigManager inicializado")
+
+    @staticmethod
+    def _contains_any(text: str, phrases: List[str]) -> List[str]:
+        found = []
+        for phrase in phrases:
+            if phrase in text:
+                found.append(phrase)
+        return found
+
     def analyze(self, text: str) -> Dict:
-        """Analiza un caso completo."""
-        text_lower = text.lower()
-        
-        # Detectar palabras clave
+        """Analiza el texto considerando coincidencias y contexto básico."""
+        text_lower = re.sub(r"\s+", " ", text.lower().strip())
         found_keywords = []
-        urgency_scores = {}
-        
+        scores = {}
+
         for category, keywords in self.KEYWORDS.items():
-            score = 0
-            found = []
-            
-            for keyword in keywords:
-                if keyword in text_lower:
-                    score += 1
-                    found.append(keyword)
-            
-            if score > 0:
+            found = self._contains_any(text_lower, keywords)
+            if found:
                 found_keywords.extend(found)
-                urgency_scores[category] = score
-        
-        # Determinar urgencia
-        urgency = self._determine_urgency(urgency_scores)
-        
-        # Generar respuesta
-        response = self.RESPONSES.get(urgency, self.RESPONSES["Baja"])
-        
-        # Recursos sugeridos
-        resources = self._suggest_resources(urgency_scores)
-        
+                scores[category] = len(found)
+
+        # Un accidente físico explícito tiene una ruta propia.
+        accident = "Accidente / Salud Física" in scores
+        violence_signal = any(c in scores for c in ("Violencia Sexual", "Violencia Doméstica"))
+        life_signal = "Riesgo de Vida" in scores
+        severe_signal = "Violencia Severa" in scores
+
+        if accident and not life_signal and not violence_signal:
+            urgency = self._accident_urgency(text_lower, scores)
+            response = self.RESPONSES["Accidente"]
+            resources = ["atención-médica"]
+        else:
+            urgency = self._determine_urgency(scores)
+            response = self.RESPONSES[urgency]
+            resources = self._suggest_resources(scores)
+
         return {
             "urgency": urgency,
-            "keywords": list(set(found_keywords))[:10],  # Max 10
+            "keywords": list(dict.fromkeys(found_keywords))[:10],
             "response": response,
             "suggested_resources": resources,
-            "scores": urgency_scores
+            "scores": scores,
+            "classification": "Accidente / Salud Física" if accident and not (life_signal or violence_signal) else "Triaje social",
+            "context_note": "La clasificación se basa en reglas locales y debe ser validada por un profesional.",
         }
-    
+
+    def _accident_urgency(self, text: str, scores: Dict) -> str:
+        """No convierte una lesión accidental en violencia/riesgo de vida por una palabra aislada."""
+        severe_terms = [
+            "no responde", "inconsciente", "no respira", "paro cardíaco", "paro cardiaco",
+            "quemadura grave", "quemaduras graves", "muy grave", "hospitalización", "hospitalizacion",
+        ]
+        if any(term in text for term in severe_terms):
+            return "Alta"
+        if "Necesidad Inmediata" in scores:
+            return "Alta"
+        return "Media"
+
     def _determine_urgency(self, scores: Dict) -> str:
-        """Determina urgencia basado en palabras detectadas."""
-        
-        # Urgencias críticas
-        critical = ["Riesgo de Vida", "Violencia Sexual", "Menores"]
+        critical = ["Riesgo de Vida", "Violencia Sexual"]
         if any(cat in scores for cat in critical):
             return "Muy Alta"
-        
-        # Alta urgencia
-        high = ["Violencia Severa", "Violencia Doméstica"]
-        if any(cat in scores for cat in high):
+        if "Violencia Doméstica" in scores or "Violencia Severa" in scores:
             return "Alta"
-        
-        # Media urgencia
-        medium = ["Salud Mental", "Asesoría Legal", "Necesidad Inmediata"]
-        if any(cat in scores for cat in medium):
+        if any(cat in scores for cat in ["Salud Mental", "Asesoría Legal", "Necesidad Inmediata", "Menores"]):
             return "Media"
-        
-        # Por defecto
         return "Baja"
-    
+
     def _suggest_resources(self, scores: Dict) -> List[str]:
-        """Sugiere recursos basado en análisis."""
         resources = []
-        
         if "Riesgo de Vida" in scores or "Violencia Sexual" in scores:
             resources.extend(["emergencia", "línea-crisis", "refugio"])
-        
         if "Violencia Doméstica" in scores:
             resources.extend(["abogado", "defensoría", "refugio"])
-        
         if "Salud Mental" in scores:
-            resources.append("psicólogo")
-        
+            resources.append("salud-mental")
         if "Asesoría Legal" in scores:
             resources.append("abogado")
-        
         if "Recursos" in scores:
             resources.extend(["municipalidad", "asistencia-social"])
-        
-        return list(set(resources))[:5]  # Max 5
+        if "Menores" in scores and not resources:
+            resources.append("protección-de-niñez")
+        return list(dict.fromkeys(resources))[:5]
