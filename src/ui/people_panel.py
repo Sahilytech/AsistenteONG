@@ -2,6 +2,7 @@
 import customtkinter as ctk
 from tkinter import filedialog,messagebox
 from .styles import COLORS,FONTS
+from .people_workspace_panel import PersonWorkspaceWindow
 from ..person_registry import PersonRegistry,PersonImporter
 class PeoplePanel(ctk.CTkFrame):
  def __init__(self,parent,person_registry=None,**kwargs):
@@ -31,15 +32,7 @@ class PeoplePanel(ctk.CTkFrame):
    except Exception as exc:messagebox.showerror("No se pudo guardar",str(exc))
   ctk.CTkButton(box,text="Guardar persona",height=40,command=save,fg_color=COLORS["primary"],hover_color=COLORS["primary_dark"]).pack(fill="x",pady=10)
  def open_person(self,p):
-  win=ctk.CTkToplevel(self);win.title(f"Expediente · {p['name']}");win.geometry("950x760");win.transient(self.winfo_toplevel());box=ctk.CTkScrollableFrame(win,fg_color="transparent");box.pack(fill="both",expand=True,padx=22,pady=22);ctk.CTkLabel(box,text=p["name"],font=FONTS["title"],text_color=COLORS["text"]).pack(anchor="w");ctk.CTkLabel(box,text=f"ID interno: {p['person_id']}",font=FONTS["tiny"],text_color=COLORS["text_muted"]).pack(anchor="w",pady=(2,12))
-  info=ctk.CTkFrame(box,fg_color=COLORS["surface_alt"],corner_radius=14,border_width=1,border_color=COLORS["border"]);info.pack(fill="x",pady=4);fields=[("Documento",p["document_id"]),("Nacimiento",p["birth_date"]),("Edad",p["age"]),("Sexo asignado al nacer",p["sex_at_birth"]),("Identidad de género",p["gender_identity"]),("Orientación sexual",p["sexual_orientation"]),("Contacto",p["contact"]),("Domicilio",p["address"])]
-  for label,val in fields:
-   if val:ctk.CTkLabel(info,text=f"{label}: {val}",font=FONTS["small"],text_color=COLORS["text_muted"]).pack(anchor="w",padx=16,pady=3)
-  ctk.CTkButton(box,text="＋ Crear nuevo caso para esta persona",height=40,command=lambda:(win.destroy(),self.new_case_for(p["person_id"])),fg_color=COLORS["primary"],hover_color=COLORS["primary_dark"]).pack(fill="x",pady=12)
-  ctk.CTkLabel(box,text=f"Historial · {self.registry.case_count(p['person_id'])} caso(s)",font=FONTS["heading"],text_color=COLORS["text"]).pack(anchor="w",pady=(12,8));cases=self.registry.cases(p["person_id"])
-  if not cases:ctk.CTkLabel(box,text="Todavía no hay casos asociados.",font=FONTS["small"],text_color=COLORS["text_muted"]).pack(anchor="w")
-  for c in cases:
-   card=ctk.CTkFrame(box,fg_color=COLORS["surface"],corner_radius=12,border_width=1,border_color=COLORS["border"]);card.pack(fill="x",pady=4);ctk.CTkLabel(card,text=c["case_number"],font=FONTS["small_bold"],text_color=COLORS["primary"]).pack(anchor="w",padx=12,pady=(10,2));ctk.CTkLabel(card,text=f"{c['case_type'] or 'Caso'} · {c['urgency']} · {c['status']}",font=FONTS["tiny"],text_color=COLORS["text_muted"]).pack(anchor="w",padx=12);ctk.CTkLabel(card,text=c["text"].replace("\n"," ")[:350],font=FONTS["small"],text_color=COLORS["text"],wraplength=830,justify="left").pack(anchor="w",padx=12,pady=(3,10))
+  PersonWorkspaceWindow(self.winfo_toplevel(),p,self.registry)
  def import_file(self):
   path=filedialog.askopenfilename(title="Importar registros",filetypes=[("Excel","*.xlsx"),("CSV","*.csv"),("PDF","*.pdf")])
   if not path:return
