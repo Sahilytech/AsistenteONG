@@ -31,29 +31,31 @@
 - OCR opcional para PDFs escaneados mediante PyMuPDF + Tesseract.
 
 ## FASE 3 — Inteligencia explicable
-**Pendiente**
+**Estado: IMPLEMENTADA / EN EVOLUCIÓN**
 
-- Contexto antes que palabras aisladas.
-- Negación y frases completas.
+- Perfil estructurado antes de clasificar.
+- Negación y señales descartadas explícitamente.
 - Indicadores positivos y negativos.
-- Información faltante.
+- Información faltante y preguntas sugeridas.
 - Confianza orientativa.
 - Explicación de por qué se clasificó.
-- Fuentes utilizadas y fragmentos citables.
+- Evidencia documental relevante con términos coincidentes.
 - Comparación con historial de la persona.
+- Comparación entre relatos sin afirmar identidad del hecho.
 - Revisión profesional obligatoria.
+- Limitaciones explícitas para evitar presentar la salida como diagnóstico o decisión.
 
 ## FASE 4 — Operación ONG
-**Pendiente**
+**Estado: IMPLEMENTADA / EN EVOLUCIÓN**
 
-- Recursos nacionales, provinciales y municipales.
-- Derivaciones.
-- Agenda.
-- Tareas.
-- Seguimientos.
-- Alertas de vencimiento.
-- Protocolos configurables por organización.
-- Dashboard operativo.
+- Recursos nacionales verificables.
+- Registro de derivaciones y estados.
+- Tareas por caso.
+- Fechas de vencimiento y detección de tareas vencidas.
+- Seguimientos por caso y canal.
+- Dashboard operativo básico.
+- Estados controlados para evitar datos operativos inválidos.
+- Base preparada para agenda, alertas y protocolos configurables en la interfaz.
 
 ## FASE 5 — Seguridad
 **Pendiente**
