@@ -5,6 +5,7 @@ se encontraron, cuáles fueron descartadas por contexto/negación, qué informac
 falta y qué evidencia documental coincide. No toma decisiones profesionales.
 """
 from typing import Any, Dict, Iterable, List, Optional
+import re
 from .case_profile import CaseProfile
 from .reasoning import analyze_profile
 
@@ -20,20 +21,15 @@ def _unique(values: Iterable[Any]) -> List[Any]:
     return result
 
 
-def analyze_case(
-    text: str,
-    metadata: Optional[Dict[str, Any]] = None,
-    history: Optional[Iterable[Dict[str, Any]]] = None,
-    evidence: Optional[Iterable[Dict[str, Any]]] = None,
-) -> Dict[str, Any]:
+def analyze_case(text: str, metadata: Optional[Dict[str, Any]] = None,
+                 history: Optional[Iterable[Dict[str, Any]]] = None,
+                 evidence: Optional[Iterable[Dict[str, Any]]] = None) -> Dict[str, Any]:
     """Analiza un relato y devuelve un resultado trazable y conservador."""
     from .case_profile import build_case_profile
-
     profile = build_case_profile(text, metadata or {})
     base = analyze_profile(profile)
     evidence_items = _rank_evidence(profile, evidence or [])
     history_items = _compare_history(profile, history or [])
-
     reasons = list(base.get("reasons", []))
     if profile.negated_signals:
         reasons.append("Se detectaron señales mencionadas en forma negada o descartada; no se usaron para elevar la urgencia.")
@@ -41,16 +37,13 @@ def analyze_case(
         reasons.append(f"Se encontraron {len(evidence_items)} coincidencias documentales relevantes.")
     if history_items:
         reasons.append(f"Se comparó el relato con {len(history_items)} caso(s) previo(s) de la misma persona.")
-
     negative_signals = list(profile.negated_signals)
     positive_signals = list(profile.indicators) + list(profile.risk_indicators)
-
     return {
         **base,
         "profile": profile.to_dict(),
         "evidence": evidence_items,
         "history_comparison": history_items,
-        # Se exponen también en el nivel superior para facilitar consumo por UI/API.
         "positive_signals": positive_signals,
         "negative_signals": negative_signals,
         "explanation": {
@@ -70,15 +63,30 @@ def analyze_case(
 
 
 def _rank_evidence(profile: CaseProfile, evidence: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    terms = set(profile.indicators + profile.risk_indicators + profile.needs + profile.contexts + profile.relationships)
-    if not terms:
-        return []
+    """Rankea evidencia usando señales estructuradas y términos relevantes del relato.
+
+    Esto evita que la búsqueda pierda un documento solo porque el motor haya
+    normalizado una expresión (por ejemplo, ``despido`` -> ``situacion laboral``).
+    Las coincidencias siguen siendo evidencia, nunca una decisión.
+    """
+    structured = profile.indicators + profile.risk_indicators + profile.needs + profile.contexts + profile.relationships
+    normalized_text = profile.text.casefold()
+    stopwords = {
+        "para", "como", "esta", "este", "esto", "tengo", "tiene", "necesito",
+        "quiero", "porque", "desde", "sobre", "entre", "donde", "cuando", "con",
+        "una", "unos", "unas", "por", "del", "las", "los", "que", "ante", "del",
+    }
+    text_terms = [
+        term for term in re.findall(r"[\wáéíóúüñ]{4,}", normalized_text)
+        if term not in stopwords
+    ]
+    terms = _unique(structured + text_terms)
     ranked = []
     for item in evidence:
         content = str(item.get("content", "")).casefold()
         title = str(item.get("title", "")).casefold()
         hay = f"{title} {content}"
-        matched = sorted({term for term in terms if str(term).casefold() in hay})
+        matched = sorted({str(term) for term in terms if str(term).casefold() in hay})
         if matched:
             ranked.append({**item, "matched_terms": matched, "evidence_score": len(matched)})
     return sorted(ranked, key=lambda x: x["evidence_score"], reverse=True)
@@ -105,14 +113,7 @@ def _compare_history(profile: CaseProfile, history: Iterable[Dict[str, Any]]) ->
 
 
 def _surface_signals(text: str) -> set[str]:
-    """Devuelve las expresiones literales compartidas entre dos relatos.
-
-    Mantener la forma literal (por ejemplo, ``despido``) complementa las
-    categorías normalizadas (``situacion laboral``) y evita perder evidencia
-    útil para una comparación explicable.
-    """
     from .case_profile import INDICATORS, normalize
-
     normalized = normalize(text)
     return {phrase for phrase in INDICATORS if phrase in normalized}
 
@@ -120,7 +121,6 @@ def _surface_signals(text: str) -> set[str]:
 def compare_texts(text_a: str, text_b: str) -> Dict[str, Any]:
     """Compara dos relatos sin afirmar que sean el mismo hecho."""
     from .case_profile import build_case_profile
-
     a = build_case_profile(text_a)
     b = build_case_profile(text_b)
     left = set(a.indicators + a.categories + a.contexts + a.needs) | _surface_signals(text_a)
