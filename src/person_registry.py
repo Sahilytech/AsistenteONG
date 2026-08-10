@@ -1,30 +1,39 @@
 """Registro local de personas y vinculación de múltiples casos por persona."""
 from __future__ import annotations
 import csv, re, sqlite3, uuid
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 DB_PATH=Path(__file__).resolve().parent.parent/"data"/"asistente.db"
 FIELDS={"name":("nombre","nombre completo","persona","name"),"birth_date":("fecha de nacimiento","fecha_nacimiento","nacimiento","birth_date"),"age":("edad","age"),"sex_at_birth":("sexo biologico","sexo biológico","sexo asignado al nacer","sex_at_birth"),"gender_identity":("identidad de genero","identidad de género","gender_identity"),"sexual_orientation":("orientacion sexual","orientación sexual","sexualidad","sexual_orientation"),"contact":("contacto","telefono","teléfono","celular","email","correo"),"document_id":("dni","documento","document_id","id"),"address":("domicilio","direccion","dirección","address"),"notes":("notas","observaciones","notes")}
+
 class PersonRegistry:
- def __init__(self,db_path=None): self.db_path=db_path or str(DB_PATH);Path(self.db_path).parent.mkdir(parents=True,exist_ok=True);self._init()
- def _db(self):return sqlite3.connect(self.db_path)
+ def __init__(self,db_path=None):
+  self.db_path=str(db_path or DB_PATH);Path(self.db_path).parent.mkdir(parents=True,exist_ok=True);self._init()
+ @contextmanager
+ def _db(self):
+  db=sqlite3.connect(self.db_path)
+  try: yield db; db.commit()
+  finally: db.close()
  def _init(self):
   with self._db() as db:
    db.execute("CREATE TABLE IF NOT EXISTS people(person_id TEXT PRIMARY KEY,name TEXT NOT NULL,normalized_name TEXT NOT NULL,birth_date TEXT DEFAULT '',age TEXT DEFAULT '',sex_at_birth TEXT DEFAULT '',gender_identity TEXT DEFAULT '',sexual_orientation TEXT DEFAULT '',contact TEXT DEFAULT '',document_id TEXT DEFAULT '',address TEXT DEFAULT '',notes TEXT DEFAULT '',created_at TEXT,updated_at TEXT)")
    db.execute("CREATE INDEX IF NOT EXISTS idx_people_name ON people(normalized_name)");db.execute("CREATE INDEX IF NOT EXISTS idx_people_document ON people(document_id)")
+   # El registro de personas puede utilizar una base nueva que todavía no tenga casos.
+   db.execute("CREATE TABLE IF NOT EXISTS cases(case_number TEXT PRIMARY KEY,created_at TEXT,text TEXT,urgency TEXT,status TEXT,case_type TEXT,person_id TEXT DEFAULT '')")
    existing={r[1] for r in db.execute("PRAGMA table_info(cases)")}
-   if "person_id" not in existing:db.execute("ALTER TABLE cases ADD COLUMN person_id TEXT DEFAULT ''")
+   if "person_id" not in existing: db.execute("ALTER TABLE cases ADD COLUMN person_id TEXT DEFAULT ''")
  @staticmethod
- def normalize(value):return re.sub(r"\s+"," ",(value or "").strip().casefold())
- def _row(self,row):return dict(zip(("person_id","name","normalized_name","birth_date","age","sex_at_birth","gender_identity","sexual_orientation","contact","document_id","address","notes","created_at","updated_at"),row))
+ def normalize(value): return re.sub(r"\s+"," ",(value or "").strip().casefold())
+ def _row(self,row): return dict(zip(("person_id","name","normalized_name","birth_date","age","sex_at_birth","gender_identity","sexual_orientation","contact","document_id","address","notes","created_at","updated_at"),row))
  def list_people(self,query=""):
   q=self.normalize(query);params=[];sql="SELECT * FROM people"
-  if q:sql+=" WHERE normalized_name LIKE ? OR lower(document_id) LIKE ? OR lower(contact) LIKE ?";like=f"%{q}%";params=[like,like,like]
+  if q: sql+=" WHERE normalized_name LIKE ? OR lower(document_id) LIKE ? OR lower(contact) LIKE ?";like=f"%{q}%";params=[like,like,like]
   sql+=" ORDER BY name COLLATE NOCASE"
-  with self._db() as db:rows=db.execute(sql,params).fetchall()
+  with self._db() as db: rows=db.execute(sql,params).fetchall()
   return [self._row(r) for r in rows]
  def get(self,pid):
-  with self._db() as db:row=db.execute("SELECT * FROM people WHERE person_id=?",(pid,)).fetchone()
+  with self._db() as db: row=db.execute("SELECT * FROM people WHERE person_id=?",(pid,)).fetchone()
   return self._row(row) if row else None
  def find_match(self,data):
   doc=self.normalize(data.get("document_id"));name=self.normalize(data.get("name"));birth=self.normalize(data.get("birth_date"))
@@ -41,14 +50,14 @@ class PersonRegistry:
   return None
  def upsert(self,data):
   clean={k:str(data.get(k,"") or "").strip() for k in FIELDS if k in data}
-  if not clean.get("name"):raise ValueError("La persona necesita al menos un nombre o identificador.")
+  if not clean.get("name"): raise ValueError("La persona necesita al menos un nombre o identificador.")
   match=self.find_match(clean);now=datetime.now().isoformat(timespec="seconds")
   if match:
    merged={**match,**{k:v for k,v in clean.items() if v}}
-   with self._db() as db:db.execute("UPDATE people SET name=?,normalized_name=?,birth_date=?,age=?,sex_at_birth=?,gender_identity=?,sexual_orientation=?,contact=?,document_id=?,address=?,notes=?,updated_at=? WHERE person_id=?",(merged["name"],self.normalize(merged["name"]),merged["birth_date"],merged["age"],merged["sex_at_birth"],merged["gender_identity"],merged["sexual_orientation"],merged["contact"],merged["document_id"],merged["address"],merged["notes"],now,match["person_id"]))
+   with self._db() as db: db.execute("UPDATE people SET name=?,normalized_name=?,birth_date=?,age=?,sex_at_birth=?,gender_identity=?,sexual_orientation=?,contact=?,document_id=?,address=?,notes=?,updated_at=? WHERE person_id=?",(merged["name"],self.normalize(merged["name"]),merged["birth_date"],merged["age"],merged["sex_at_birth"],merged["gender_identity"],merged["sexual_orientation"],merged["contact"],merged["document_id"],merged["address"],merged["notes"],now,match["person_id"]))
    return match["person_id"],False
   pid=str(uuid.uuid4())[:12]
-  with self._db() as db:db.execute("INSERT INTO people VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(pid,clean["name"],self.normalize(clean["name"]),clean.get("birth_date",""),clean.get("age",""),clean.get("sex_at_birth",""),clean.get("gender_identity",""),clean.get("sexual_orientation",""),clean.get("contact",""),clean.get("document_id",""),clean.get("address",""),clean.get("notes",""),now,now))
+  with self._db() as db: db.execute("INSERT INTO people VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(pid,clean["name"],self.normalize(clean["name"]),clean.get("birth_date",""),clean.get("age",""),clean.get("sex_at_birth",""),clean.get("gender_identity",""),clean.get("sexual_orientation",""),clean.get("contact",""),clean.get("document_id",""),clean.get("address",""),clean.get("notes",""),now,now))
   return pid,True
  def case_count(self,pid):
   with self._db() as db:return db.execute("SELECT COUNT(*) FROM cases WHERE person_id=?",(pid,)).fetchone()[0]
@@ -57,10 +66,11 @@ class PersonRegistry:
  def cases(self,pid):
   with self._db() as db:rows=db.execute("SELECT case_number,created_at,text,urgency,status,case_type FROM cases WHERE person_id=? ORDER BY created_at DESC",(pid,)).fetchall()
   return [dict(zip(("case_number","created_at","text","urgency","status","case_type"),r)) for r in rows]
+
 class PersonImporter:
- def __init__(self,registry=None):self.registry=registry or PersonRegistry()
+ def __init__(self,registry=None): self.registry=registry or PersonRegistry()
  @staticmethod
- def _key(value):return re.sub(r"\s+"," ",str(value or "").strip().casefold())
+ def _key(value): return re.sub(r"\s+"," ",str(value or "").strip().casefold())
  def map_row(self,row):
   normalized={self._key(k):v for k,v in row.items()};mapped={}
   for field,aliases in FIELDS.items():
