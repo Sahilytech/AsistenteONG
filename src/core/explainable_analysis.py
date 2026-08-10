@@ -63,12 +63,6 @@ def analyze_case(text: str, metadata: Optional[Dict[str, Any]] = None,
 
 
 def _rank_evidence(profile: CaseProfile, evidence: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Rankea evidencia usando señales estructuradas y términos relevantes del relato.
-
-    Esto evita que la búsqueda pierda un documento solo porque el motor haya
-    normalizado una expresión (por ejemplo, ``despido`` -> ``situacion laboral``).
-    Las coincidencias siguen siendo evidencia, nunca una decisión.
-    """
     structured = profile.indicators + profile.risk_indicators + profile.needs + profile.contexts + profile.relationships
     normalized_text = profile.text.casefold()
     stopwords = {
@@ -76,10 +70,7 @@ def _rank_evidence(profile: CaseProfile, evidence: Iterable[Dict[str, Any]]) -> 
         "quiero", "porque", "desde", "sobre", "entre", "donde", "cuando", "con",
         "una", "unos", "unas", "por", "del", "las", "los", "que", "ante", "del",
     }
-    text_terms = [
-        term for term in re.findall(r"[\wáéíóúüñ]{4,}", normalized_text)
-        if term not in stopwords
-    ]
+    text_terms = [term for term in re.findall(r"[\wáéíóúüñ]{4,}", normalized_text) if term not in stopwords]
     terms = _unique(structured + text_terms)
     ranked = []
     for item in evidence:
@@ -93,13 +84,23 @@ def _rank_evidence(profile: CaseProfile, evidence: Iterable[Dict[str, Any]]) -> 
 
 
 def _compare_history(profile: CaseProfile, history: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Relaciona casos por señales normalizadas y por expresiones explícitas del relato."""
+    from .case_profile import INDICATORS, normalize
     current = set(profile.categories + profile.indicators + profile.contexts)
+    current_raw = set()
+    normalized_current = normalize(profile.text)
+    for phrase, (_, indicator) in INDICATORS.items():
+        phrase_n = normalize(phrase)
+        if re.search(r"(?<!\w)" + re.escape(phrase_n) + r"(?!\w)", normalized_current):
+            current_raw.add(phrase_n)
+            current_raw.add(normalize(indicator))
+    current |= current_raw
     if not current:
         return []
     results = []
     for case in history:
         text = str(case.get("text", case.get("description", "")))
-        hay = text.casefold()
+        hay = normalize(text)
         matched = sorted({term for term in current if str(term).casefold() in hay})
         if matched:
             results.append({
