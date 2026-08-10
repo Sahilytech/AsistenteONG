@@ -34,41 +34,42 @@ def extract_pdf(path: str | Path) -> dict[str, Any]:
 
     reader = PdfReader(str(path))
     pages = []
-    for number, page in enumerate(reader.pages, 1):
-        try:
-            text = _clean(page.extract_text() or "")
-        except Exception:
-            text = ""
-        pages.append({"page": number, "text": text, "characters": len(text)})
+    try:
+        for number, page in enumerate(reader.pages, 1):
+            try:
+                text = _clean(page.extract_text() or "")
+            except Exception:
+                text = ""
+            pages.append({"page": number, "text": text, "characters": len(text)})
+    finally:
+        close = getattr(reader, "close", None)
+        if callable(close):
+            close()
     text = _clean(" ".join(p["text"] for p in pages))
     return {
-        "type": "pdf",
-        "filename": Path(path).name,
-        "pages": len(pages),
-        "text": text,
-        "characters": len(text),
-        "pages_detail": pages,
-        "fingerprint": fingerprint(path),
-        "status": "texto_extraido" if text else "sin_texto",
+        "type": "pdf", "filename": Path(path).name, "pages": len(pages),
+        "text": text, "characters": len(text), "pages_detail": pages,
+        "fingerprint": fingerprint(path), "status": "texto_extraido" if text else "sin_texto",
     }
 
 
 def preview_xlsx(path: str | Path, limit: int = 100) -> dict[str, Any]:
     from openpyxl import load_workbook
 
-    ws = load_workbook(path, read_only=True, data_only=True).active
-    rows = list(ws.iter_rows(values_only=True))
+    workbook = load_workbook(path, read_only=True, data_only=True)
+    try:
+        ws = workbook.active
+        rows = list(ws.iter_rows(values_only=True))
+    finally:
+        workbook.close()
+
     if not rows:
         return {"type": "xlsx", "filename": Path(path).name, "headers": [], "rows": [], "row_count": 0}
     headers = [str(value or "").strip() for value in rows[0]]
     data = [dict(zip(headers, row)) for row in rows[1 : limit + 1]]
     return {
-        "type": "xlsx",
-        "filename": Path(path).name,
-        "headers": headers,
-        "rows": data,
-        "row_count": max(0, len(rows) - 1),
-        "preview_count": len(data),
+        "type": "xlsx", "filename": Path(path).name, "headers": headers,
+        "rows": data, "row_count": max(0, len(rows) - 1), "preview_count": len(data),
         "fingerprint": fingerprint(path),
     }
 
@@ -78,12 +79,8 @@ def preview_csv(path: str | Path, limit: int = 100) -> dict[str, Any]:
         reader = csv.DictReader(fh)
         rows = list(reader)
     return {
-        "type": "csv",
-        "filename": Path(path).name,
-        "headers": reader.fieldnames or [],
-        "rows": rows[:limit],
-        "row_count": len(rows),
-        "preview_count": min(len(rows), limit),
+        "type": "csv", "filename": Path(path).name, "headers": reader.fieldnames or [],
+        "rows": rows[:limit], "row_count": len(rows), "preview_count": min(len(rows), limit),
         "fingerprint": fingerprint(path),
     }
 
