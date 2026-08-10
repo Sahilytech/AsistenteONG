@@ -42,15 +42,21 @@ def analyze_case(
     if history_items:
         reasons.append(f"Se comparó el relato con {len(history_items)} caso(s) previo(s) de la misma persona.")
 
+    negative_signals = list(profile.negated_signals)
+    positive_signals = list(profile.indicators) + list(profile.risk_indicators)
+
     return {
         **base,
         "profile": profile.to_dict(),
         "evidence": evidence_items,
         "history_comparison": history_items,
+        # Se exponen también en el nivel superior para facilitar consumo por UI/API.
+        "positive_signals": positive_signals,
+        "negative_signals": negative_signals,
         "explanation": {
             "why": _unique(reasons),
-            "positive_signals": list(profile.indicators) + list(profile.risk_indicators),
-            "negative_signals": list(profile.negated_signals),
+            "positive_signals": positive_signals,
+            "negative_signals": negative_signals,
             "contexts": list(profile.contexts),
             "missing_information": list(profile.missing_information),
             "limitations": [
@@ -98,14 +104,27 @@ def _compare_history(profile: CaseProfile, history: Iterable[Dict[str, Any]]) ->
     return sorted(results, key=lambda x: x["similarity_hint"], reverse=True)
 
 
+def _surface_signals(text: str) -> set[str]:
+    """Devuelve las expresiones literales compartidas entre dos relatos.
+
+    Mantener la forma literal (por ejemplo, ``despido``) complementa las
+    categorías normalizadas (``situacion laboral``) y evita perder evidencia
+    útil para una comparación explicable.
+    """
+    from .case_profile import INDICATORS, normalize
+
+    normalized = normalize(text)
+    return {phrase for phrase in INDICATORS if phrase in normalized}
+
+
 def compare_texts(text_a: str, text_b: str) -> Dict[str, Any]:
     """Compara dos relatos sin afirmar que sean el mismo hecho."""
     from .case_profile import build_case_profile
 
     a = build_case_profile(text_a)
     b = build_case_profile(text_b)
-    left = set(a.indicators + a.categories + a.contexts + a.needs)
-    right = set(b.indicators + b.categories + b.contexts + b.needs)
+    left = set(a.indicators + a.categories + a.contexts + a.needs) | _surface_signals(text_a)
+    right = set(b.indicators + b.categories + b.contexts + b.needs) | _surface_signals(text_b)
     common = sorted(left & right)
     only_a = sorted(left - right)
     only_b = sorted(right - left)
@@ -116,4 +135,5 @@ def compare_texts(text_a: str, text_b: str) -> Dict[str, Any]:
         "only_second": only_b,
         "similarity_hint": round(len(left & right) / len(union), 3) if union else 0.0,
         "review_required": True,
+        "decision": None,
     }
