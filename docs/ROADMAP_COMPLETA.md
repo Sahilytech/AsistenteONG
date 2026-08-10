@@ -57,29 +57,54 @@
 - Estados controlados para evitar datos operativos inválidos.
 - Base preparada para agenda, alertas y protocolos configurables en la interfaz.
 
-## FASE 5 — Seguridad
-**Pendiente**
+## FASE 5 — Seguridad y privacidad
+**Estado: IMPLEMENTADA / EN EVOLUCIÓN**
 
-- Roles y permisos.
-- Bloqueo de sesión.
-- Cifrado en reposo.
-- Auditoría completa.
-- Exportaciones controladas.
-- Backup/restore.
-- Vista anonimizada.
-- Minimización de datos.
+- Redacción de datos personales para logs/exportaciones.
+- Referencias internas no reversibles.
+- Validación de extensiones de importación.
+- Sanitización de nombres de archivos.
+- Procesamiento local como principio de diseño.
+- Revisión profesional obligatoria.
+
+**Pendiente para cierre:** roles/permisos, bloqueo de sesión, cifrado de base, backup/restore y controles avanzados de exportación.
 
 ## FASE 6 — Producto y distribución
-**Pendiente**
+**Estado: EN EVOLUCIÓN**
 
-- Tutorial interactivo.
-- Modo capacitación con datos ficticios claramente marcados.
-- Animaciones y onboarding.
-- Instalador Windows.
-- Smoke test de arranque.
-- Instalación limpia.
-- Actualizaciones seguras.
-- Manual de uso.
+- Pipeline de importación separado de la persistencia.
+- Previsualización antes de guardar personas.
+- Base para instalador Windows y smoke tests.
+
+**Pendiente:** tutorial interactivo completo, modo capacitación, animaciones/onboarding definitivo, instalador, actualización segura y manual final.
+
+## FASE 7 — Biblioteca inteligente
+**Estado: IMPLEMENTADA / EN EVOLUCIÓN**
+
+- Previsualización de PDF antes de utilizarlo como conocimiento.
+- Conteo de páginas y caracteres.
+- Huella SHA del documento.
+- Previsualización de XLSX y CSV.
+- Lectura de encabezados y filas sin persistirlas automáticamente.
+- Importación explícita de personas después de revisión.
+- Biblioteca separada del registro de personas.
+- Eliminación de documento + índice local.
+- Evidencia documental trazable.
+
+**Pendiente:** OCR integrado con selección por página, detección de tablas complejas y búsqueda semántica local.
+
+## FASE 8 — Contexto documental + expediente
+**Estado: IMPLEMENTADA / EN EVOLUCIÓN**
+
+- Recuperación de documentos locales relevantes para un relato.
+- Integración de evidencia documental en el análisis explicable.
+- Comparación con historial de casos.
+- Señales positivas y negativas separadas.
+- La coincidencia documental nunca se convierte automáticamente en una decisión.
+- `review_required=True` en el contexto integrado.
+- Importación revisable de personas desde planillas/documentos.
+
+**Pendiente:** interfaz completa de evidencia por caso, comparación lado a lado y filtros por jurisdicción/categoría/fecha.
 
 ## Principio de producto
 Asistente ONG es un **copiloto de organización y análisis**, no un sustituto de profesionales. El sistema recupera información, organiza expedientes, encuentra documentación y propone acciones para revisión humana.
