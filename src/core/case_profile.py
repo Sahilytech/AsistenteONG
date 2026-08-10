@@ -34,7 +34,6 @@ class CaseProfile:
         return asdict(self)
 
 
-# Frases deliberadamente concretas: una palabra aislada no alcanza para elevar riesgo.
 RELATIONSHIPS = {
     "hijo": "hijo", "hija": "hija", "pareja": "pareja", "ex pareja": "ex pareja",
     "ex marido": "ex pareja", "ex esposa": "ex pareja", "madre": "madre",
@@ -47,6 +46,12 @@ CONTEXTS = {
 }
 INDICATORS = {
     "despido": ("laboral", "situacion laboral"),
+    "despiden": ("laboral", "situacion laboral"),
+    "despidieron": ("laboral", "situacion laboral"),
+    "despedido": ("laboral", "situacion laboral"),
+    "despedida": ("laboral", "situacion laboral"),
+    "me echaron": ("laboral", "situacion laboral"),
+    "echaron del trabajo": ("laboral", "situacion laboral"),
     "no me pagan": ("laboral", "situacion laboral"),
     "horas extras": ("laboral", "situacion laboral"),
     "quemadura": ("salud", "accidente"), "se quemo": ("salud", "accidente"),
@@ -69,7 +74,6 @@ NEEDS = {
 
 
 def _contains_phrase(text: str, phrase: str) -> bool:
-    # Evita el error clásico de detectar "ex" dentro de "extraño".
     return bool(re.search(r"(?<!\w)" + re.escape(phrase) + r"(?!\w)", text))
 
 
@@ -85,7 +89,6 @@ def build_case_profile(text: str, metadata: Dict | None = None) -> CaseProfile:
     metadata = metadata or {}
     normalized = normalize(text)
     profile = CaseProfile(text=text, location=(metadata.get("location") or "").strip())
-
     for phrase, relation in RELATIONSHIPS.items():
         if _contains_phrase(normalized, normalize(phrase)):
             profile.relationships.append(relation)
@@ -107,7 +110,6 @@ def build_case_profile(text: str, metadata: Dict | None = None) -> CaseProfile:
     for phrase, need in NEEDS.items():
         if _contains_phrase(normalized, normalize(phrase)):
             profile.needs.append(need)
-
     profile.contexts = sorted(set(profile.contexts))
     profile.categories = sorted(set(profile.categories))
     profile.relationships = sorted(set(profile.relationships))
