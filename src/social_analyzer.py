@@ -36,7 +36,7 @@ class SocialReportAnalyzer:
         missing = [label for key, label in self.REQUIRED.items() if not str(data.get(key, "")).strip()]
         indicators = [label for label, patterns in self.RISK_PATTERNS.items() if any(re.search(p, text) for p in patterns)]
         household = self._household_count(data.get("miembros_hogar", ""))
-        rooms = self._first_number(data.get("condiciones_vivienda", ""), r"(?:habitaciones?|ambientes?)\s*[:=]?\s*(\d+)")
+        rooms = self._first_number(data.get("condiciones_vivienda", ""), r"(?:hab(?:itaciones?)?|ambientes?)\s*[:=]?\s*(\d+(?:[.,]\d+)?)|\b(\d+(?:[.,]\d+)?)\s*(?:hab(?:itaciones?)?|ambientes?)\b")
         overcrowding = round(household / rooms, 2) if household and rooms else None
         income = self._money_total(data.get("ingresos", "")); expenses = self._money_total(data.get("egresos", ""))
         balance = None if income is None or expenses is None else round(income - expenses, 2)
@@ -81,7 +81,9 @@ class SocialReportAnalyzer:
     def _first_number(value, pattern=r"(\d+(?:[.,]\d+)?)"):
         m=re.search(pattern,str(value or ""),re.I)
         if not m:return None
-        try:return float(m.group(1).replace(",","."))
+        try:
+            groups = [g for g in m.groups() if g is not None]
+            return float(groups[0].replace(",",".")) if groups else None
         except ValueError:return None
     @staticmethod
     def _household_count(value):
