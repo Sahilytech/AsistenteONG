@@ -1,12 +1,17 @@
 """Memoria local SQLite para fuentes, documentos y fragmentos recuperables."""
 from __future__ import annotations
 import re, sqlite3
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 DB_PATH=Path(__file__).resolve().parents[2]/"data"/"asistente.db"
 class LocalMemory:
- def __init__(self,db_path=None):self.db_path=db_path or str(DB_PATH);Path(self.db_path).parent.mkdir(parents=True,exist_ok=True);self._init()
- def _connect(self):return sqlite3.connect(self.db_path)
+ def __init__(self,db_path=None):self.db_path=str(db_path or DB_PATH);Path(self.db_path).parent.mkdir(parents=True,exist_ok=True);self._init()
+ @contextmanager
+ def _connect(self):
+  db=sqlite3.connect(self.db_path)
+  try:yield db;db.commit()
+  finally:db.close()
  def _init(self):
   with self._connect() as db:
    db.execute("CREATE TABLE IF NOT EXISTS knowledge_memory(id INTEGER PRIMARY KEY AUTOINCREMENT,source_url TEXT UNIQUE,domain TEXT,title TEXT,snippet TEXT,content TEXT,saved_at TEXT)")
@@ -17,7 +22,7 @@ class LocalMemory:
   text=re.sub(r"\s+"," ",content or "").strip()
   if not text:return 0
   self.save(source_url,domain,title,text[:1800],text)
-  step=max(400,chunk_size-overlap);chunks=[];start=0
+  chunks=[];start=0
   while start<len(text):
    end=min(len(text),start+chunk_size);chunk=text[start:end]
    if end<len(text):
@@ -43,10 +48,13 @@ class LocalMemory:
   keys=("url","domain","title","snippet","content","saved_at")
   return [dict(zip(keys,r if include_content else (r[0],r[1],r[2],r[3],r[5]))) for r in rows]
  def delete_file(self,path):
-  base=f"file://{Path(path).resolve()}"
-  with self._connect() as db:db.execute("DELETE FROM knowledge_memory WHERE source_url=? OR source_url LIKE ?",(base,base+"#chunk=%"))
+  raw=str(path).replace("\\","/");resolved=str(Path(path).resolve()).replace("\\","/")
+  candidates={f"file://{raw}",f"file://{resolved}",f"file:///{raw.lstrip('/')}",f"file:///{resolved.lstrip('/')}"}
+  with self._connect() as db:
+   for base in candidates:db.execute("DELETE FROM knowledge_memory WHERE source_url=? OR source_url LIKE ?",(base,base+"#chunk=%"))
  def get_document(self,path):
-  with self._connect() as db:return db.execute("SELECT source_url,domain,title,snippet,content,saved_at FROM knowledge_memory WHERE source_url=?",(f"file://{Path(path).resolve()}",)).fetchone()
+  resolved=str(Path(path).resolve()).replace("\\","/")
+  with self._connect() as db:return db.execute("SELECT source_url,domain,title,snippet,content,saved_at FROM knowledge_memory WHERE source_url IN (?,?)",(f"file://{resolved}",f"file:///{resolved.lstrip('/')}" )).fetchone()
  def clear_library(self):
   with self._connect() as db:db.execute("DELETE FROM knowledge_memory WHERE domain LIKE 'archivo local%'")
  def count(self):
