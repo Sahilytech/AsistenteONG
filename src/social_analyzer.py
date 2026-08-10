@@ -15,6 +15,7 @@ class SocialReportAnalyzer:
         "ingresos": "Ingresos", "situacion_laboral": "Situación laboral", "egresos": "Egresos básicos",
         "tenencia": "Régimen de tenencia", "condiciones_vivienda": "Condiciones de vivienda",
         "servicios_entorno": "Servicios y entorno", "salud": "Situación sanitaria", "educacion": "Educación",
+        "dinamica_familiar": "Dinámica familiar / red de apoyo",
         "diagnostico": "Valoración social / juicio técnico", "propuesta": "Propuesta de intervención",
     }
     RISK_PATTERNS = {
