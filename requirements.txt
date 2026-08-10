@@ -1,8 +1,14 @@
-# Core - MÍNIMO NECESARIO
+# Núcleo
 customtkinter>=5.2.0
 pillow>=10.0.0
 python-dotenv>=1.0.0
 cryptography>=41.0.0
 reportlab>=4.0.0
 pypdf>=5.0.0
+openpyxl>=3.1.0
 pyinstaller>=6.0.0
+
+# OCR opcional para PDFs escaneados
+# Requiere además instalar Tesseract OCR en el sistema y activar ASISTENTE_OCR=1
+pytesseract>=0.3.13
+PyMuPDF>=1.24.0
