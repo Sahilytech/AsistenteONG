@@ -48,14 +48,26 @@ El núcleo cubre registro único de personas y múltiples casos, biblioteca docu
 - Mensajes de estado para errores y operaciones completadas.
 - Restauración separada del directorio activo para permitir revisión antes de reemplazar datos.
 
-## FASES 35–36 — Próximo bloque
-**Estado: PLANIFICADAS**
+## FASES 35–36 — Biblioteca inteligente local
+**Estado: IMPLEMENTADAS / EN EVOLUCIÓN**
 
-- Biblioteca semántica local.
-- OCR integrado con selección de páginas.
-- Detección y normalización de tablas complejas.
-- Recuperación híbrida: coincidencia textual + similitud semántica local.
-- Explicación de por qué cada documento fue recuperado.
+- Recuperador local explicable mediante coincidencia léxica ponderada.
+- Ranking de documentos según cobertura, frecuencia y coincidencia de frase.
+- Evidencia recuperada separada de cualquier decisión.
+- Indicador explícito `is_decision=False` y `requires_review=True`.
+- Extracción PDF conservando texto por página.
+- Proveniencia por página para poder señalar dónde apareció una coincidencia.
+- OCR opcional para PDFs escaneados mediante `PyMuPDF` + `pytesseract` cuando `ASISTENTE_OCR=1`.
+- Registro del modo de extracción: texto, OCR, error o sin texto.
+- Comparación de textos que expone términos comunes y similitud sin transformarlos en conclusiones.
+- Limpieza de evidencia de páginas al eliminar un documento.
+- Tests específicos de recuperación, procedencia y frontera entre evidencia y decisión.
+
+### Próxima evolución de biblioteca
+- OCR configurable desde la interfaz.
+- Selección de páginas a procesar.
+- Extracción y normalización de tablas complejas.
+- Recuperación híbrida con embeddings locales opcionales, sin enviar expedientes a servicios externos.
 
 ## Principio de producto
 Asistente ONG es un **copiloto de organización y análisis**, no un sustituto de profesionales. El sistema recupera información, organiza expedientes, encuentra documentación y propone acciones para revisión humana.
