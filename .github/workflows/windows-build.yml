@@ -46,11 +46,29 @@ jobs:
           if (!(Test-Path "dist/AsistenteONG.exe")) { throw "No se genero dist/AsistenteONG.exe" }
           $size = (Get-Item "dist/AsistenteONG.exe").Length
           if ($size -lt 1000000) { throw "El EXE parece invalido o demasiado pequeno: $size bytes" }
-          Write-Host "EXE generado correctamente: $size bytes"
+          Get-FileHash "dist/AsistenteONG.exe" -Algorithm SHA256 | Format-List
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --no-progress -y
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist-installer | Out-Null
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installer\AsistenteONG.iss"
+          if (!(Test-Path "dist-installer\AsistenteONG-Setup-1.0.0.exe")) { throw "No se genero el instalador" }
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
           name: AsistenteONG-Windows
           path: dist/AsistenteONG.exe
+          if-no-files-found: error
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AsistenteONG-Windows-Installer
+          path: dist-installer/AsistenteONG-Setup-1.0.0.exe
           if-no-files-found: error
