@@ -11,13 +11,27 @@ from src.ui.splash_screen import show_splash
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+THEME_FILE = Path.home() / ".asistente_ong_theme"
+
+
+def _saved_theme():
+    try:
+        value = THEME_FILE.read_text(encoding="utf-8").strip().lower()
+        return value if value in {"light", "dark"} else "light"
+    except Exception:
+        return "light"
 
 
 def launch_app():
-    """Construye la aplicación oculta y la devuelve lista para una transición sin parpadeo."""
+    """Construye la aplicación y sincroniza su tema antes de crear la interfaz."""
     try:
+        import customtkinter as ctk
         from src.ui.main_window import MainWindow
+        ctk.set_appearance_mode(_saved_theme())
         app = MainWindow()
+        # main_window históricamente fija el modo claro al importar; se vuelve a aplicar
+        # después de construir la ventana para que el tema elegido gane prioridad.
+        ctk.set_appearance_mode(_saved_theme())
         app.root.withdraw()
         app.root.update_idletasks()
         try:
