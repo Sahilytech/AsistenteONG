@@ -14,17 +14,21 @@ logger = logging.getLogger(__name__)
 
 
 def launch_app():
+    """Construye la aplicación oculta y la devuelve lista para una transición sin parpadeo."""
     try:
         from src.ui.main_window import MainWindow
         app = MainWindow()
-        # Maximizar antes de mostrar el primer frame evita el salto visual de 1500x900 a pantalla completa.
+        app.root.withdraw()
         app.root.update_idletasks()
         try:
             app.root.state("zoomed")
         except Exception:
-            app.root.attributes("-zoomed", True)
+            try:
+                app.root.attributes("-zoomed", True)
+            except Exception:
+                pass
         app.root.update_idletasks()
-        app.run()
+        return app
     except Exception as exc:
         logger.error("Error crítico: %s", exc, exc_info=True)
         print(f"\nERROR CRITICO: {exc}\n")
