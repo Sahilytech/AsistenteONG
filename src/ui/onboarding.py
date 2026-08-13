@@ -43,10 +43,27 @@ class Onboarding(ctk.CTkToplevel):
         foot.pack(fill="x", padx=30, pady=(0, 26))
         self.progress = ctk.CTkLabel(foot, text="", font=FONTS["tiny"], text_color=COLORS["text_muted"])
         self.progress.pack(side="left")
-        self.go = ctk.CTkButton(foot, text="Abrir sección", width=135, fg_color=COLORS["surface_alt"], hover_color=COLORS["primary_soft"], text_color=COLORS["text"], border_width=1, border_color=COLORS["border"], command=self._go_section)
+        self.go = ctk.CTkButton(
+            foot, text="Abrir sección", width=135,
+            font=FONTS["body"],
+            fg_color=COLORS["surface_alt"], hover_color=COLORS["primary_soft"],
+            text_color=COLORS["text"], border_width=1,
+            border_color=COLORS["border"], command=self._go_section,
+        )
         self.go.pack(side="right", padx=5)
-        ctk.CTkButton(foot, text="Cerrar", width=85, fg_color="transparent", hover_color=COLORS["primary_soft"], text_color=COLORS["text_muted"], command=self.finish).pack(side="right", padx=5)
-        self.next = ctk.CTkButton(foot, text="Siguiente", width=110, fg_color=COLORS["primary"], hover_color=COLORS["primary_dark"], command=self._next)
+        self.close = ctk.CTkButton(
+            foot, text="Cerrar", width=85,
+            font=FONTS["body"],
+            fg_color="transparent", hover_color=COLORS["primary_soft"],
+            text_color=COLORS["text_muted"], command=self.finish,
+        )
+        self.close.pack(side="right", padx=5)
+        self.next = ctk.CTkButton(
+            foot, text="Siguiente", width=110,
+            font=FONTS["body"],
+            fg_color=COLORS["primary"], hover_color=COLORS["primary_dark"],
+            command=self._next,
+        )
         self.next.pack(side="right")
 
     def _render(self):
