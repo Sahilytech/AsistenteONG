@@ -16,10 +16,11 @@ El núcleo cubre registro único de personas y múltiples casos, biblioteca docu
 **Estado: IMPLEMENTADA**
 
 - `SessionGuard` para detectar inactividad y bloquear la sesión.
-- Bloqueo manual disponible desde el núcleo de seguridad.
+- Bloqueo manual disponible desde la interfaz.
 - Desbloqueo mediante verificador derivado por SHA-256, sin almacenar la frase secreta.
 - Comparación resistente a timing mediante `compare_digest`.
-- Timeout configurable.
+- Timeout configurable desde el Centro de Seguridad.
+- Pantalla de bloqueo integrada en la ventana principal.
 
 ## FASE 32 — Backup y recuperación segura
 **Estado: IMPLEMENTADA**
@@ -33,14 +34,19 @@ El núcleo cubre registro único de personas y múltiples casos, biblioteca docu
 - Contraseña incorrecta invalida la restauración.
 - Pruebas automatizadas de backup, restore y sesión.
 
-## FASES 33–34 — Próximo bloque
-**Estado: PLANIFICADAS**
+## FASES 33–34 — Centro de seguridad e interfaz de recuperación
+**Estado: IMPLEMENTADAS**
 
-- Centro de seguridad visible en la interfaz.
-- Configuración de timeout y bloqueo.
-- Asistente visual de backup/restore.
-- Validación previa a restaurar para evitar sobrescrituras accidentales.
-- Registro auditable de operaciones de seguridad sin guardar datos sensibles.
+- Centro de Seguridad visible desde la navegación principal.
+- Configuración de tiempo de inactividad y frase de desbloqueo.
+- Bloqueo manual desde la interfaz.
+- Bloqueo automático cuando existe una frase configurada y se supera el timeout.
+- Pantalla modal de desbloqueo.
+- Creación de backup cifrado desde la interfaz.
+- Selección visual del archivo de backup y carpeta de restauración.
+- Confirmación antes de restaurar.
+- Mensajes de estado para errores y operaciones completadas.
+- Restauración separada del directorio activo para permitir revisión antes de reemplazar datos.
 
 ## FASES 35–36 — Próximo bloque
 **Estado: PLANIFICADAS**
