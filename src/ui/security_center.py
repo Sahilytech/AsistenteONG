@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import datetime
-import os
 from pathlib import Path
 from tkinter import filedialog, messagebox
 
@@ -16,6 +15,7 @@ class SecurityCenter(ctk.CTkScrollableFrame):
     """Panel operativo: sesión, backup cifrado y restauración explícita."""
 
     def __init__(self, parent, session_guard=None, on_secret_configured=None, **kwargs):
+        kwargs.pop("fg_color", None)
         super().__init__(parent, fg_color=COLORS["background"], **kwargs)
         self.session_guard = session_guard
         self.on_secret_configured = on_secret_configured
@@ -70,7 +70,7 @@ class SecurityCenter(ctk.CTkScrollableFrame):
         try:
             minutes = int(self.timeout.get().strip())
             if not 1 <= minutes <= 120:
-                raise ValueError
+                raise ValueError("El tiempo debe estar entre 1 y 120 minutos.")
             secret = self.secret.get()
             if len(secret) < 8 or secret != self.secret_confirm.get():
                 raise ValueError("La frase debe tener al menos 8 caracteres y coincidir.")
@@ -81,14 +81,16 @@ class SecurityCenter(ctk.CTkScrollableFrame):
             self.secret.delete(0, "end"); self.secret_confirm.delete(0, "end")
             self.session_status.configure(text=f"Seguridad actualizada. Bloqueo por inactividad: {minutes} min.")
         except ValueError as exc:
-            self.session_status.configure(text=str(exc) or "El tiempo debe estar entre 1 y 120 minutos.")
+            self.session_status.configure(text=str(exc))
 
     def _lock_now(self):
-        if self.session_guard:
-            self.session_guard.lock()
-        controller = getattr(self.winfo_toplevel(), "app_controller", None)
-        if controller:
-            controller.show_lock_screen()
+        if not self.session_guard:
+            return
+        if not getattr(self.winfo_toplevel(), "app_controller", None).session_verifier:
+            self.session_status.configure(text="Primero configurá una frase de desbloqueo.")
+            return
+        self.session_guard.lock()
+        self.winfo_toplevel().app_controller.show_lock_screen()
 
     def _choose_backup(self):
         path = filedialog.asksaveasfilename(title="Guardar backup cifrado", defaultextension=".ong", filetypes=[("Backup Asistente ONG", "*.ong")])
