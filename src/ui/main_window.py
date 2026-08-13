@@ -69,15 +69,43 @@ class MainWindow:
         self.root.app_controller = self
         self.root.bind_all("<Any-KeyPress>", self._activity_event, add="+")
         self.root.bind_all("<Any-Button>", self._activity_event, add="+")
+        self.root.bind("<Control-n>", lambda _e: self.open_new_case())
+        self.root.bind("<Control-b>", lambda _e: self.select_tab("Biblioteca"))
+        self.root.bind("<Control-k>", lambda _e: self._focus_analysis())
+        self.root.bind("<Escape>", lambda _e: self._close_active_dialog())
         self.root.after(1000, self._maximize_after_start)
         self.root.after(1000, self._session_tick)
         show_first_run(self.root)
+
+    def _focus_analysis(self):
+        self.select_tab("Análisis")
+        frame = self.frames.get("Análisis")
+        for widget_name in ("search_entry", "query_entry", "input_box"):
+            widget = getattr(frame, widget_name, None)
+            if widget is not None:
+                try:
+                    widget.focus_set()
+                    return
+                except Exception:
+                    pass
+
+    def _close_active_dialog(self):
+        for window in (self._lock_window,):
+            if window is not None:
+                try:
+                    window.focus_set()
+                    return
+                except Exception:
+                    pass
 
     def _maximize_after_start(self):
         try:
             self.root.state("zoomed")
         except Exception:
-            pass
+            try:
+                self.root.attributes("-zoomed", True)
+            except Exception:
+                pass
 
     def _activity_event(self, _event=None):
         if not self.session_guard.locked:
