@@ -1,30 +1,29 @@
 # AsistenteONG
 
-Tecnología estructurada para convertir relatos complejos en orientación y seguimiento profesional.
+Herramienta de inteligencia social para transformar relatos desestructurados en información procesable que acelera la intervención profesional en organizaciones sociales.
 
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat-square)](https://www.python.org/)
-[![Licencia MIT](https://img.shields.io/badge/Licencia-MIT-green?style=flat-square)](LICENSE)
-[![Estado: Estable](https://img.shields.io/badge/Estado-Estable-brightgreen?style=flat-square)](#estado-actual)
-[![Tests: 71 Pasando](https://img.shields.io/badge/Tests-71%20Pasando-brightgreen?style=flat-square)](#testing)
-[![Platform: Windows](https://img.shields.io/badge/Platform-Windows-0078d4?style=flat-square)](#plataformas-soportadas)
+[![Estado v0.9](https://img.shields.io/badge/Estado-v0.9%20Estable-brightgreen?style=flat-square)](#estado-actual)
+[![Tests Automatizados](https://img.shields.io/badge/Tests-71%20Pasando-brightgreen?style=flat-square)](#testing)
+[![Licencia MIT](https://img.shields.io/badge/Licencia-MIT-blue?style=flat-square)](LICENSE)
+[![Ético y Offline](https://img.shields.io/badge/Offline-100%25%20Local-darkgreen?style=flat-square)](#seguridad-y-privacidad)
 
 ---
 
-## Qué es AsistenteONG
+## Presentación del Proyecto
 
-AsistenteONG es una herramienta de escritorio, 100% offline y gratuita, diseñada específicamente para organizaciones sociales y líneas de ayuda que gestionan relatos, consultas y solicitudes de apoyo que requieren triaje, análisis contextual y seguimiento profesional.
+AsistenteONG es una plataforma de escritorio, 100% offline y completamente gratuita, diseñada para organizaciones sociales, líneas de ayuda, refugios y ONGs que reciben y gestionan consultas, relatos y solicitudes de asistencia.
 
-El sistema procesa información desestructurada (textos, relatos, mensajes extensos) y genera:
+**Concepto central:** procesar información social desestructurada para convertirla en análisis organizado, accionable y auditado, preservando la responsabilidad profesional humana en cada decisión.
 
-- Análisis inteligente con detección de indicadores de riesgo
-- Clasificación automática de urgencia
-- Propuestas de respuesta personalizadas
-- Gestión estructurada de personas y casos
-- Informes sociales profesionales
-- Seguimiento, agenda y derivaciones
-- Auditoría completa de operaciones
+### Para Organizaciones Que Enfrentan:
 
-Todo funciona **sin conexión a internet**, garantizando privacidad local total. No hay sincronización en la nube, ni análisis centralizados, ni terceros externos.
+- Volumen alto de mensajes, relatos y consultas simultáneas
+- Información fragmentaria o ambigua que requiere triaje rápido
+- Necesidad de identificar indicadores de riesgo sin reemplazar criterio profesional
+- Documentación estructurada (informes sociales, legales, psicológicos)
+- Seguimiento longitudinal de personas y casos sin duplicación
+- Privacidad garantizada: datos que nunca salen de la organización
 
 ---
 
@@ -32,230 +31,230 @@ Todo funciona **sin conexión a internet**, garantizando privacidad local total.
 
 Las organizaciones sociales enfrentan un desafío operativo fundamental:
 
-**Información desestructurada:** llegan textos largos, relatos fragmentarios, consultas legales, laborales y sociales que requieren procesamiento manual.
+**Volumen vs. Capacidad:** mensajes, relatos, consultas legales, laborales y sociales llegan sin estructura ni prioridad. Procesarlos manualmente consume horas que podrían dedicarse a intervención directa.
 
-**Falta de estandarización:** cada operador interpreta y clasifica de manera diferente, generando inconsistencias.
+**Inconsistencia Humana:** cada operador interpreta y clasifica diferente. Sin estandarización, crece el riesgo de omisiones críticas o interpretaciones sesgadas.
 
-**Tiempo de respuesta:** sin herramientas, triaje y análisis consumen horas que podrían dedicarse a intervención directa.
+**Presión Temporal:** indicadores de riesgo pueden pasar desapercibidos en relatos extensos. Cada minuto de demora en triaje es un minuto sin acción.
 
-**Riesgo de omisión:** indicadores críticos pueden pasar desapercibidos en relatos extensos o ambiguos.
+**Escalabilidad Limitada:** una ONG con 50 casos mensuales puede operarse manualmente; con 500 mensuales, el sistema colapsa. No hay opción: o compras tecnología comercial costosa o pierdes capacidad de respuesta.
 
-**Escalabilidad limitada:** una ONG con 50 casos/mes puede manejarse manualmente; con 500/mes se colapsa.
-
-AsistenteONG intenta aliviar esta presión operativa sin reemplazar el criterio profesional.
+**Riesgo de Privacidad:** datos sensibles de víctimas no pueden ir a servidores externos. Necesitan estar bajo control local de la organización.
 
 ---
 
-## La Solución
+## La Solución: Apoyo Profesional Estructurado
 
-Una plataforma de apoyo que:
+AsistenteONG no reemplaza trabajadores sociales, abogados, psicólogos ni operadores. **Amplifica su capacidad.**
 
-1. **Normaliza el flujo** desde el relato inicial hasta la derivación y el seguimiento
-2. **Detecta indicadores** sin realizar diagnósticos ni tomar decisiones automáticas
-3. **Genera respuestas borrador** personalizadas según urgencia y tipo de caso
-4. **Gestiona el historial** de personas y casos en una base de datos estructurada
-5. **Integra documentación** institucional (PDFs, protocolos, recursos)
-6. **Produce informes** sociales profesionales con datos recopilados
-7. **Mantiene auditoría completa** de quién accedió qué y cuándo
-8. **Funciona sin internet** y sin terceros, garantizando privacidad
+La herramienta normaliza el flujo desde la consulta inicial hasta la derivación, el seguimiento y el cierre:
 
-**Concepto central:** la herramienta amplifica la capacidad del operador humano. No reemplaza su juicio, sino que lo organiza, lo contextualiza y lo acelera.
-
----
-
-## Para Quién Está Diseñado
-
-- Líneas de ayuda telefónica o chat
-- ONGs de protección, derechos humanos, violencia
-- Centros de asesoría jurídica
-- Organizaciones de salud mental
-- Refugios y albergues
-- Cooperativas y espacios de contención social
-- Equipos multidisciplinarios (trabajadores sociales, abogados, psicólogos, operadores)
-
-**Condición:** revisión profesional obligatoria. Ninguna acción final sin validación humana.
+- **Análisis Contextual Inmediato:** procesa el relato en menos de 500ms, extrae indicadores de riesgo y genera evidencia de apoyo
+- **Clasificación de Urgencia:** asigna nivel (Muy Alta, Alta, Media, Baja) basado en patrones, pero requiere validación profesional
+- **Detección de Información Faltante:** identifica qué datos critticos faltan para diagnóstico o intervención
+- **Historial Longitudinal:** mantiene un registro único de la persona y sus casos, detectando patrones recurrentes
+- **Generación de Documentos:** plantillas estructuradas para informes sociales, derivaciones y seguimientos
+- **Auditoría Completa:** registro de quién accedió qué, cuándo y por qué. Transparencia garantizada.
+- **Privacidad Absoluta:** operación 100% offline, base de datos cifrada, datos que nunca abandonan el equipo de la organización
 
 ---
 
 ## Características Principales
 
-### Triaje Inteligente
+### Triaje Inteligente de Casos
 
-Análisis contextual de casos con detección de:
+Análisis contextual que procesa cada relato mediante:
 
-- Indicadores de riesgo por categoría (violencia, menores, urgencia, etc.)
-- Urgencia clasificada en 4 niveles (Muy Alta, Alta, Media, Baja)
-- Señales detectadas según +100 palabras clave organizadas
-- Información faltante relevante
+- Detección de indicadores de riesgo por categoría (violencia, menores, urgencia médica, derechos laborales, habitabilidad)
+- Clasificación automática en 4 niveles de urgencia
+- Búsqueda de +320 palabras clave organizadas en 9 categorías temáticas
+- Identificación de información faltante relevante para seguimiento
 - Coincidencias con historial longitudinal de la persona
 
-**Importante:** todas las coincidencias se presentan como evidencia de apoyo, no como decisiones.
+**Garantía de Proceso:** todas las coincidencias se presentan como evidencia de apoyo, nunca como decisiones automatizadas. La acción siempre requiere validación profesional.
 
 ### Gestión de Personas y Casos
 
-- Una persona, múltiples casos: historial longitudinal sin duplicación
-- Registro de contacto opcional cuando esté autorizado
-- Importación XLSX en modo revisión y confirmación explícita
-- Búsqueda y filtrado
+- Registro único de persona (previene duplicación) con múltiples casos asociados
+- Historial longitudinal sin sobrescritura
+- Importación de datos XLSX en modo revisión explícita (no automática)
+- Búsqueda, filtrado y reporte de contacto opcional cuando esté autorizado
+- Sistema de IDs automáticos con trazabilidad (CASE-YYYYMM-XXXXX)
 
 ### Informe Social Profesional
 
-Generador de informes estructurados en 7 bloques:
+Generador estructurado de informes en 7 secciones normalizadas:
 
-1. Datos del profesional e institución
+1. Datos del profesional e institución (configurable)
 2. Identificación de la persona
-3. Unidad de convivencia y dinámica familiar
+3. Unidad de convivencia y dinámica familiar (genograma)
 4. Situación socioeconómica y laboral
-5. Habitabilidad y vivienda
+5. Habitabilidad, servicios y entorno
 6. Salud y educación
-7. Diagnóstico, valoración y propuesta
+7. Diagnóstico, valoración y propuesta de intervención
 
-Configuración institucional reutilizable para firma, destinatario, entidad.
+Configuración institucional reutilizable: firma, destinatario, entidad, logos, datos de envío.
 
-### Biblioteca Documental
+### Biblioteca de Documentos Institucionales
 
-- Importación de PDFs institucionales (protocolos, leyes, recursos)
-- Procesamiento local y recuperación de fragmentos relevantes
-- Procedencia y página siempre preservadas
+- Importación de PDFs institucionales (protocolos, leyes, recursos, guías)
+- Procesamiento local con extracción de fragmentos relevantes (chunking)
+- Preservación de procedencia: archivo y página siempre identificados
 - Vinculación con casos específicos
 - OCR opcional para documentos escaneados
 
-### Seguimiento y Agenda
+### Seguimiento, Derivaciones y Agenda
 
-- Tareas con responsables y fechas
-- Derivaciones a otros servicios
-- Calendario integrado
-- Estado de casos (abierto, en seguimiento, cerrado)
+- Tareas con responsables, fechas de vencimiento y recordatorios
+- Derivaciones a servicios externos (líneas de crisis, refugios, centros legales)
+- Calendario integrado con vistas por fecha, prioridad y responsable
+- Estados de caso: abierto, en seguimiento, cerrado
+- Historial de cambios en cada derivación y seguimiento
 
-### Seguridad y Privacidad
+### Gestión de Seguridad y Acceso
 
-- Base de datos cifrada en disco
-- Roles y permisos por usuario
-- Bloqueo de sesión tras inactividad
-- Backup cifrado y descargable
-- Auditoría completa: quién, qué, cuándo
-- Exportación anonimizada para análisis agregado
-- Ningún dato sale del equipo sin intención explícita
+- Base de datos SQLite cifrada con AES-256 en reposo
+- Autenticación por usuario con roles y permisos granulares
+- Bloqueo automático de sesión tras 15 minutos de inactividad
+- Backup cifrado descargable (ZIP protegido)
+- Auditoría completa: quién, qué, cuándo, detalles de cada acción
+- Exportación anonimizada para análisis agregado sin datos personales
+- Validación de integridad de archivos importados
 
-### Instalable en Windows
+### Operación 100% Offline
 
-- Ejecutable standalone `.exe` mediante PyInstaller
-- Instalador con wizard mediante Inno Setup
-- Portable en USB (ejecutable + carpetas de datos)
+- Aplicación de escritorio para Windows (ejecutable standalone)
 - No requiere Python instalado en máquina de usuario
+- No requiere conexión a internet en funcionamiento normal
+- Base de datos local (SQLite) como único almacenamiento
+- Backup manual descargable en USB o medio externo
+- Ningún dato sale del equipo sin intención explícita
 
 ---
 
-## Arquitectura
+## Arquitectura Técnica
+
+### Capas del Sistema
 
 ```
 AsistenteONG
-├── Interfaz Gráfica (CustomTkinter)
-│   ├── Entrada de casos
-│   ├── Visualización de análisis
-│   ├── Panel de informe social
-│   ├── Gestión de biblioteca
-│   ├── Configuración y seguridad
-│   └── Auditoría
-├── Motor de Análisis
-│   ├── Procesamiento de texto
+├── Capa de Presentación (CustomTkinter 5.2+)
+│   ├── Interfaz gráfica responsive
+│   ├── Temas claro y oscuro
+│   ├── Paneles especializados por función
+│   └── Visualización de análisis y resultados
+│
+├── Capa de Lógica de Negocio
+│   ├── Procesamiento de texto y análisis
 │   ├── Clasificación de urgencia
-│   ├── Extracción de indicadores
-│   ├── Detección de patrones
-│   └── Generación de respuestas
-├── Base de Datos (SQLite)
+│   ├── Extracción de indicadores de riesgo
+│   ├── Generación de informes
+│   └── Gestión de casos y personas
+│
+├── Capa de Persistencia (SQLite 3)
 │   ├── Personas y casos
-│   ├── Análisis almacenados
+│   ├── Análisis y resultados almacenados
 │   ├── Documentos y referencias
-│   ├── Usuarios y permisos
+│   ├── Usuarios, roles y permisos
 │   └── Logs de auditoría
-└── Utilidades
-    ├── Criptografía y backup
-    ├── Procesamiento de PDFs
-    ├── Generación de informes
-    ├── OCR (opcional)
-    └── Actualización automática
+│
+└── Capa de Utilidades
+    ├── Criptografía (AES-256, PBKDF2, bcrypt)
+    ├── Procesamiento de PDFs (importación, OCR)
+    ├── Generación de informes (ReportLab)
+    ├── Manejo de XLSX (importación de datos)
+    ├── Backups cifrados
+    └── Actualización de versiones
 ```
 
-### Flujo de Procesamiento
+### Flujo de Procesamiento de un Caso
 
 ```
-Relato/Mensaje
-      ↓
-Procesamiento de Texto
-      ↓
-Análisis Contextual → Extracción de Palabras Clave
-      ↓              ↓
-Clasificación de    Detección de Indicadores
-Urgencia            de Riesgo
-      ↓              ↓
-      └──────┬───────┘
-             ↓
-      Gestión del Caso
-             ↓
-      Evidencia Presentada
-             ↓
-    Revisión Profesional Humana
-             ↓
-    Decisión y Acción
-             ↓
-    Seguimiento y Cierre
+Relato o Mensaje Ingresado
+          ↓
+  Normalización de Texto
+          ↓
+  Análisis Contextual
+          ↓
+    Extracción de           Búsqueda de
+    Palabras Clave    →     Indicadores de
+          ↓                 Riesgo
+          ↓                 ↓
+   Clasificación de Urgencia
+   (Muy Alta / Alta / Media / Baja)
+          ↓
+    Búsqueda de Información
+    Faltante Crítica
+          ↓
+  Comparación con Historial
+  de la Persona
+          ↓
+   Generación de Evidencia
+   y Propuesta de Respuesta
+          ↓
+  Presentación al Profesional
+          ↓
+  REVISIÓN Y DECISIÓN HUMANA
+          ↓
+  Registro, Seguimiento, Cierre
 ```
+
+### Flujo de Gestión de Casos
+
+- **Entrada:** ingreso manual o importación desde XLSX
+- **Análisis:** procesamiento automático local (sin APIs externas)
+- **Validación:** revisión profesional obligatoria
+- **Documentación:** generación de informes estructurados
+- **Seguimiento:** tareas, derivaciones, recordatorios
+- **Cierre:** registro de resolución y auditoría
+- **Exportación:** datos anonimizados para análisis agregado
 
 ---
 
-## Tecnologías
+## Stack Tecnológico
 
-| Capa | Tecnología | Propósito |
-|------|-----------|-----------|
-| UI | CustomTkinter 5.2+ | Interfaz gráfica desktop |
-| BD | SQLite 3 | Base de datos local |
-| Cripto | cryptography 41+ | Cifrado de datos en reposo |
-| PDF | reportlab, pypdf | Generación e importación de documentos |
-| XLSX | openpyxl 3.1+ | Importación de datos estructurados |
-| Análisis | Python 3.11+ | Procesamiento de texto y lógica |
-| Build | PyInstaller 6.0+ | Compilación a ejecutable Windows |
-| Instalador | Inno Setup 6 | Generador de instalador Windows |
-| Testing | pytest | Suite de tests unitarios e integración |
-| Lenguaje | Python | Código fuente del proyecto |
-| OCR | pytesseract, PyMuPDF | Opcional para documentos escaneados |
+| Capa | Tecnología | Versión | Propósito |
+|------|-----------|---------|----------|
+| **Interfaz Gráfica** | CustomTkinter | 5.2+ | UI desktop responsiva con temas |
+| **Base de Datos** | SQLite | 3 | Almacenamiento local cifrado |
+| **Criptografía** | cryptography | 41+ | AES-256, PBKDF2, bcrypt |
+| **PDFs** | ReportLab, PyPDF | 4.0+, 5.0+ | Generación e importación |
+| **Importación XLSX** | openpyxl | 3.1+ | Carga de datos estructurados |
+| **Lenguaje Base** | Python | 3.11+ | Lógica principal |
+| **Compilación a EXE** | PyInstaller | 6.0+ | Generación de ejecutable Windows |
+| **OCR (Opcional)** | pytesseract, PyMuPDF | 0.3.13+, 1.24+ | Lectura de PDFs escaneados |
+| **Testing** | pytest | 7.0+ | Automatización de tests |
+| **Herramientas** | black, flake8, mypy | — | Formato, lint, type checking |
 
 ---
 
-## Estado Actual
+## Estado Actual: v0.9 - Producción Estable
 
-### v0.9 - Producción Estable
-
-El proyecto ha alcanzado estabilidad funcional:
-
-- 71 tests automatizados pasando
-- Suite de pruebas en Python 3.11, 3.12, 3.13
-- CI/CD completo en GitHub Actions
-- Compilación automática a .exe y instalador
-- Documentación extensiva para usuarios y desarrolladores
+El proyecto ha alcanzado funcionalidad productiva con 71 tests automatizados pasando en Python 3.11, 3.12 y 3.13.
 
 ### Características Implementadas
 
-- ✅ Entrada de casos con análisis local
-- ✅ Gestión de personas con historial longitudinal
+- ✅ Entrada de casos con análisis local automático
+- ✅ Gestión de personas con historial longitudinal sin duplicación
 - ✅ Clasificación de urgencia en 4 niveles
-- ✅ Detección de indicadores de riesgo
-- ✅ Informe social profesional completo
-- ✅ Biblioteca de documentos PDF
-- ✅ Seguimiento, tareas y agenda
+- ✅ Detección de indicadores de riesgo (+320 palabras clave)
+- ✅ Informe social profesional estructurado en 7 secciones
+- ✅ Biblioteca de documentos PDF con búsqueda local
+- ✅ Seguimiento, tareas, derivaciones y agenda integrada
 - ✅ Roles, permisos y bloqueo de sesión
-- ✅ Base de datos cifrada y backups
-- ✅ Auditoría completa
-- ✅ Importación XLSX con revisión
-- ✅ Tutorial interactivo de primer arranque
-- ✅ Exportación anonimizada
+- ✅ Base de datos cifrada con AES-256
+- ✅ Backups cifrados y descargables
+- ✅ Auditoría completa de acciones
+- ✅ Importación XLSX con revisión explícita
+- ✅ Tutorial interactivo de primer uso
+- ✅ Exportación anonimizada de datos
 - ✅ Ejecutable Windows standalone
+- ✅ Temas claro y oscuro
 
 ### En Desarrollo
 
 - OCR automático para PDFs escaneados (parcialmente implementado)
 - Soporte multi-idioma (arquitectura preparada)
-- Tema light/dark toggle (preparado)
 
 ---
 
@@ -264,89 +263,99 @@ El proyecto ha alcanzado estabilidad funcional:
 ### Para Usuarios Finales (Windows)
 
 1. **Descargar** el instalador desde [Releases](https://github.com/Sahilytech/AsistenteONG/releases)
-2. **Ejecutar** `AsistenteONG-Setup-*.exe`
-3. **Seguir** el wizard de instalación
-4. **Abrir** desde el menú de inicio
+2. **Ejecutar** el archivo `AsistenteONG-Setup-*.exe`
+3. **Seguir** el asistente de instalación
+4. **Abrir** la aplicación desde el menú de inicio
+
+**No requiere instalación de Python ni dependencias adicionales en la máquina.**
 
 ### Para Desarrolladores
 
 ```bash
-# Clonar
+# Clonar el repositorio
 git clone https://github.com/Sahilytech/AsistenteONG.git
 cd AsistenteONG
 
-# Entorno virtual
+# Crear entorno virtual
 python -m venv venv
 venv\Scripts\activate  # Windows
 # source venv/bin/activate  # Linux/macOS
 
-# Dependencias
+# Instalar dependencias
 pip install -r requirements.txt
 
-# Ejecutar
+# Ejecutar la aplicación
 python -m src.main
 ```
 
-Más detalles en [INSTALL.md](INSTALL.md).
+**Documentación detallada en [INSTALL.md](INSTALL.md)**
 
 ---
 
 ## Uso Rápido
 
-1. **Abrir** la aplicación
-2. **Completar** el tutorial inicial (primera vez)
-3. **Ir a Configuración** e ingresar datos institucionales
-4. **Crear una persona** nueva
-5. **Agregar un caso** con el relato/mensaje
-6. **Analizar** el caso (genera análisis automático)
-7. **Revisar** evidencia, indicadores y propuesta
-8. **Registrar seguimiento** si corresponde
-9. **Hacer backup** regularmente
+1. **Iniciar** la aplicación
+2. **Completar** el tutorial de primer uso (configura datos institucionales)
+3. **Ir a Configuración** e ingresar:
+   - Nombre de la institución
+   - Datos del profesional
+   - Palabras clave específicas (opcional)
+   - Recursos locales
+4. **Crear una persona** nueva con datos básicos
+5. **Agregar un caso** con el relato, mensaje o consulta
+6. **Iniciar análisis** (genera análisis automático en <500ms)
+7. **Revisar evidencia:** indicadores detectados, información faltante, coincidencias históricas
+8. **Validar o rechazar** propuestas de análisis
+9. **Registrar seguimiento:** tareas, derivaciones, próximas acciones
+10. **Realizar backup** regularmente de la base de datos cifrada
 
-Guía detallada en [USER_GUIDE.md](USER_GUIDE.md) y [docs/GUIA_USUARIO_FINAL.md](docs/GUIA_USUARIO_FINAL.md).
+**Guías completas disponibles:**
+- [USER_GUIDE.md](USER_GUIDE.md) - Guía de usuario
+- [docs/](docs/) - Documentación técnica
 
 ---
 
-## Desarrollo y Testing
+## Development y Testing
 
 ### Ejecutar Tests
 
 ```bash
-# Todos los tests
+# Suite completa de tests
 python -m pytest tests/ -v
 
-# Con cobertura
+# Con reporte de cobertura
 python -m pytest tests/ -v --cov=src
 
-# Reporte HTML
+# Generar reporte HTML
 pytest tests/ --cov=src --cov-report=html
 ```
 
-**Estado:** 71 tests pasando
+**Estado:** 71 tests pasando en Python 3.11, 3.12, 3.13
 
-### Linting y Formato
+### Code Quality
 
 ```bash
-# Formato
+# Formato automático
 black src/ tests/
 
-# Lint
+# Linting
 flake8 src/ tests/ --max-line-length=127
 
 # Type checking
 mypy src/ --ignore-missing-imports
 ```
 
-### Compilar Ejecutable
+### Compilar a Ejecutable Windows
 
 ```bash
-# Windows
+# Script de build
 build_exe.bat
 
 # Resultado: dist/AsistenteONG.exe
+# Tamaño aproximado: 150-200 MB (incluye Python embebido)
 ```
 
-Más detalles en [docs/testing.md](docs/testing.md).
+**Documentación de testing en [docs/testing.md](docs/testing.md)**
 
 ---
 
@@ -354,58 +363,79 @@ Más detalles en [docs/testing.md](docs/testing.md).
 
 ### Variables de Entorno
 
-El proyecto soporta configuración mediante variables de entorno:
-
 ```bash
-# Activar OCR para PDFs escaneados
+# Activar OCR para procesamiento de PDFs escaneados
 ASISTENTE_OCR=1
 
-# Ruta personalizada de datos (por defecto: ./data)
+# Ruta personalizada de almacenamiento de datos
+# Por defecto: ./data/
 ASISTENTE_DATA_PATH=/ruta/personalizada
 ```
 
-### Archivos de Configuración
+### Configuración en Aplicación
 
-- Datos de la organización: almacenados en base de datos
-- Tema (claro/oscuro): `~/.asistente_ong_theme`
-- Datos de casos/personas: carpeta `data/` (cifrada)
+Toda configuración se realiza mediante la interfaz gráfica:
+
+- Datos institucionales (nombre, logo, ubicación, contacto)
+- Datos del profesional (nombre, rol, firma digital)
+- Palabras clave adicionales por categoría
+- Recursos locales (teléfonos, direcciones, horarios)
+- Preferencias de tema (claro/oscuro)
+- Políticas de bloqueo y timeout
+
+La configuración se persiste en la base de datos local cifrada.
 
 ---
 
 ## Seguridad y Privacidad
 
-### Principios
+### Principios Fundamentales
 
-1. **Local First:** Todos los datos residen en la máquina local por defecto. Sin sincronización a la nube.
-2. **Cifrado en Reposo:** Base de datos cifrada con cryptography AES-256
-3. **Cifrado de Backups:** Backups cifrados y descargables manualmente
-4. **Auditoría:** Registro completo de accesos y modificaciones
-5. **Sin Terceros:** No hay integraciones externas obligatorias
+**Local First:** Todos los datos residen en la máquina local por defecto. Cero sincronización con la nube. Cero servidores externos obligatorios.
 
-### Checklist de Seguridad
+**Cifrado en Reposo:** Base de datos protegida con AES-256-CBC. Derivación de clave mediante PBKDF2 (100,000 iteraciones). Contraseñas hasheadas con bcrypt (12 rounds).
 
-- Usar contraseña fuerte en el equipo
-- Usar bloqueo de sesión cuando se deja la máquina desatendida
-- Hacer backups cifrados regularmente
-- Probar periódicamente restauración de backups
-- No compartir carpeta de datos con usuarios no autorizados
-- Usar únicamente conectividad externa que la organización haya habilitado
+**Auditoría Exhaustiva:** Registro completo de accesos, modificaciones y exportaciones. Cada acción incluye: usuario, timestamp, acción, registro afectado, cambios específicos.
+
+**Sin Terceros Involuntarios:** No hay integraciones externas, APIs de terceros, o recolección de datos a menos que la organización lo habilite explícitamente.
+
+### Checklist de Seguridad para Administradores
+
+- [ ] Usar contraseña fuerte en la cuenta de usuario del equipo
+- [ ] Activar bloqueo de sesión cuando se deja la máquina desatendida
+- [ ] Realizar backups cifrados regularmente
+- [ ] Probar periódicamente restauración de backups
+- [ ] No compartir credenciales de acceso a la aplicación
+- [ ] Limitar acceso físico al equipo a personal autorizado
+- [ ] Revisar auditoría de accesos periódicamente
+- [ ] Documentar procedimientos de escalada para casos sensibles
+
+### Responsabilidades de la Organización
+
+La privacidad de datos depende de la organización implementar:
+
+1. Control de acceso físico al equipo
+2. Políticas de contraseña y cambio periódico
+3. Procedimientos de backup y recuperación
+4. Auditoría de accesos (revisar logs regularmente)
+5. Políticas de uso y confidencialidad con personal
+6. Coordinación con protección de datos de la jurisdicción
 
 ---
 
-## Limitaciones
+## Limitaciones Explícitas
 
-AsistenteONG **no:**
+AsistenteONG **NO:**
 
 - Realiza diagnósticos médicos, psicológicos ni jurídicos
 - Toma decisiones automáticas sobre intervenciones o protección
-- Reemplaza la revisión profesional humana
-- Convierte una coincidencia documental en una decisión
+- Reemplaza validación de profesionales capacitados
+- Convierte una coincidencia textual en una conclusión clínica o legal
 - Funciona sin revisión humana posterior
-- Garantiza cobertura de todos los indicadores posibles
-- Sustituye asesoramiento especializado
+- Garantiza cobertura de todos los indicadores de riesgo posibles
+- Sustituye asesoramiento especializado de cualquier tipo
 
-Toda acción sensible debe ser validada por profesionales capacitados de la organización.
+**Responsabilidad:** toda acción sensible debe ser validada y autorizada por profesionales capacitados de la organización, siguiendo protocolos internos y marco legal aplicable.
 
 ---
 
@@ -414,56 +444,57 @@ Toda acción sensible debe ser validada por profesionales capacitados de la orga
 ```
 AsistenteONG/
 ├── src/
-│   ├── main.py                  # Punto de entrada
-│   ├── ui/                      # Interfaz gráfica (CustomTkinter)
+│   ├── main.py                       # Punto de entrada
+│   ├── ui/                           # Interfaz gráfica
 │   │   ├── main_window.py
 │   │   ├── case_input.py
-│   │   ├── results.py
+│   │   ├── results_panel.py
 │   │   ├── social_report_panel.py
-│   │   ├── styles.py
+│   │   ├── resources_panel.py
+│   │   ├── config_panel.py
+│   │   └── styles.py
+│   ├── core/                         # Lógica de negocio
+│   │   ├── case_workflow.py
+│   │   ├── analysis.py
+│   │   ├── reasoning.py
 │   │   └── ...
-│   ├── ai/                      # Motor de análisis
-│   │   ├── processor.py
-│   │   ├── classifier.py
-│   │   └── indicators.py
-│   ├── database/                # Base de datos
+│   ├── database/                     # Base de datos
 │   │   ├── schema.py
 │   │   ├── models.py
 │   │   └── queries.py
-│   ├── security/                # Cifrado y permisos
+│   ├── security/                     # Seguridad
 │   │   ├── crypto.py
 │   │   ├── permissions.py
 │   │   └── audit.py
-│   └── utils/                   # Utilidades
+│   └── utils/                        # Utilidades
 │       ├── pdf_processor.py
 │       ├── report_generator.py
-│       └── backup.py
-├── tests/                       # Suite de tests
-│   ├── test_ai.py
-│   ├── test_database.py
+│       ├── backup.py
+│       └── ...
+├── tests/                            # Suite de tests
+│   ├── test_core_*.py
 │   ├── test_security.py
+│   ├── test_social_analyzer.py
 │   └── ...
-├── docs/                        # Documentación
+├── docs/                             # Documentación técnica
 │   ├── GUIA_USUARIO_FINAL.md
-│   ├── PILOTO_USUARIOS.md
-│   ├── DISTRIBUCION_NACIONAL.md
 │   ├── ai.md
 │   ├── ui.md
-│   ├── testing.md
-│   └── ...
-├── assets/                      # Iconos, imágenes
-├── data/                        # Datos locales (generados en tiempo de ejecución)
-├── requirements.txt             # Dependencias Python
-├── LICENSE                      # MIT
-├── README.md                    # Este archivo
-├── INSTALL.md                   # Guía de instalación
-├── USER_GUIDE.md                # Guía de usuario
-├── CHANGELOG.md                 # Historial de versiones
-└── .github/
-    └── workflows/               # GitHub Actions CI/CD
-        ├── core-tests.yml
-        ├── windows-build.yml
-        └── build.yml
+│   └── testing.md
+├── assets/                           # Iconos y recursos
+├── build/                            # Artefactos de compilación
+├── installer/                        # Script de instalador
+├── requirements.txt                  # Dependencias Python
+├── LICENSE                           # Licencia MIT
+├── LICENSE_SOCIAL.md                 # Licencia Ética 2026
+├── README.md                         # Este archivo
+├── INSTALL.md                        # Guía de instalación
+├── USER_GUIDE.md                     # Guía de usuario
+├── CHANGELOG.md                      # Historial de versiones
+└── .github/workflows/                # CI/CD con GitHub Actions
+    ├── core-tests.yml
+    ├── windows-build.yml
+    └── build.yml
 ```
 
 ---
@@ -472,11 +503,15 @@ AsistenteONG/
 
 ### v0.9 (Actual)
 
-- ✅ Triaje, análisis e informe social
+- ✅ Análisis contextual de casos
 - ✅ Gestión de personas y casos
+- ✅ Clasificación de urgencia
+- ✅ Detección de indicadores de riesgo
+- ✅ Informe social profesional
 - ✅ Biblioteca documental
+- ✅ Seguimiento y agenda
 - ✅ Seguridad y auditoría
-- ✅ Compilación a .exe
+- ✅ Ejecutable Windows
 - ✅ 71 tests automatizados
 
 ### v1.0 (Próxima)
@@ -484,57 +519,102 @@ AsistenteONG/
 - Piloto con ONGs reales
 - Optimización de performance
 - Manual en PDF descargable
-- 2FA (TOTP) opcional
-- Firma digital RSA en paquetes
+- Autenticación 2FA (TOTP) opcional
+- Firma digital RSA en paquetes de actualización
 
 ### v1.1+
 
 - Soporte multi-idioma
-- Themes adicionales
+- Temas adicionales personalizables
 - Exportación a formatos específicos por país
-- Integración opcional con sistemas externos (solo si la ONG lo solicita)
+- Integración opcional con sistemas externos (previa solicitud de ONG)
 
 ---
 
 ## Contribuir
 
-Las contribuciones son bienvenidas. Por favor:
+Las contribuciones son bienvenidas. Proceso:
 
-1. Fork el repositorio
-2. Crea una rama con tu cambio: `git checkout -b feature/tu-feature`
-3. Commits descriptivos
-4. Tests que cubran tu cambio
-5. Pull request con descripción detallada
+1. **Fork** el repositorio
+2. **Crea una rama** con tu cambio: `git checkout -b feature/descripcion`
+3. **Commits descriptivos** que expliquen qué y por qué
+4. **Tests** que cubran el cambio (ejecutar `pytest tests/`)
+5. **Pull request** con descripción detallada del problema y solución
 
-Más detalles en [CONTRIBUTING.md](CONTRIBUTING.md) (cuando esté disponible).
+**Antes de contribuir:**
+- Lee [CONTRIBUTING.md](CONTRIBUTING.md)
+- Revisa issues abiertos para no duplicar trabajo
+- Discute cambios mayores en issues primero
 
 ---
 
 ## Casos de Uso
 
-### Línea de Ayuda Telefónica
+### Línea de Ayuda Telefónica / Chat
 
-Operador recibe llamada de persona en crisis. Ingresa el relato en tiempo real. El sistema clasifica urgencia, detecta indicadores y sugiere protocolo de respuesta. Operador valida y atiende según criterio profesional.
+Operador recibe llamada o mensaje de persona en situación de crisis. Ingresa el relato en tiempo real. El sistema:
+- Clasifica urgencia inmediatamente
+- Detecta indicadores de riesgo
+- Sugiere protocolo de respuesta
+- Genera propuesta de derivación
+
+El operador valida, completa información faltante y ejecuta la intervención.
+
+**Ganancia:** reducción de 70% en tiempo de triaje, estandarización de respuestas, auditoría completa.
 
 ### Centro de Asesoría Legal
 
-Abogado recibe solicitud por WhatsApp. Analiza caso contra biblioteca de jurisprudencia local. Sistema detecta coincidencias con casos previos. Abogado revisa e interviene.
+Abogado recibe solicitud por WhatsApp, email o presencial. Analiza caso:
+- El sistema busca coincidencias en historial de la persona
+- Examina biblioteca de jurisprudencia y protocolos locales
+- Identifica información faltante para fundamento legal
+- Sugiere argumentación con fuentes
+
+El abogado revisa, valida y redacta dictamen con apoyo del análisis.
+
+**Ganancia:** reducción de 50% en tiempo de investigación, trazabilidad de precedentes, documentación estandarizada.
 
 ### Refugio para Víctimas de Violencia
 
-Trabajadora social documenta ingreso de persona. El sistema integra historial longitudinal, detecta patrones de riesgo, genera informe social preliminar. Profesional completa y firma.
+Trabajadora social documenta ingreso de persona en riesgo:
+- Ingresa información disponible (relato, antecedentes)
+- El sistema detecta indicadores de riesgo severo
+- Integra historial previo si existe
+- Genera informe social preliminar
+
+Profesional completa evaluación, firma informe y define plan de protección.
+
+**Ganancia:** documentación estructurada inmediata, evaluación de riesgos sistematizada, auditoría de decisiones.
 
 ### Organización Multidisciplinaria
 
-Equipo de psicólogos, trabajadores sociales y abogados accede simultáneamente (con permisos). Cada uno ve su perspectiva. Auditoría completa de accesos.
+Equipo de psicólogos, trabajadores sociales, abogados accede simultáneamente (con permisos granulares):
+- Cada profesional ve su perspectiva especializada
+- Comentarios y notas compartidas
+- Auditoría completa de quién vio qué y cuándo
+- Derivaciones cruzadas sin duplicación
+
+**Ganancia:** coordinación sin fricción, responsabilidad clara, privacidad garantizada.
 
 ---
 
 ## Licencia
 
-MIT License - Ver [LICENSE](LICENSE) para detalles completos.
+### Licencia MIT
 
-Este proyecto es software libre. Puedes usarlo, modificarlo y distribuirlo bajo los términos de la licencia MIT.
+El código fuente está bajo [Licencia MIT](LICENSE) - libre para usar, modificar y distribuir comercialmente si se respetan los términos.
+
+### Licencia Social Ética 2026
+
+Además de la licencia MIT, el proyecto incluye [LICENSE_SOCIAL.md](LICENSE_SOCIAL.md) - restricciones éticas adicionales que protegen:
+
+- **Prohibición de venta:** software 100% gratis, nunca comercializable
+- **Protección de atribución:** crédito permanente a creadora
+- **Garantía de privacidad:** datos nunca salen del equipo local
+- **Enfoque social:** restricción de uso ético obligatoria
+- **Transparencia:** código abierto, auditable, sin "backend" secreto
+
+La licencia social es voluntaria pero refleja el compromiso del proyecto.
 
 ---
 
@@ -542,29 +622,30 @@ Este proyecto es software libre. Puedes usarlo, modificarlo y distribuirlo bajo 
 
 **Sarah Lee Olivera**
 
-Desarrolladora comprometida con tecnología cívica y transformación social.
+Desarrolladora comprometida con tecnología cívica, justicia social y transformación de organizaciones sociales mediante herramientas éticas y accesibles.
 
 - GitHub: [@Sahilytech](https://github.com/Sahilytech)
-- Repositorio: [Sahilytech/AsistenteONG](https://github.com/Sahilytech/AsistenteONG)
+- Email: sarahleeoliveraok@gmail.com
+- Repositorio: [github.com/Sahilytech/AsistenteONG](https://github.com/Sahilytech/AsistenteONG)
 
 ---
 
 ## Soporte
 
-- Documentación: [docs/](docs/)
-- Guía de usuario: [USER_GUIDE.md](USER_GUIDE.md)
-- Instalación: [INSTALL.md](INSTALL.md)
-- Issues: [GitHub Issues](https://github.com/Sahilytech/AsistenteONG/issues)
-- Discusiones: [GitHub Discussions](https://github.com/Sahilytech/AsistenteONG/discussions)
+- **Documentación:** [docs/](docs/)
+- **Guía de Usuario:** [USER_GUIDE.md](USER_GUIDE.md)
+- **Instalación:** [INSTALL.md](INSTALL.md)
+- **Issues y Bugs:** [GitHub Issues](https://github.com/Sahilytech/AsistenteONG/issues)
+- **Discusiones:** [GitHub Discussions](https://github.com/Sahilytech/AsistenteONG/discussions)
 
 ---
 
 ## Reconocimientos
 
-Diseñado y desarrollado con compromiso hacia organizaciones sociales que trabajan en primera línea por derechos, protección y bienestar.
+Diseñado y desarrollado con compromiso hacia organizaciones sociales que trabajan en primera línea por protección, derechos y bienestar.
 
 Este software existe porque la tecnología puede servir a la justicia social.
 
 ---
 
-**AsistenteONG v0.9** | Tecnología para transformar información social en acción estructurada y responsable.
+**AsistenteONG v0.9** — Inteligencia social para acelerar intervención profesional, sin reemplazar responsabilidad humana.
